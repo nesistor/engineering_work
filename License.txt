@@ -1,0 +1,27 @@
+## Software License Agreement
+
+### 1. Definitions
+
+**Software** – refers to all materials, documentation, source code, and other resources provided by the Owner.
+
+**Owner** – refers to the individual or legal entity that holds the copyright to the Software.
+
+### 2. License Scope
+
+The Software is licensed, not sold. You are granted the right to use the Software under the terms outlined in this license.
+
+### 3. Restrictions
+
+1. **No Sharing**: You may not copy, distribute, or make the Software available to third parties without the written consent of the Owner.
+
+2. **No Usage**: You may not use the Software for commercial, public, or any other purposes without the explicit consent of the Owner.
+
+3. **No Modifications**: You may not modify, decompile, or otherwise attempt to obtain the source form of the Software unless permitted by law.
+
+### 4. Liability
+
+The Owner shall not be liable for any damages resulting from the use of the Software, including, but not limited to, indirect, special, incidental, or consequential damages.
+
+### 5. Final Provisions
+
+This license constitutes the entire agreement between you and the Owner concerning the Software. Any amendments to this license must be made in writing and signed by both parties.
