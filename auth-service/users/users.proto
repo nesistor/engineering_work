@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "/users";
+
+// Definicja wiadomości żądania
+message ValidateUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+// Definicja wiadomości odpowiedzi
+message ValidateUserResponse {
+  bool is_valid = 1;
+  int64 user_id = 2;
+  string message = 3; 
+}
+
+// Definicja serwisu do weryfikacji użytkownika
+service UserService {
+  rpc ValidateUser (ValidateUserRequest) returns (ValidateUserResponse);
+}

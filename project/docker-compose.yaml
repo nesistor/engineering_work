@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+
+  vault:
+    image: 'vault:1.13.2'
+    container_name: vault
+    ports:
+      - "8200:8200"
+    environment:
+      VAULT_ADDR: http://0.0.0.0:8200
+      VAULT_API_ADDR: http://localhost:8200
+      VAULT_DEV_ROOT_TOKEN_ID: root_token
+    cap_add:
+      - IPC_LOCK
+    volumes:
+      - ./vault/data:/vault/file
+    command: "server -dev -dev-root-token-id=root_token"
+    networks:
+      - vault-network
+
+  redis:
+    image: 'redis:7.0'
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - vault-network
+
+  authentication-service:
+    build:
+      context: ./../auth-service
+      dockerfile: ./../auth-service/auth-service.dockerfile
+    restart: always
+    ports:
+      - "8081:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      REDIS_URL: "redis://redis:6379"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: root_token
+    depends_on:
+      - redis
+      - vault
+    networks:
+      - vault-network
+
+networks:
+  vault-network:
+    driver: bridge
+
+volumes:
+  vault_data:
