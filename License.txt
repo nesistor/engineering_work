@@ -1,27 +1,21 @@
-## Software License Agreement
+MIT License
 
-### 1. Definitions
+Copyright (c) 2024 Karol Malicki Merito University of Wroclaw 
 
-**Software** – refers to all materials, documentation, source code, and other resources provided by the Owner.
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-**Owner** – refers to the individual or legal entity that holds the copyright to the Software.
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-### 2. License Scope
-
-The Software is licensed, not sold. You are granted the right to use the Software under the terms outlined in this license.
-
-### 3. Restrictions
-
-1. **No Sharing**: You may not copy, distribute, or make the Software available to third parties without the written consent of the Owner.
-
-2. **No Usage**: You may not use the Software for commercial, public, or any other purposes without the explicit consent of the Owner.
-
-3. **No Modifications**: You may not modify, decompile, or otherwise attempt to obtain the source form of the Software unless permitted by law.
-
-### 4. Liability
-
-The Owner shall not be liable for any damages resulting from the use of the Software, including, but not limited to, indirect, special, incidental, or consequential damages.
-
-### 5. Final Provisions
-
-This license constitutes the entire agreement between you and the Owner concerning the Software. Any amendments to this license must be made in writing and signed by both parties.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
