@@ -47,6 +47,59 @@ services:
     networks:
       - vault-network
 
+  postgres-users:
+    image: 'postgres:14.0'
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres-users/:/var/lib/postgresql/data/
+
+  user-service:
+    build:
+      context: ./../user-service
+      dockerfile: ./../user-service/user-service.dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+      - "50001:50001"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres-users port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: root_token
+    depends_on:
+      - postgres-users
+      - vault
+    networks:
+
+  flyway:
+    build:
+      context: ./../migrations
+      dockerfile: ./../migrations/migrations.dockerfile
+    depends_on:
+      - postgres-tokens
+      - postgres-users
+    restart: on-failure
+
+  postgres-users:
+    image: 'postgres:14.0'
+    ports:
+      - "5433:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: users
+    volumes:
+      - ./db-data/postgres-users/:/var/lib/postgresql/data/
+
 networks:
   vault-network:
     driver: bridge

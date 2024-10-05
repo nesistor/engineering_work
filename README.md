@@ -15,7 +15,7 @@ Clone the project
 Go to the project directory
 
 ```bash
-  cd enigneering_work
+  cd enigneering_work/project
 ```
 
 Start the server
