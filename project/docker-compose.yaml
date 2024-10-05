@@ -47,18 +47,6 @@ services:
     networks:
       - vault-network
 
-  postgres-users:
-    image: 'postgres:14.0'
-    ports:
-      - "5433:5432"
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: users
-    volumes:
-      - ./db-data/postgres-users/:/var/lib/postgresql/data/
-
   user-service:
     build:
       context: ./../user-service
@@ -78,13 +66,13 @@ services:
       - postgres-users
       - vault
     networks:
+      - vault-network
 
   flyway:
     build:
       context: ./../migrations
       dockerfile: ./../migrations/migrations.dockerfile
     depends_on:
-      - postgres-tokens
       - postgres-users
     restart: on-failure
 

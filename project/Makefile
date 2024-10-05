@@ -9,7 +9,7 @@ up:
 
 ## up_build: stops docker-compose (if running), builds all projects and starts docker compose
 up_build: build_auth user_auth
-	@echo "Stopping docker images (if running...)"
+	@echo "Stopping docker images (if running...)"								
 	docker-compose down
 	@echo "Building (when required) and starting docker images..."
 	docker-compose up --build -d
@@ -36,6 +36,6 @@ build_auth:
 
 	## build_auth: builds the auth binary as a linux executable
 build_user:
-	@echo "Building auth binary..."
-	cd ../user-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
+	@echo "Building user binary..."
+	cd ../user-service && env GOOS=linux CGO_ENABLED=0 go build -o ${USER_BINARY} ./cmd/api
 	@echo "Done!"
