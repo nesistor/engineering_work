@@ -43,7 +43,7 @@ func main() {
 	app := Config{
 		RedisClient: redisClient,
 		Models:      data.New(redisClient, keyManager),
-		KeyManager:  keyManager, // Przypisz KeyManager
+		KeyManager:  keyManager,
 	}
 
 	srv := &http.Server{
