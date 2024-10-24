@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+
+	"user-service/data"
 )
 
 // Register handles the registration of new users. It processes the request payload,

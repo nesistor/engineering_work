@@ -12,7 +12,7 @@ message ValidateUserRequest {
 message ValidateUserResponse {
   bool is_valid = 1;
   string message = 2;
-  string user_id = 3;  
+  int64 user_id = 3;  
 }
 service UserService {
   rpc ValidateUser (ValidateUserRequest) returns (ValidateUserResponse);

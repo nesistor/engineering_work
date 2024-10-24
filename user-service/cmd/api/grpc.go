@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"user-service/data"
-	"user-service/users"
 	"net"
 	"database/sql"
+
+	"user-service/data"
+	"user-service/users"
 
 	"google.golang.org/grpc"
 	
