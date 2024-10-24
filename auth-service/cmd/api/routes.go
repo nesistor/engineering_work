@@ -22,18 +22,18 @@ func (app *Config) routes() http.Handler {
 
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Post("/auth/login", app.Authenticate)
-	mux.Post("/auth/validate", app.IsTokenBlackListed)
-	mux.Post("/auth/refresh", app.RefreshToken)
-	mux.Post("/auth/blacklist", app.AddTokenToBlackList)
+	mux.Post("/api/auth/login", app.AuthenticateUser)
+	mux.Post("/api/admin/login", app.AuthenticateAdmin)
+	mux.Post("/api/auth/refresh", app.RefreshToken)
+	mux.Post("/api/auth/revoke", app.RevokeToken) 
 
 	mux.Route("/api/admin", func(mux chi.Router) {
-		mux.Use(app.AuthMiddleware)
+		mux.Use(app.AuthMiddleware("admin"))
 
-		mux.Post("/all-tokens/{id}", app.OneToken)
+		mux.Post("/all-tokens/{id}", app.OneToken) 
 	})
 
-	mux.Post("/auth/logout", app.AuthMiddleware(app.Logout))
+	mux.Post("/auth/logout", app.AuthMiddleware("user")(http.HandlerFunc(app.Logout)).ServeHTTP)
 
 	return mux
 }

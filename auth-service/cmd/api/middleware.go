@@ -31,18 +31,22 @@ func (app *Config) AuthMiddleware(requiredRole string) func(http.Handler) http.H
 
 			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-			// Parse the token without verifying the signature initially
+			// Parse the token and verify it
 			token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
-				// Always return the public key for verification
-				// Używamy jednego publicznego klucza, ale należy podać właściwy identyfikator (np. "kid")
-				publicKey, err := app.KeyManager.GetPublicKey("your-key-id") // Przekaż właściwy identyfikator klucza
-				if err != nil {
-					return nil, fmt.Errorf("failed to get public key: %v", err)
+
+				// Get the key ID from the token claims
+				if kid, ok := token.Header["kid"].(string); ok {
+					// Retrieve the public key using the key ID
+					publicKey, err := app.KeyManager.GetPublicKey(kid) // Użyj kid z nagłówka
+					if err != nil {
+						return nil, fmt.Errorf("failed to get public key: %v", err)
+					}
+					return publicKey, nil
 				}
-				return publicKey, nil
+				return nil, fmt.Errorf("missing key ID (kid) in token header")
 			})
 
 			if err != nil || !token.Valid {

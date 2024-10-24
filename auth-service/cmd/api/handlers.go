@@ -139,7 +139,6 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Logowanie operacji
 	err = app.logRequest("AuthenticateAdmin", fmt.Sprintf("Admin %s authenticated successfully", requestPayload.Email))
 	if err != nil {
 		app.errorJSON(w, err)
@@ -174,14 +173,12 @@ func (app *Config) RefreshToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Odświeżenie access tokena na podstawie refresh tokena JWT
 	accessToken, err := app.Models.Token.RefreshAccessToken(context.Background(), requestPayload.RefreshToken, "user-key")
 	if err != nil {
 		app.errorJSON(w, err, http.StatusUnauthorized)
 		return
 	}
 
-	// Logowanie operacji
 	err = app.logRequest("RefreshToken", "Access token refreshed successfully")
 	if err != nil {
 		app.errorJSON(w, err)
