@@ -16,7 +16,7 @@ import (
 
 const (
 	webPort  = "80"
-	gRPCPort = "50001"
+	gRPCPort = "50002"
 )
 
 var counts int64
@@ -29,7 +29,7 @@ type Config struct {
 }
 
 func main() {
-	log.Println("Starting auth service")
+	log.Println("Starting admin service")
 
 	vaultConfig := data.VaultConfig{
 		Address: os.Getenv("VAULT_ADDR"),

@@ -14,8 +14,8 @@ type contextKey string
 // ContextKeyUserID is key to store userID
 const ContextKeyUserID = contextKey("userID")
 
-// Check Authentication Header is correct for Admin and User and return their ID name userID
-func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
+// AuthUserMiddleware checks Authentication Header for users and verifies their roles
+func (app *Config) AuthUserMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		authHeader := r.Header.Get("Authorization")
@@ -31,7 +31,9 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
+		// Parse the token without a key to inspect claims
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Here we return nil since we want to parse the token without validating the signature
 			return nil, nil
 		})
 
@@ -40,44 +42,61 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		kid, ok := token.Header["kid"].(string)
-		if !ok {
-			app.errorJSON(w, fmt.Errorf("missing kid in token header"), http.StatusUnauthorized)
-			return
-		}
-
+		// Ensure claims are of the correct type
 		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
+		if !ok || !token.Valid {
 			app.errorJSON(w, fmt.Errorf("invalid token claims"), http.StatusUnauthorized)
 			return
 		}
 
+		// Check the role of the user
 		role, ok := claims["role"].(string)
-		if !ok {
-			app.errorJSON(w, fmt.Errorf("invalid role in token"), http.StatusUnauthorized)
+		if !ok || role != "user" {
+			app.errorJSON(w, fmt.Errorf("unauthorized role: %s", role), http.StatusUnauthorized)
 			return
 		}
 
-		var publicKey interface{}
-
-		if role == "admin" {
-			publicKey, err = app.KeyManager.GetPublicAdminKey() 
-			if err != nil {
-				app.errorJSON(w, fmt.Errorf("failed to get admin public key: %v", err), http.StatusUnauthorized)
-				return
-			}
-		} else {
-
-			publicKey, err = app.KeyManager.GetPublicKey(kid)
-			if err != nil {
-				app.errorJSON(w, fmt.Errorf("invalid KID: %s", kid), http.StatusUnauthorized)
-				return
-			}
+		// Retrieve the user ID from the claims
+		userID, ok := claims["user_id"].(float64)
+		if !ok {
+			app.errorJSON(w, fmt.Errorf("invalid user ID in token"), http.StatusUnauthorized)
+			return
 		}
 
-		token, err = jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		// Store the user ID in the context
+		ctx := context.WithValue(r.Context(), ContextKeyUserID, int64(userID))
+
+		// Call the next handler with the new context
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
+}
+
+// AuthAdminMiddleware checks if the user is an admin and verifies the JWT token
+func (app *Config) AuthAdminMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		authHeader := r.Header.Get("Authorization")
+		if authHeader == "" {
+			app.errorJSON(w, fmt.Errorf("missing Authorization header"), http.StatusUnauthorized)
+			return
+		}
+
+		if !strings.HasPrefix(authHeader, "Bearer ") {
+			app.errorJSON(w, fmt.Errorf("invalid Authorization header format"), http.StatusUnauthorized)
+			return
+		}
+
+		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+		// Parse the token without verifying the signature initially
+		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			// Only accept RSA signing method
 			if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
+			// Always return the public key for verification
+			publicKey, err := app.KeyManager.GetPublicKey() // Używamy jednego publicznego klucza
+			if err != nil {
+				return nil, fmt.Errorf("failed to get public key: %v", err)
 			}
 			return publicKey, nil
 		})
@@ -87,16 +106,31 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		userID, ok := claims["user_id"].(float64) 
+		claims, ok := token.Claims.(jwt.MapClaims)
+		if !ok {
+			app.errorJSON(w, fmt.Errorf("invalid token claims"), http.StatusUnauthorized)
+			return
+		}
+
+		// Sprawdzanie roli
+		role, ok := claims["role"].(string)
+		if !ok || role != "admin" {
+			app.errorJSON(w, fmt.Errorf("unauthorized: user is not an admin"), http.StatusForbidden)
+			return
+		}
+
+		// Pobieranie user_id z claims
+		userID, ok := claims["user_id"].(float64)
 		if !ok {
 			app.errorJSON(w, fmt.Errorf("invalid user ID in token"), http.StatusUnauthorized)
 			return
 		}
 
+		// Ustawienie userID w kontekście
 		ctx := context.WithValue(r.Context(), ContextKeyUserID, int64(userID))
 
-		// Call the next handler with the new context
+		// Przekazanie nowego kontekstu do następnego handlera
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
-	
+

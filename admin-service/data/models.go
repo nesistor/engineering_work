@@ -12,134 +12,98 @@ import (
 
 const dbTimeout = time.Second * 3
 
-type UserModel struct {
+type AdminModel struct {
 	DB *sql.DB
 }
 
 type Models struct {
-	User UserModel
+	Admin AdminModel
 }
 
 func New(db *sql.DB) Models {
 	return Models{
-		User: UserModel{DB: db},
+		Admin: AdminModel{DB: db},
 	}
 }
 
-type User struct {
+type Admin struct {
 	ID           int64     `json:"id"`
-	UserName     string    `json:"username"`
+	AdminName    string    `json:"admin_name"`
 	Email        string    `json:"email"`
 	PasswordHash string    `json:"passwordhash"`
 	CreatedAt    time.Time `json:"created_at"`
-	UpdatedAt    time.Time `json:"udpated_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
-// GetAll returns a slice of all users, sorted by last name
-func (u *UserModel) GetAllUsers() ([]*User, error) {
+// GetAdminByEmail retrieves an admin by their email address
+func (a *AdminModel) GetAdminByEmail(email string) (*Admin, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `SELECT id, email, first_name, last_name, passwordhash,
-			  created_at, updated_at FROM users ORDER BY last_name`
+	query := `SELECT id, email, admin_name, passwordhash, created_at, updated_at FROM admins WHERE email = $1`
 
-	rows, err := u.DB.QueryContext(ctx, query)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	var users []*User
-
-	for rows.Next() {
-		var user User
-		err := rows.Scan(
-			&user.ID,
-			&user.Email,
-			&user.UserName,
-			&user.PasswordHash,
-			&user.CreatedAt,
-			&user.UpdatedAt,
-		)
-		if err != nil {
-			log.Println("Error scanning", err)
-			return nil, err
-		}
-
-		users = append(users, &user)
-	}
-
-	return users, nil
-}
-
-func (u *UserModel) GetUserByEmail(email string) (*User, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
-	defer cancel()
-
-	query := `SELECT id, email, username, passwordhash, created_at, updated_at FROM users WHERE email = $1`
-
-	var user User
-	row := u.DB.QueryRowContext(ctx, query, email)
+	var admin Admin
+	row := a.DB.QueryRowContext(ctx, query, email)
 
 	err := row.Scan(
-		&user.ID,
-		&user.Email,
-		&user.UserName,
-		&user.PasswordHash,
-		&user.CreatedAt,
-		&user.UpdatedAt,
+		&admin.ID,
+		&admin.Email,
+		&admin.AdminName,
+		&admin.PasswordHash,
+		&admin.CreatedAt,
+		&admin.UpdatedAt,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return &admin, nil
 }
 
-func (u *UserModel) GetUserByID(id int64) (*User, error) {
+func (a *AdminModel) GetAdminByID(id int64) (*Admin, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `SELECT id, email, username, passwordhash, created_at, updated_at 
-	          FROM users 
+	query := `SELECT id, email, admin_name, passwordhash, created_at, updated_at 
+	          FROM admins 
 	          WHERE id = $1`
 
-	var user User
-	row := u.DB.QueryRowContext(ctx, query, id)
+	var admin Admin
+	row := a.DB.QueryRowContext(ctx, query, id)
 
 	err := row.Scan(
-		&user.ID,
-		&user.Email,
-		&user.UserName,
-		&user.PasswordHash,
-		&user.CreatedAt,
-		&user.UpdatedAt,
+		&admin.ID,
+		&admin.Email,
+		&admin.AdminName,
+		&admin.PasswordHash,
+		&admin.CreatedAt,
+		&admin.UpdatedAt,
 	)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return &user, nil
+	return &admin, nil
 }
 
-func (u *UserModel) InsertUser(user User) (int, error) {
+func (a *AdminModel) InsertAdmin(admin Admin) (int, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.PasswordHash), 12)
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(admin.PasswordHash), 12)
 	if err != nil {
 		return 0, err
 	}
 
 	var newID int
-	query := `INSERT INTO users (email, username, passwordhash, created_at, updated_at)
+	query := `INSERT INTO admins (email, admin_name, passwordhash, created_at, updated_at)
 			  VALUES ($1, $2, $3, $4, $5) RETURNING id`
 
-	err = u.DB.QueryRowContext(ctx, query,
-		user.Email,
-		user.UserName,
+	err = a.DB.QueryRowContext(ctx, query,
+		admin.Email,
+		admin.AdminName,
 		hashedPassword,
 		time.Now(),
 		time.Now(),
@@ -152,13 +116,13 @@ func (u *UserModel) InsertUser(user User) (int, error) {
 	return newID, nil
 }
 
-func (u *UserModel) DeleteUserByID(id int64) error {
+func (a *AdminModel) DeleteAdminByID(id int64) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `DELETE FROM users WHERE id = $1`
+	query := `DELETE FROM admins WHERE id = $1`
 
-	_, err := u.DB.ExecContext(ctx, query, id)
+	_, err := a.DB.ExecContext(ctx, query, id)
 	if err != nil {
 		return err
 	}
@@ -166,22 +130,22 @@ func (u *UserModel) DeleteUserByID(id int64) error {
 	return nil
 }
 
-func (u *UserModel) UpdateUser(user User) error {
+func (a *AdminModel) UpdateAdmin(admin Admin) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
-	query := `UPDATE users SET
+	query := `UPDATE admins SET
 		email = $1,
-		username = $2,
-				updated_at = $4
-		WHERE id = $5
+		admin_name = $2,
+		updated_at = $3
+		WHERE id = $4
 	`
 
-	_, err := u.DB.ExecContext(ctx, query,
-		user.Email,
-		user.UserName,
+	_, err := a.DB.ExecContext(ctx, query,
+		admin.Email,
+		admin.AdminName,
 		time.Now(),
-		user.ID,
+		admin.ID,
 	)
 
 	if err != nil {
@@ -191,7 +155,7 @@ func (u *UserModel) UpdateUser(user User) error {
 	return nil
 }
 
-func (u *UserModel) ResetUserPassword(userID int64, password string) error {
+func (a *AdminModel) ResetAdminPassword(adminID int64, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -200,8 +164,8 @@ func (u *UserModel) ResetUserPassword(userID int64, password string) error {
 		return err
 	}
 
-	stmt := `UPDATE users SET passwordhash = $1, updated_at = $2 WHERE id = $3`
-	_, err = u.DB.ExecContext(ctx, stmt, hashedPassword, time.Now(), userID)
+	stmt := `UPDATE admins SET passwordhash = $1, updated_at = $2 WHERE id = $3`
+	_, err = a.DB.ExecContext(ctx, stmt, hashedPassword, time.Now(), adminID)
 	if err != nil {
 		return err
 	}
@@ -209,19 +173,18 @@ func (u *UserModel) ResetUserPassword(userID int64, password string) error {
 	return nil
 }
 
-// PasswordMatches uses Go's bcrypt package to compare a user supplied password
-func (u *UserModel) PasswordMatches(userID int64, plainText string) (bool, error) {
+// PasswordMatches uses Go's bcrypt package to compare an admin supplied password
+func (a *AdminModel) PasswordMatches(adminID int64, plainText string) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
 	var hashedPassword string
-	query := `SELECT passwordhash FROM users WHERE id = $1`
-	err := u.DB.QueryRowContext(ctx, query, userID).Scan(&hashedPassword)
+	query := `SELECT passwordhash FROM admins WHERE id = $1`
+	err := a.DB.QueryRowContext(ctx, query, adminID).Scan(&hashedPassword)
 	if err != nil {
 		return false, err
 	}
 
-	log.Println("MODELS: Stored hashed password:", hashedPassword) // Debug Log
 	log.Println("MODELS: Request password:", plainText)
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainText))
@@ -233,7 +196,6 @@ func (u *UserModel) PasswordMatches(userID int64, plainText string) (bool, error
 		}
 		log.Println("MODELS: Other error in CompareHashAndPassword:", err)
 		return false, err
-
 	}
 
 	return true, nil

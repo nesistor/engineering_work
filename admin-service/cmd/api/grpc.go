@@ -2,56 +2,56 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"log"
-	"user-service/data"
-	"user-service/users"
 	"net"
-	"database/sql"
 
 	"google.golang.org/grpc"
-	
+
+	"admin-service/data"  
+	"admin-service/admin" 
 )
 
-type UserServer struct {
-	users.UnimplementedUserServiceServer
+type AdminServer struct {
+	admins.UnimplementedAdminServiceServer
 	Models data.Models
 }
 
-func (s *UserServer) ValidateUser(ctx context.Context, req *users.ValidateUserRequest) (*users.ValidateUserResponse, error) {
+func (s *AdminServer) ValidateAdmin(ctx context.Context, req *admins.ValidateAdminRequest) (*admins.ValidateAdminResponse, error) {
 	email := req.GetEmail()
 	password := req.GetPassword()
 
-	// Pobranie użytkownika z bazy danych na podstawie emaila
-	user, err := s.Models.User.GetUserByEmail(email)
+	// Pobranie administratora z bazy danych na podstawie emaila
+	admin, err := s.Models.Admin.GetAdminByEmail(email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &users.ValidateUserResponse{
+			return &admins.ValidateAdminResponse{
 				IsValid: false,
-				Message: "User not found",
+				Message: "Admin not found",
 			}, nil
 		}
 		return nil, err
 	}
 
 	// Weryfikacja hasła
-	valid, err := s.Models.User.PasswordMatches(user.ID, password)
+	valid, err := s.Models.Admin.PasswordMatches(admin.ID, password)
 	if err != nil || !valid {
-		return &users.ValidateUserResponse{
+		return &admins.ValidateAdminResponse{
 			IsValid: false,
 			Message: "Invalid password",
 		}, nil
 	}
 
-	// Odpowiedź, że użytkownik jest poprawny
-	return &users.ValidateUserResponse{
+	// Odpowiedź, że administrator jest poprawny
+	return &admins.ValidateAdminResponse{
 		IsValid: true,
-		UserId:  user.ID,
-		Message: "User authenticated successfully",
+		AdminId: admin.ID,
+		Message: "Admin authenticated successfully",
 	}, nil
 }
 
-// gRPCListen starts the gRPC server for the user service
+// gRPCListen starts the gRPC server for the admin service
 func (app *Config) gRPCListen() {
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", gRPCPort))
 	if err != nil {
@@ -59,7 +59,7 @@ func (app *Config) gRPCListen() {
 	}
 
 	s := grpc.NewServer()
-	users.RegisterUserServiceServer(s, &UserServer{Models: app.Models})
+	admins.RegisterAdminServiceServer(s, &AdminServer{Models: app.Models})
 
 	log.Printf("gRPC Server started on port %s", gRPCPort)
 
@@ -67,4 +67,3 @@ func (app *Config) gRPCListen() {
 		log.Fatalf("Failed to serve gRPC: %v", err)
 	}
 }
-

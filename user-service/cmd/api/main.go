@@ -29,7 +29,7 @@ type Config struct {
 }
 
 func main() {
-	log.Println("Starting auth service")
+	log.Println("Starting user service")
 
 	vaultConfig := data.VaultConfig{
 		Address: os.Getenv("VAULT_ADDR"),

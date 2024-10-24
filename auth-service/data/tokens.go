@@ -16,8 +16,6 @@ const (
 	RoleUser            = "user"
 )
 
-var ctx = context.Background()
-
 // TokenModel holds the Redis client and KeyManager for token handling.
 type TokenModel struct {
 	RedisClient *redis.Client
@@ -48,7 +46,7 @@ type JWTClaims struct {
 }
 
 // GenerateToken creates a JWT for the specified user with role, scope, and TTL.
-func (m *TokenModel) GenerateToken(userID int, role string, ttl time.Duration, scope, kid string) (string, error) {
+func (m *TokenModel) GenerateToken(ctx context.Context, userID int, role string, ttl time.Duration, scope, kid string) (string, error) {
 	claims := JWTClaims{
 		UserID: int64(userID),
 		Role:   role,
@@ -75,7 +73,7 @@ func (m *TokenModel) GenerateToken(userID int, role string, ttl time.Duration, s
 }
 
 // InsertDeactivatedToken stores a deactivated token in Redis.
-func (m *TokenModel) InsertDeactivatedToken(tokenString string, ttl time.Duration) error {
+func (m *TokenModel) InsertDeactivatedToken(ctx context.Context, tokenString string, ttl time.Duration) error {
 	key := fmt.Sprintf("deactivated_token:%s", tokenString)
 
 	err := m.RedisClient.Set(ctx, key, "deactivated", ttl).Err()
@@ -86,18 +84,8 @@ func (m *TokenModel) InsertDeactivatedToken(tokenString string, ttl time.Duratio
 	return nil
 }
 
-// DeleteToken marks the token as deactivated by adding it to Redis (blacklist).
-func (m *TokenModel) DeleteToken(userID int64, tokenString string, ttl time.Duration) error {
-	err := m.InsertDeactivatedToken(tokenString, ttl)
-	if err != nil {
-		return fmt.Errorf("failed to mark token as deactivated: %v", err)
-	}
-
-	return nil
-}
-
 // IsTokenDeactivated checks if a token has been added to the deactivated list in Redis.
-func (m *TokenModel) IsTokenDeactivated(tokenString string) (bool, error) {
+func (m *TokenModel) IsTokenDeactivated(ctx context.Context, tokenString string) (bool, error) {
 	key := fmt.Sprintf("deactivated_token:%s", tokenString)
 
 	exists, err := m.RedisClient.Exists(ctx, key).Result()
@@ -109,9 +97,9 @@ func (m *TokenModel) IsTokenDeactivated(tokenString string) (bool, error) {
 }
 
 // GetUserIDForToken retrieves the user ID and role from a token, ensuring it is valid and has the correct scope.
-func (m *TokenModel) GetUserIDForToken(tokenString, scope string) (int64, string, error) {
+func (m *TokenModel) GetUserIDForToken(ctx context.Context, tokenString, scope string) (int64, string, error) {
 
-	deactivated, err := m.IsTokenDeactivated(tokenString)
+	deactivated, err := m.IsTokenDeactivated(ctx, tokenString)
 	if err != nil {
 		return 0, "", err
 	}
@@ -150,14 +138,14 @@ func (m *TokenModel) GetUserIDForToken(tokenString, scope string) (int64, string
 }
 
 // RefreshAccessToken creates a new access token based on a valid refresh token.
-func (m *TokenModel) RefreshAccessToken(refreshToken, kid string) (string, error) {
+func (m *TokenModel) RefreshAccessToken(ctx context.Context, refreshToken, kid string) (string, error) {
 
-	userID, role, err := m.GetUserIDForToken(refreshToken, ScopeRefresh)
+	userID, role, err := m.GetUserIDForToken(ctx, refreshToken, ScopeRefresh)
 	if err != nil {
 		return "", fmt.Errorf("failed to refresh access token: %v", err)
 	}
 
-	accessToken, err := m.GenerateToken(int(userID), role, 15*time.Minute, ScopeAuthentication, kid)
+	accessToken, err := m.GenerateToken(ctx, int(userID), role, 15*time.Minute, ScopeAuthentication, kid)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate access token: %v", err)
 	}
