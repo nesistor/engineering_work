@@ -12,6 +12,8 @@ import (
 const (
 	ScopeAuthentication = "authentication"
 	ScopeRefresh        = "refresh"
+	RoleAdmin           = "admin"
+	RoleUser            = "user"
 )
 
 var ctx = context.Background()
@@ -37,17 +39,19 @@ func New(redisClient *redis.Client, keyManager *KeyManager) Models {
 	}
 }
 
-// JWTClaims stores extra JWT information.
+// JWTClaims stores extra JWT information, including role and scope.
 type JWTClaims struct {
 	UserID int64  `json:"user_id"`
+	Role   string `json:"role"`  // Role (admin/user)
 	Scope  string `json:"scope"`
 	jwt.RegisteredClaims
 }
 
-// GenerateToken creates a JWT for the specified user and scope, with a given TTL.
-func (m *TokenModel) GenerateToken(userID int, ttl time.Duration, scope, kid string) (string, error) {
+// GenerateToken creates a JWT for the specified user with role, scope, and TTL.
+func (m *TokenModel) GenerateToken(userID int, role string, ttl time.Duration, scope, kid string) (string, error) {
 	claims := JWTClaims{
 		UserID: int64(userID),
+		Role:   role,
 		Scope:  scope,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
@@ -70,7 +74,7 @@ func (m *TokenModel) GenerateToken(userID int, ttl time.Duration, scope, kid str
 	return signedToken, nil
 }
 
-// InsertDeactivatedToken stores a **deactivated** token in Redis.
+// InsertDeactivatedToken stores a deactivated token in Redis.
 func (m *TokenModel) InsertDeactivatedToken(tokenString string, ttl time.Duration) error {
 	key := fmt.Sprintf("deactivated_token:%s", tokenString)
 
@@ -104,56 +108,56 @@ func (m *TokenModel) IsTokenDeactivated(tokenString string) (bool, error) {
 	return exists > 0, nil
 }
 
-// GetUserIDForToken retrieves the user ID from a token, ensuring it is valid and has the correct scope.
-func (m *TokenModel) GetUserIDForToken(tokenString, scope string) (int64, error) {
+// GetUserIDForToken retrieves the user ID and role from a token, ensuring it is valid and has the correct scope.
+func (m *TokenModel) GetUserIDForToken(tokenString, scope string) (int64, string, error) {
 
 	deactivated, err := m.IsTokenDeactivated(tokenString)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	if deactivated {
-		return 0, fmt.Errorf("token has been deactivated")
+		return 0, "", fmt.Errorf("token has been deactivated")
 	}
 
 	token, _, err := new(jwt.Parser).ParseUnverified(tokenString, &JWTClaims{})
 	if err != nil {
-		return 0, fmt.Errorf("failed to parse token: %v", err)
+		return 0, "", fmt.Errorf("failed to parse token: %v", err)
 	}
 
 	kid, ok := token.Header["kid"].(string)
 	if !ok {
-		return 0, fmt.Errorf("kid missing from token header")
+		return 0, "", fmt.Errorf("kid missing from token header")
 	}
 
 	publicKey, err := m.KeyManager.GetPublicKey(kid)
 	if err != nil {
-		return 0, fmt.Errorf("public key not found for kid: %s, %v", kid, err)
+		return 0, "", fmt.Errorf("public key not found for kid: %s, %v", kid, err)
 	}
 
 	token, err = jwt.ParseWithClaims(tokenString, &JWTClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return publicKey, nil
 	})
 	if err != nil {
-		return 0, fmt.Errorf("failed to verify token: %v", err)
+		return 0, "", fmt.Errorf("failed to verify token: %v", err)
 	}
 
 	claims, ok := token.Claims.(*JWTClaims)
 	if !ok || !token.Valid || claims.Scope != scope {
-		return 0, fmt.Errorf("invalid or unauthorized token")
+		return 0, "", fmt.Errorf("invalid or unauthorized token")
 	}
 
-	return claims.UserID, nil
+	return claims.UserID, claims.Role, nil
 }
 
 // RefreshAccessToken creates a new access token based on a valid refresh token.
 func (m *TokenModel) RefreshAccessToken(refreshToken, kid string) (string, error) {
 
-	userID, err := m.GetUserIDForToken(refreshToken, ScopeRefresh)
+	userID, role, err := m.GetUserIDForToken(refreshToken, ScopeRefresh)
 	if err != nil {
 		return "", fmt.Errorf("failed to refresh access token: %v", err)
 	}
 
-	accessToken, err := m.GenerateToken(int(userID), 15*time.Minute, ScopeAuthentication, kid)
+	accessToken, err := m.GenerateToken(int(userID), role, 15*time.Minute, ScopeAuthentication, kid)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate access token: %v", err)
 	}

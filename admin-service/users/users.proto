@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package users;
+
+option go_package = "/users"; 
+
+message ValidateUserRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message ValidateUserResponse {
+  bool is_valid = 1;
+  string message = 2;
+  string user_id = 3;  
+}
+service UserService {
+  rpc ValidateUser (ValidateUserRequest) returns (ValidateUserResponse);
+}

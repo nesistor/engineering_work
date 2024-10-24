@@ -1,9 +1,8 @@
 package main
 
 import (
-	"auth-service/data"
-	"auth-service/users"
-	
+	"auth/data"
+	"auth/users"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -16,10 +15,13 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 )
 
-// Authenticate handles user authentication by validating the provided email and password.
-// It reads the request payload, establishes a gRPC connection to the user service. 
-// If the credentials are valid, it generates access and refresh tokens.
-func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
+const (
+	userServiceAddress = "user-service:50001"
+	adminServiceAddress = "admin-service:50002")
+
+// AuthenticateUser handles user authentication by validating email and password.
+// It assigns the "user" role if authentication is successful.
+func (app *Config) AuthenticateUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
@@ -31,7 +33,8 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	conn, err := grpc.Dial("user-service:50001", grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	// Używamy user-service dla autoryzacji użytkownika
+	conn, err := grpc.Dial(userServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -39,7 +42,6 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 	defer conn.Close()
 
 	c := users.NewUserServiceClient(conn)
-
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
@@ -47,37 +49,26 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 		Email:    requestPayload.Email,
 		Password: requestPayload.Password,
 	})
+	if err != nil || !response.IsValid {
+		app.errorJSON(w, fmt.Errorf("invalid credentials"), http.StatusUnauthorized)
+		return
+	}
+
+	// Generowanie tokenu z rolą "user"
+	accessToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleUser, 15*time.Minute, data.ScopeAuthentication, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	if !response.IsValid {
-		payload := jsonResponse{
-			Error:   true,
-			Message: response.Message,
-			Status:  http.StatusUnauthorized,
-		}
-		err = app.writeJSON(w, http.StatusUnauthorized, payload)
-		if err != nil {
-			app.errorJSON(w, err)
-		}
-		return
-	}
-
-	accessToken, err := app.Models.Token.GenerateToken(int(response.UserId), 15*time.Minute, data.ScopeAuthentication)
+	refreshToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleUser, 7*24*time.Hour, data.ScopeRefresh, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	refreshToken, err := app.Models.Token.GenerateToken(int(response.UserId), 7*24*time.Hour, data.ScopeRefresh)
-	if err != nil {
-		app.errorJSON(w, err)
-		return
-	}
-
-	err = app.logRequest("authentication", fmt.Sprintf("%s logged in", requestPayload.Email))
+	// Logowanie operacji
+	err = app.logRequest("AuthenticateUser", fmt.Sprintf("User %s authenticated successfully", requestPayload.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -85,10 +76,79 @@ func (app *Config) Authenticate(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: fmt.Sprintf("Logged in user %s", requestPayload.Email),
+		Message: fmt.Sprintf("User %s authenticated successfully", requestPayload.Email),
 		Status:  http.StatusOK,
 		Data: map[string]interface{}{
-			"user_id":       response.UserId,
+			"access_token":  accessToken,
+			"refresh_token": refreshToken,
+		},
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+// AuthenticateAdmin handles admin authentication by validating credentials against admin-service.
+func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	// Używamy admin-service dla autoryzacji administratora
+	conn, err := grpc.Dial(adminServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	defer conn.Close()
+
+	c := users.NewUserServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	response, err := c.ValidateAdmin(ctx, &admins.ValidateAdminRequest{
+		Email:    requestPayload.Email,
+		Password: requestPayload.Password,
+	})
+	if err != nil || !response.IsValid {
+		app.errorJSON(w, fmt.Errorf("invalid admin credentials"), http.StatusUnauthorized)
+		return
+	}
+
+	// Generowanie tokenu z rolą "admin"
+	accessToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "admin-key")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	refreshToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleAdmin, 7*24*time.Hour, data.ScopeRefresh, "admin-key")
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// Logowanie operacji
+	err = app.logRequest("AuthenticateAdmin", fmt.Sprintf("Admin %s authenticated successfully", requestPayload.Email))
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("Admin %s authenticated successfully", requestPayload.Email),
+		Status:  http.StatusOK,
+		Data: map[string]interface{}{
 			"access_token":  accessToken,
 			"refresh_token": refreshToken,
 		},
@@ -113,9 +173,16 @@ func (app *Config) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Odświeżenie access tokena na podstawie refresh tokena JWT
-	accessToken, err := app.Models.Token.RefreshAccessToken(requestPayload.RefreshToken)
+	accessToken, err := app.Models.Token.RefreshAccessToken(requestPayload.RefreshToken, "user-key")
 	if err != nil {
 		app.errorJSON(w, err, http.StatusUnauthorized)
+		return
+	}
+
+	// Logowanie operacji
+	err = app.logRequest("RefreshToken", "Access token refreshed successfully")
+	if err != nil {
+		app.errorJSON(w, err)
 		return
 	}
 
@@ -134,40 +201,18 @@ func (app *Config) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// RevokeToken ...
-func (app *Config) RevokeToken(w http.ResponseWriter, r *http.Request) {
-	var requestPayload struct {
-		Token string `json:"token"`
-	}
-
-	err := app.readJSON(w, r, &requestPayload)
-	if err != nil {
-		app.errorJSON(w, err, http.StatusBadRequest)
-		return
-	}
-
-	// Dodaj token do blacklisty w Redis
-	err = app.Models.Token.DeleteToken(requestPayload.Token) 
-	if err != nil {
-		app.errorJSON(w, err)
-		return
-	}
-
-	payload := jsonResponse{
-		Error:   false,
-		Message: "Token revoked successfully",
-		Status:  http.StatusOK,
-	}
-
-	err = app.writeJSON(w, http.StatusOK, payload)
-	if err != nil {
-		app.errorJSON(w, err)
-	}
+// ValidateUserToken validates a token for a regular user role.
+func (app *Config) ValidateUserToken(w http.ResponseWriter, r *http.Request) {
+	app.validateTokenWithRole(w, r, data.RoleUser)
 }
 
-// ValidateUserToken ...
-func (app *Config) ValidateUserToken(w http.ResponseWriter, r *http.Request) {
+// ValidateAdminToken validates a token for the admin role.
+func (app *Config) ValidateAdminToken(w http.ResponseWriter, r *http.Request) {
+	app.validateTokenWithRole(w, r, data.RoleAdmin)
+}
 
+// validateTokenWithRole validates a token, ensuring the correct role and scope.
+func (app *Config) validateTokenWithRole(w http.ResponseWriter, r *http.Request, requiredRole string) {
 	authHeader := r.Header.Get("Authorization")
 	if authHeader == "" {
 		app.errorJSON(w, fmt.Errorf("missing Authorization header"), http.StatusUnauthorized)
@@ -181,28 +226,64 @@ func (app *Config) ValidateUserToken(w http.ResponseWriter, r *http.Request) {
 
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	valid, err := app.Models.Token.IsTokenValid(token, data.ScopeAuthentication)
+	userID, role, err := app.Models.Token.GetUserIDForToken(token, data.ScopeAuthentication)
+	if err != nil || role != requiredRole {
+		app.errorJSON(w, fmt.Errorf("unauthorized or invalid token"), http.StatusUnauthorized)
+		return
+	}
+
+	// Logowanie operacji
+	err = app.logRequest("ValidateToken", fmt.Sprintf("Token for user %d with role %s validated", userID, role))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	if !valid {
-		payload := jsonResponse{
-			Error:   true,
-			Message: "Invalid or expired token",
-			Status:  http.StatusUnauthorized,
-		}
-		err = app.writeJSON(w, http.StatusUnauthorized, payload)
-		if err != nil {
-			app.errorJSON(w, err)
-		}
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("Token is valid for %s", requiredRole),
+		Status:  http.StatusOK,
+		Data: map[string]interface{}{
+			"user_id": userID,
+			"role":    role,
+		},
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+// RevokeToken handles token revocation (blacklisting in Redis).
+func (app *Config) RevokeToken(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Token string `json:"token"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	// Dezaktywowanie tokenu poprzez dodanie go do blacklisty (Redis)
+	err = app.Models.Token.DeleteToken(0, requestPayload.Token, 7*24*time.Hour) // 7 dni TTL
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	// Logowanie operacji
+	err = app.logRequest("RevokeToken", "Token revoked successfully")
+	if err != nil {
+		app.errorJSON(w, err)
 		return
 	}
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: "Token is valid",
+		Message: "Token revoked successfully",
 		Status:  http.StatusOK,
 	}
 

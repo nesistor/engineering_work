@@ -8,7 +8,7 @@ import (
 	"os"
 	"time"
 
-	"auth-service/data"
+	"auth/data"
 
 	"github.com/go-redis/redis/v8"
 )

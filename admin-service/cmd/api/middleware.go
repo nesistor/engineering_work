@@ -61,7 +61,7 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 		var publicKey interface{}
 
 		if role == "admin" {
-			publicKey, err = app.KeyManager.GetAdminPublicKey()
+			publicKey, err = app.KeyManager.GetPublicAdminKey() 
 			if err != nil {
 				app.errorJSON(w, fmt.Errorf("failed to get admin public key: %v", err), http.StatusUnauthorized)
 				return
@@ -87,7 +87,7 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
-		userID, ok := claims["user_id"].(float64)
+		userID, ok := claims["user_id"].(float64) 
 		if !ok {
 			app.errorJSON(w, fmt.Errorf("invalid user ID in token"), http.StatusUnauthorized)
 			return
@@ -95,6 +95,8 @@ func (app *Config) AuthMiddleware(next http.Handler) http.Handler {
 
 		ctx := context.WithValue(r.Context(), ContextKeyUserID, int64(userID))
 
+		// Call the next handler with the new context
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
+	

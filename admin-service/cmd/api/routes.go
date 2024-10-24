@@ -22,18 +22,21 @@ func (app *Config) routes() http.Handler {
 
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Post("/auth/login", app.Authenticate)
-	mux.Post("/auth/validate", app.IsTokenBlackListed)
-	mux.Post("/auth/refresh", app.RefreshToken)
-	mux.Post("/auth/blacklist", app.AddTokenToBlackList)
+	userRouter := chi.NewRouter()
+	mux.Mount("/user", userRouter)
 
-	mux.Route("/api/admin", func(mux chi.Router) {
-		mux.Use(app.AuthMiddleware)
+	userRouter.Post("/register", app.Register)
+	userRouter.Get("/check-email", app.CheckEmailExists)
+	userRouter.Post("/forgot-password", app.SendPasswordResetEmail)
+	userRouter.Post("/reset-password", app.ResetPassword)
 
-		mux.Post("/all-tokens/{id}", app.OneToken)
+	userRouter.Group(func(r chi.Router) {
+		r.Use(middleware.AuthMiddleware) 
+
+		r.Delete("/delete/{user_id}", app.DeleteUserByID)
+		r.Post("/change-password", app.ChangePassword)
+		r.Put("/update/{user_id}", app.UpdateUser)
 	})
-
-	mux.Post("/auth/logout", app.AuthMiddleware(app.Logout))
 
 	return mux
 }

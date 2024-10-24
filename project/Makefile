@@ -8,7 +8,7 @@ up:
 	@echo "Docker images started!"
 
 ## up_build: stops docker-compose (if running), builds all projects and starts docker compose
-up_build: build_auth user_auth
+up_build: build_auth build_user					
 	@echo "Stopping docker images (if running...)"								
 	docker-compose down
 	@echo "Building (when required) and starting docker images..."
@@ -19,7 +19,7 @@ up_build: build_auth user_auth
 down:
 	@echo "Stopping docker compose..."
 	docker-compose down
-	@echo "Stopping docker compose and
+	@echo "Stopped containers succesfully"
 
 ## down_rm: stop and remove all of data about containers
 down_rm:
@@ -27,15 +27,14 @@ down_rm:
 	docker-compose down -v
 	@echo "Stoping and remove running containers"
 
-
 ## build_auth: builds the auth binary as a linux executable
 build_auth:
 	@echo "Building auth binary..."
 	cd ../auth-service && env GOOS=linux CGO_ENABLED=0 go build -o ${AUTH_BINARY} ./cmd/api
 	@echo "Done!"
 
-	## build_auth: builds the auth binary as a linux executable
+## build_user: builds the user binary as a linux executable
 build_user:
 	@echo "Building user binary..."
 	cd ../user-service && env GOOS=linux CGO_ENABLED=0 go build -o ${USER_BINARY} ./cmd/api
-	@echo "Done!"
+	@echo "Done!"	

@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
 
   vault:
     image: 'vault:1.13.2'
     container_name: vault
-    ports:
+    ports:    
       - "8200:8200"
     environment:
       VAULT_ADDR: http://0.0.0.0:8200
@@ -30,7 +28,7 @@ services:
   authentication-service:
     build:
       context: ./../auth-service
-      dockerfile: ./../auth-service/auth-service.dockerfile
+      dockerfile: auth-service.dockerfile
     restart: always
     ports:
       - "8081:80"
