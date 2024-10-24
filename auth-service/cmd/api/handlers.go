@@ -17,7 +17,8 @@ import (
 
 const (
 	userServiceAddress = "user-service:50001"
-	adminServiceAddress = "admin-service:50002")
+	adminServiceAddress = "admin-service:50002"
+)
 
 // AuthenticateUser handles user authentication by validating email and password.
 // It assigns the "user" role if authentication is successful.
@@ -55,13 +56,13 @@ func (app *Config) AuthenticateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generowanie tokenu z rolą "user"
-	accessToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleUser, 15*time.Minute, data.ScopeAuthentication, "user-key")
+	accessToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleUser, 15*time.Minute, data.ScopeAuthentication, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	refreshToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleUser, 7*24*time.Hour, data.ScopeRefresh, "user-key")
+	refreshToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleUser, 7*24*time.Hour, data.ScopeRefresh, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -90,7 +91,7 @@ func (app *Config) AuthenticateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// AuthenticateAdmin handles admin authentication by validating credentials against admin-service.
+// AuthenticateAdmin handles admin authentication by validating credentials.
 func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email    string `json:"email"`
@@ -125,13 +126,13 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generowanie tokenu z rolą "admin"
-	accessToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "admin-key")
+	accessToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	refreshToken, err := app.Models.Token.GenerateToken(int(response.UserId), data.RoleAdmin, 7*24*time.Hour, data.ScopeRefresh, "admin-key")
+	refreshToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleAdmin, 7*24*time.Hour, data.ScopeRefresh, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -173,7 +174,7 @@ func (app *Config) RefreshToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Odświeżenie access tokena na podstawie refresh tokena JWT
-	accessToken, err := app.Models.Token.RefreshAccessToken(requestPayload.RefreshToken, "user-key")
+	accessToken, err := app.Models.Token.RefreshAccessToken(context.Background(), requestPayload.RefreshToken, "user-key")
 	if err != nil {
 		app.errorJSON(w, err, http.StatusUnauthorized)
 		return
@@ -226,7 +227,7 @@ func (app *Config) validateTokenWithRole(w http.ResponseWriter, r *http.Request,
 
 	token := strings.TrimPrefix(authHeader, "Bearer ")
 
-	userID, role, err := app.Models.Token.GetUserIDForToken(token, data.ScopeAuthentication)
+	userID, role, err := app.Models.Token.GetUserIDForToken(context.Background(), token, data.ScopeAuthentication)
 	if err != nil || role != requiredRole {
 		app.errorJSON(w, fmt.Errorf("unauthorized or invalid token"), http.StatusUnauthorized)
 		return
@@ -268,7 +269,7 @@ func (app *Config) RevokeToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Dezaktywowanie tokenu poprzez dodanie go do blacklisty (Redis)
-	err = app.Models.Token.DeleteToken(0, requestPayload.Token, 7*24*time.Hour) // 7 dni TTL
+	err = app.Models.Token.InsertDeactivatedToken(context.Background(), requestPayload.Token, 7*24*time.Hour) // 7 dni TTL
 	if err != nil {
 		app.errorJSON(w, err)
 		return
