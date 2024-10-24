@@ -3,6 +3,7 @@ package main
 import (
 	"auth/data"
 	"auth/users"
+	"auth/admin"
 	"bytes"
 	"context"
 	"encoding/json"
@@ -112,11 +113,11 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 	defer conn.Close()
 
-	c := users.NewUserServiceClient(conn)
+	c := admin.NewAdminServiceClient(conn)
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	response, err := c.ValidateAdmin(ctx, &admins.ValidateAdminRequest{
+	response, err := c.ValidateAdmin(ctx, &admin.ValidateAdminRequest{
 		Email:    requestPayload.Email,
 		Password: requestPayload.Password,
 	})
@@ -126,13 +127,13 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Generowanie tokenu z rolą "admin"
-	accessToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "user-key")
+	accessToken, err := app.Models.Token.GenerateToken(ctx, int(response.AdminId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	refreshToken, err := app.Models.Token.GenerateToken(ctx, int(response.UserId), data.RoleAdmin, 7*24*time.Hour, data.ScopeRefresh, "user-key")
+	refreshToken, err := app.Models.Token.GenerateToken(ctx, int(response.AdminId), data.RoleAdmin, 7*24*time.Hour, data.ScopeRefresh, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
 		return

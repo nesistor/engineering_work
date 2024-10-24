@@ -15,7 +15,7 @@ type contextKey string
 const ContextKeyUserID = contextKey("userID")
 
 // AuthMiddleware checks Authentication Header for both users and admins
-func (app *Config) AuthMiddleware(requiredRole string) http.HandlerFunc {
+func (app *Config) AuthMiddleware(requiredRole string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -37,7 +37,8 @@ func (app *Config) AuthMiddleware(requiredRole string) http.HandlerFunc {
 					return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 				}
 				// Always return the public key for verification
-				publicKey, err := app.KeyManager.GetPublicKey() // Używamy jednego publicznego klucza
+				// Używamy jednego publicznego klucza, ale należy podać właściwy identyfikator (np. "kid")
+				publicKey, err := app.KeyManager.GetPublicKey("your-key-id") // Przekaż właściwy identyfikator klucza
 				if err != nil {
 					return nil, fmt.Errorf("failed to get public key: %v", err)
 				}
