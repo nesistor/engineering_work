@@ -1,13 +1,14 @@
 package main
 
 import (
+	"user-service/keys"
+	"user-service/data"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"time"
-	"user-service/data"
 
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"

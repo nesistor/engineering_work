@@ -1,5 +1,6 @@
 AUTH_BINARY=authApp
 USER_BINARY=userApp
+ADMIN_BINARY=adminApp
 
 ## up: starts all containers in the background without forcing build
 up:
@@ -37,4 +38,10 @@ build_auth:
 build_user:
 	@echo "Building user binary..."
 	cd ../user-service && env GOOS=linux CGO_ENABLED=0 go build -o ${USER_BINARY} ./cmd/api
+	@echo "Done!"	
+
+## build_user: builds the user binary as a linux executable
+build_admin:
+	@echo "Building user binary..."
+	cd ../admin-service && env GOOS=linux CGO_ENABLED=0 go build -o ${ADMIN_BINARY} ./cmd/api
 	@echo "Done!"	

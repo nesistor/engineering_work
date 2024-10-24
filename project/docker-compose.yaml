@@ -17,14 +17,6 @@ services:
     networks:
       - vault-network
 
-  redis:
-    image: 'redis:7.0'
-    container_name: redis
-    ports:
-      - "6379:6379"
-    networks:
-      - vault-network
-
   authentication-service:
     build:
       context: ./../auth-service
@@ -66,6 +58,35 @@ services:
     networks:
       - vault-network
 
+  user-service:
+    build:
+      context: ./../user-service
+      dockerfile: ./../user-service/user-service.dockerfile
+    restart: always
+    ports:
+      - "8082:80"
+      - "50001:50001"
+    deploy:
+      mode: replicated
+      replicas: 1
+    environment:
+      DSN: "host=postgres-admins port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+      VAULT_ADDR: "http://vault:8200"
+      VAULT_TOKEN: root_token
+    depends_on:
+      - postgres-users
+      - vault
+    networks:
+      - vault-network
+
+  redis:
+    image: 'redis:7.0'
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - vault-network
+
   flyway:
     build:
       context: ./../migrations
@@ -73,6 +94,7 @@ services:
     depends_on:
       - postgres-users
     restart: on-failure
+
 
   postgres-users:
     image: 'postgres:14.0'
