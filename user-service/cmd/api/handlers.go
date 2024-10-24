@@ -7,13 +7,12 @@ import (
 	"fmt"
 	"net/http"
 	"time"
+	"strconv"
+
 	"user-service/data"
 )
 
-// Register handles the registration of new users. It processes the request payload,
-// checks for existing users with the same email, hashes the provided password, and
-// inserts the new user into the database.
-// .
+// Register handles the registration of new user
 func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email    string `json:"email"`
@@ -81,7 +80,6 @@ func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Prepare the response payload
 	payload := jsonResponse{
 		Error:   false,
 		Message: "Users retrieved successfully",
@@ -90,7 +88,6 @@ func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 		},
 	}
 
-	// Write the JSON response
 	err = app.writeJSON(w, http.StatusOK, payload)
 	if err != nil {
 		app.errorJSON(w, err)
@@ -146,21 +143,18 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create a struct to hold the new password
 	var requestPayload struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
-	// Read the JSON payload
 	err := app.readJSON(w, r, &requestPayload)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
 
-	// Verify the token. Check both return values.
-	isValidToken, err := app.Models.User.VerifyToken(token)
+	isValidToken, err := app.Models.Token.ValidateResetToken(token, "ka")
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -170,14 +164,12 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Update the password in the database
 	err = app.Models.User.UpdateUserPassword(requestPayload.Email, requestPayload.Password)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	// Respond with a success message
 	payload := jsonResponse{
 		Error:   false,
 		Message: "Password changed successfully",
@@ -232,6 +224,46 @@ func (app *Config) SendResetPasswordEmail(email, token string) error {
 	}
 
 	return nil
+}
+
+
+// DeleteUser handles the deletion of a user based on their ID passed in the URL.
+func (app *Config) DeleteUser(w http.ResponseWriter, r *http.Request) {
+	// Extract user ID from the URL path
+	vars := r.URL.Query()
+	idStr := vars.Get("user_id")
+
+	// Convert the user ID from string to int64
+	userID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || userID < 1 {
+		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
+		return
+	}
+
+	// Call the DeleteUserByID method from the user model
+	err = app.Models.User.DeleteUserByID(userID)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	// Log the user deletion request
+	err = app.logRequest("delete_user", fmt.Sprintf("User with ID %d deleted", userID))
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with a success message
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("User with ID %d deleted successfully", userID),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
 }
 
 func (app *Config) logRequest(name, data string) error {

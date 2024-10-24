@@ -23,14 +23,14 @@ func (app *Config) routes() http.Handler {
 	mux.Use(middleware.Heartbeat("/ping"))
 
 	mux.Post("/api/user/register", app.Register)
-	mux.Get("/api/user/check-email", app.ChceckEmailExists)
-	mux.Post("/api/user/forgot-password", app.SendPasswordResetEmail) 
+	mux.Get("/api/user/check-email", app.CheckEmail)
+	mux.Post("/api/user/forgot-password", app.SendResetPasswordEmail) 
 	mux.Post("/reset-password", app.ResetPassword)
 
 	mux.Route("/api/user", func(mux chi.Router) {
 		mux.Use(app.AuthMiddleware("user"))
 		
-		mux.Delete("/delete/{user_id}", app.DeleteUserByID)
+		mux.Delete("/delete-user/{user_id}", app.DeleteUser)
 		mux.Post("/change-password", app.ChangePassword)
 		mux.Put("/update/{user_id}", app.UpdateUser)
 		

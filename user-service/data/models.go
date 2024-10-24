@@ -18,11 +18,13 @@ type UserModel struct {
 
 type Models struct {
 	User UserModel
+	Token TokenModel
 }
 
 func New(db *sql.DB) Models {
 	return Models{
 		User: UserModel{DB: db},
+		Token: TokenModel{DB: db},
 	}
 }
 
@@ -191,7 +193,8 @@ func (u *UserModel) UpdateUser(user User) error {
 	return nil
 }
 
-func (u *UserModel) ResetUserPassword(userID int64, password string) error {
+// UpdateUserPassword updates the user's password in the database.
+func (u *UserModel) UpdateUserPassword(email string, password string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
 	defer cancel()
 
@@ -200,13 +203,31 @@ func (u *UserModel) ResetUserPassword(userID int64, password string) error {
 		return err
 	}
 
-	stmt := `UPDATE users SET passwordhash = $1, updated_at = $2 WHERE id = $3`
-	_, err = u.DB.ExecContext(ctx, stmt, hashedPassword, time.Now(), userID)
+	stmt := `UPDATE users SET passwordhash = $1, updated_at = $2 WHERE email = $3`
+	_, err = u.DB.ExecContext(ctx, stmt, hashedPassword, time.Now(), email)
 	if err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// VerifyToken checks if the provided token exists and is valid in the database.
+func (u *UserModel) VerifyToken(token string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	var count int
+	query := `SELECT COUNT(*) FROM tokens WHERE token = $1 AND expiration > $2`
+
+	err := u.DB.QueryRowContext(ctx, query, token, time.Now()).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	isValid := count > 0
+
+	return isValid, nil
 }
 
 // PasswordMatches uses Go's bcrypt package to compare a user supplied password
@@ -221,20 +242,32 @@ func (u *UserModel) PasswordMatches(userID int64, plainText string) (bool, error
 		return false, err
 	}
 
-	log.Println("MODELS: Stored hashed password:", hashedPassword) // Debug Log
-	log.Println("MODELS: Request password:", plainText)
-
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(plainText))
 	if err != nil {
 		if errors.Is(err, bcrypt.ErrMismatchedHashAndPassword) {
-			log.Println("MODELS: Error Mismatched password:", err)
-			// niepoprawne hasło
 			return false, nil
 		}
-		log.Println("MODELS: Other error in CompareHashAndPassword:", err)
 		return false, err
 
 	}
 
 	return true, nil
+}
+
+// EmailExists checks if a user with the given email exists in the database.
+func (u *UserModel) EmailExists(email string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT COUNT(*) FROM users WHERE email = $1`
+	var count int
+
+	err := u.DB.QueryRowContext(ctx, query, email).Scan(&count)
+	if err != nil {
+		return false, err
+	}
+
+	emailExists := count > 0
+	// If count is greater than 0, the email exists
+	return emailExists, nil
 }
