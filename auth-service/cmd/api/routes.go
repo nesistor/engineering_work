@@ -24,13 +24,13 @@ func (app *Config) routes() http.Handler {
 
 	mux.Post("/api/auth/login", app.AuthenticateUser)
 	mux.Post("/api/admin/login", app.AuthenticateAdmin)
-	mux.Post("/api/auth/refresh", app.RefreshToken)
-	mux.Post("/api/auth/revoke", app.RevokeToken) 
+	mux.Post("/api/auth/refresh", app.RefreshToken) 
 
 	mux.Route("/api/admin", func(mux chi.Router) {
 		mux.Use(app.AuthMiddleware("admin"))
-
-		mux.Post("/all-tokens/{id}", app.OneToken) 
+		
+		mux.Post("/api/auth/revoke", app.RevokeToken)
+		//mux.Post("/all-tokens/{id}", app.OneToken) 
 	})
 
 	mux.Post("/auth/logout", app.AuthMiddleware("user")(http.HandlerFunc(app.Logout)).ServeHTTP)

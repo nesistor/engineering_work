@@ -105,7 +105,6 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Używamy admin-service dla autoryzacji administratora
 	conn, err := grpc.Dial(adminServiceAddress, grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		app.errorJSON(w, err)
@@ -126,7 +125,6 @@ func (app *Config) AuthenticateAdmin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generowanie tokenu z rolą "admin"
 	accessToken, err := app.Models.Token.GenerateToken(ctx, int(response.AdminId), data.RoleAdmin, 15*time.Minute, data.ScopeAuthentication, "user-key")
 	if err != nil {
 		app.errorJSON(w, err)
@@ -290,6 +288,46 @@ func (app *Config) RevokeToken(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.errorJSON(w, err)
 	}
+}
+
+// Logout handles the process of logging out a user or admin by revoking their access token.
+func (app *Config) Logout(w http.ResponseWriter, r *http.Request) {
+
+	authHeader := r.Header.Get("Authorization")
+    if authHeader == "" {
+        app.errorJSON(w, fmt.Errorf("missing Authorization header"), http.StatusUnauthorized)
+        return
+    }
+
+    if !strings.HasPrefix(authHeader, "Bearer ") {
+        app.errorJSON(w, fmt.Errorf("invalid Authorization header format"), http.StatusUnauthorized)
+        return
+    }
+
+    tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+
+    err := app.Models.Token.InsertDeactivatedToken(context.Background(), tokenString, 15*time.Minute) // TTL np. 15 minut na dezaktywację
+    if err != nil {
+        app.errorJSON(w, err)
+        return
+    }
+
+    err = app.logRequest("Logout", "User or Admin logged out successfully")
+    if err != nil {
+        app.errorJSON(w, err)
+        return
+    }
+
+    payload := jsonResponse{
+        Error:   false,
+        Message: "Logged out successfully",
+        Status:  http.StatusOK,
+    }
+
+    err = app.writeJSON(w, http.StatusOK, payload)
+    if err != nil {
+        app.errorJSON(w, err)
+    }
 }
 
 func (app *Config) logRequest(name, data string) error {
