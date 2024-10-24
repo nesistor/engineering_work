@@ -5,7 +5,7 @@ FROM alpine:latest
 RUN mkdir /app
 
 # Kopiowanie plików aplikacji
-COPY userApp /app
+COPY adminApp /app
 
-# Uruchamianie aplikacji
-CMD ["/app/userApp"]
+# Uruchamiaanie aplikacji
+CMD ["/adminApp"]
