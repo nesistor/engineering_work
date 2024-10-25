@@ -14,7 +14,7 @@ import (
 )
 
 type AdminServer struct {
-	admins.UnimplementedAdminServiceServer
+	admins.AdminServiceServer
 	Models data.Models
 }
 

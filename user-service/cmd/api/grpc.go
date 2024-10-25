@@ -15,7 +15,7 @@ import (
 )
 
 type UserServer struct {
-	users.UnimplementedUserServiceServer
+	users.UserServiceServer
 	Models data.Models
 }
 

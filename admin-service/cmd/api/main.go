@@ -7,7 +7,8 @@ import (
 	"net/http"
 	"os"
 	"time"
-	"user-service/data"
+	
+	"admin-service/data"
 
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
