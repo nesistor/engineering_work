@@ -24,7 +24,6 @@ Start the server
   make up_build
 ```
 
-If u want test becase you need. Please write to me i give you a link to test another services.
 ## 🚀 About Me
 I'm a full stack developer focusing on Golang and Flutter.
 
