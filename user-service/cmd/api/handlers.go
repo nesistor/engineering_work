@@ -133,46 +133,46 @@ func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ResetPassword handles changing a user's password. It extracts a token from the URL
-// and a new password from the request payload, verifies the token, and updates the password.
+// ResetPassword handles the request to reset a user's password by generating a token and sending an email.
 func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
-	// Extract the token from the URL
-	token := r.URL.Query().Get("token")
-	if token == "" {
-		app.errorJSON(w, fmt.Errorf("token is required"), http.StatusBadRequest)
-		return
-	}
-
 	var requestPayload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Email string `json:"email"`
 	}
 
+	// Read the email from the request payload
 	err := app.readJSON(w, r, &requestPayload)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
 
-	isValidToken, err := app.Models.Token.ValidateResetToken(token, "ka")
+	// Get user by email
+	user, err := app.Models.User.GetUserByEmail(requestPayload.Email)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			app.errorJSON(w, fmt.Errorf("user with email %s does not exist", requestPayload.Email), http.StatusNotFound)
+			return
+		}
+		app.errorJSON(w, err)
+		return
+	}
+
+	// Generate and save a password reset token
+	token, err := app.Models.Token.GenerateAndSavePasswordResetToken(requestPayload.Email, int(user.ID))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
-	if !isValidToken {
-		app.errorJSON(w, fmt.Errorf("invalid or expired token"), http.StatusUnauthorized)
-		return
-	}
 
-	err = app.Models.User.UpdateUserPassword(requestPayload.Email, requestPayload.Password)
-	if err != nil {
+	// Integrate email sending into the reset password process
+	if err := app.SendResetPasswordEmail(requestPayload.Email, token.PlainText); err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: "Password changed successfully",
+		Message: "Password reset email sent successfully",
 	}
 
 	err = app.writeJSON(w, http.StatusOK, payload)
@@ -190,7 +190,7 @@ func (app *Config) SendResetPasswordEmail(email, token string) error {
 		Message string `json:"message"`
 	}
 
-	resetLink := fmt.Sprintf("https://fit_for_example.com/reset-password?token=%s", token)
+	resetLink := fmt.Sprintf("https://fit_new_password.com/reset-password?token=%s", token)
 
 	mailPayload := mailMessage{
 		From:    "no-reply@your-domain.com",
@@ -226,6 +226,110 @@ func (app *Config) SendResetPasswordEmail(email, token string) error {
 	return nil
 }
 
+// UpdatePassword handles the process of changing the user's password after token verification.
+func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Token    string `json:"token"`
+		Password string `json:"password"`
+		Email    string `json:"email"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	// Validate the reset token and get the user's email
+	isValidToken, err := app.Models.Token.ValidateResetToken(requestPayload.Email, requestPayload.Token)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+	if !isValidToken {
+		app.errorJSON(w, fmt.Errorf("invalid or expired token"), http.StatusUnauthorized)
+		return
+	}
+
+	// Update the user's password using the email from the payload
+	err = app.Models.User.UpdateUserPassword(requestPayload.Email, requestPayload.Password)
+	if err != nil {
+		app.errorJSON(w, err)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "Password changed successfully",
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+
+
+// UpdateUser handles the update of a user's information based on their ID passed in the URL.
+func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
+	// Extract user ID from the URL path
+	vars := r.URL.Query()
+	idStr := vars.Get("user_id")
+
+	// Convert the user ID from string to int64
+	userID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || userID < 1 {
+		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
+		return
+	}
+
+	// Create a struct to hold the updated user data
+	var requestPayload struct {
+		Email    string `json:"email"`
+		Username string `json:"username"`
+	}
+
+	// Read the JSON payload
+	err = app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	// Create a user object with the updated data
+	updatedUser := data.User{
+		ID:       userID,
+		Email:    requestPayload.Email,
+		UserName: requestPayload.Username,
+		UpdatedAt: time.Now(),
+	}
+
+	// Call the UpdateUser method from the user model
+	err = app.Models.User.UpdateUser(updatedUser)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	// Log the user update request
+	err = app.logRequest("update_user", fmt.Sprintf("User with ID %d updated", userID))
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	// Respond with a success message
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("User with ID %d updated successfully", userID),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
 
 // DeleteUser handles the deletion of a user based on their ID passed in the URL.
 func (app *Config) DeleteUser(w http.ResponseWriter, r *http.Request) {

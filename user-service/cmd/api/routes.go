@@ -24,14 +24,12 @@ func (app *Config) routes() http.Handler {
 
 	mux.Post("/api/login/register", app.Register)
 	mux.Get("/api/login/check-email", app.CheckEmail)
-	mux.Post("/api/login/forgot-password", app.SendResetPasswordEmail) 
 	mux.Post("api/login/reset-password", app.ResetPassword)
 
 	mux.Route("/api/login", func(mux chi.Router) {
 		mux.Use(app.AuthMiddleware("user"))
 		
 		mux.Delete("/delete-user/{user_id}", app.DeleteUser)
-		mux.Post("/change-password", app.ChangePassword)
 		mux.Put("/update/{user_id}", app.UpdateUser)
 		
 	})

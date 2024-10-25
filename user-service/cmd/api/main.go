@@ -43,20 +43,17 @@ func main() {
 		log.Fatalf("failed to initialize key manager: %v", err)
 	}
 
-	// connect to DB
 	conn := connectToDB()
 	if conn == nil {
 		log.Panic("Can't connect to Postgres!")
 	}
 
-	// set up config
 	app := Config{
 		DB:     conn,
 		Models: data.New(conn),
 		KeyManager:  keyManager,
 	}
 
-	// Start HTTP server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
 		Handler: app.routes(),
@@ -69,10 +66,8 @@ func main() {
 		}
 	}()
 
-	// Start gRPC server
 	go app.gRPCListen()
 
-	// Block main thread to keep the servers running
 	select {}
 }
 
