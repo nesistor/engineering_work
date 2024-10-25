@@ -7,8 +7,9 @@ import (
 	"net/http"
 	"os"
 	"time"
-	
+
 	"admin-service/data"
+	"admin-service/keys"
 
 	_ "github.com/jackc/pgconn"
 	_ "github.com/jackc/pgx/v4"
@@ -26,18 +27,18 @@ var counts int64
 type Config struct {
 	DB     *sql.DB
 	Models data.Models
-	KeyManager  *data.KeyManager 
+	KeyManager  *keys.KeyManager 
 }
 
 func main() {
 	log.Println("Starting admin service")
 
-	vaultConfig := data.VaultConfig{
+	vaultConfig := keys.VaultConfig{
 		Address: os.Getenv("VAULT_ADDR"),
 		Token:   os.Getenv("VAULT_TOKEN"),
 	}
 
-	keyManager, err := data.NewKeyManager(vaultConfig, time.Hour)
+	keyManager, err := keys.NewKeyManager(vaultConfig, time.Hour)
 	if err != nil {
 		log.Fatalf("failed to initialize key manager: %v", err)
 	}

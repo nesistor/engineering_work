@@ -11,6 +11,7 @@ require (
 	github.com/jackc/pgx/v4 v4.18.3
 	golang.org/x/crypto v0.28.0
 	google.golang.org/grpc v1.67.1
+	google.golang.org/protobuf v1.35.1
 )
 
 require (
@@ -39,5 +40,5 @@ require (
 	golang.org/x/text v0.19.0 // indirect
 	golang.org/x/time v0.0.0-20200416051211-89c76fbcd5d1 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20240814211410-ddb44dafa142 // indirect
-	google.golang.org/protobuf v1.34.2 // indirect
+	google.golang.org/grpc/cmd/protoc-gen-go-grpc v1.5.1 // indirect
 )

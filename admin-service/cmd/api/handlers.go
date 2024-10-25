@@ -53,7 +53,7 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.logRequest("registration", fmt.Sprintf("User %s registered", newUser.Email))
+	err = app.logRequest("registration", fmt.Sprintf("Admin %s registered", newUser.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -61,7 +61,7 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: fmt.Sprintf("User %s registered successfully", newUser.Email),
+		Message: fmt.Sprintf("Admin %s registered successfully", newUser.Email),
 		Data: map[string]interface{}{
 			"user_id": userID,
 		},
