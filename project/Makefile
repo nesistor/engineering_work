@@ -44,18 +44,18 @@ build_user:
 
 ## build_admin: builds the user binary as a linux executable
 build_admin:
-	@echo "Building user binary..."
+	@echo "Building admin binary..."
 	cd ../admin-service && env GOOS=linux CGO_ENABLED=0 go build -o ${ADMIN_BINARY} ./cmd/api
 	@echo "Done!"	
 
 ## build_mailer: builds the user binary as a linux executable
 build_mail:
-	@echo "Building user binary..."
+	@echo "Building mail binary..."
 	cd ../mail-service && env GOOS=linux CGO_ENABLED=0 go build -o ${MAIL_BINARY} ./cmd/api
 	@echo "Done!"	
 
 ## build_logger: builds the user binary as a linux executable
 build_logger:
-	@echo "Building user binary..."
+	@echo "Building logger binary..."
 	cd ../logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LOGGER_BINARY} ./cmd/api
 	@echo "Done!"	

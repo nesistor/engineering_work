@@ -16,13 +16,19 @@ type AdminModel struct {
 	DB *sql.DB
 }
 
+type NewAdminModel struct {
+	DB *sql.DB
+}
+
 type Models struct {
-	Admin AdminModel
+	Admin     AdminModel
+	NewAdmin  NewAdminModel
 }
 
 func New(db *sql.DB) Models {
 	return Models{
-		Admin: AdminModel{DB: db},
+		Admin:    AdminModel{DB: db},
+		NewAdmin: NewAdminModel{DB: db},
 	}
 }
 
@@ -33,6 +39,65 @@ type Admin struct {
 	PasswordHash string    `json:"passwordhash"`
 	CreatedAt    time.Time `json:"created_at"`
 	UpdatedAt    time.Time `json:"updated_at"`
+}
+
+// NewAdmin struct for storing email addresses of admins who can create accounts
+type NewAdmin struct {
+	Email string `json:"email"`
+}
+
+// InsertNewAdmin inserts a new admin email into the database
+func (n *NewAdminModel) InsertNewAdmin(email string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `INSERT INTO new_admins (email, created_at) VALUES ($1, $2)`
+
+	_, err := n.DB.ExecContext(ctx, query, email, time.Now())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetAllNewAdmins retrieves all new admin emails from the database
+func (n *NewAdminModel) GetAllNewAdmins() ([]NewAdmin, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT email FROM new_admins`
+	rows, err := n.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var newAdmins []NewAdmin
+	for rows.Next() {
+		var newAdmin NewAdmin
+		if err := rows.Scan(&newAdmin.Email); err != nil {
+			return nil, err
+		}
+		newAdmins = append(newAdmins, newAdmin)
+	}
+
+	return newAdmins, nil
+}
+
+// DeleteNewAdmin removes an admin email from the new admins table
+func (n *NewAdminModel) DeleteNewAdmin(email string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `DELETE FROM new_admins WHERE email = $1`
+
+	_, err := n.DB.ExecContext(ctx, query, email)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // GetAdminByEmail retrieves an admin by their email address
