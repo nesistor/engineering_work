@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package admin;
 
-option go_package = "admin-service/admin;admin";
+option go_package = "/admin";
 
 message ValidateAdminRequest {
   string email = 1;

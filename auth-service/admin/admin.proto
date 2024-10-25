@@ -4,20 +4,17 @@ package admin;
 
 option go_package = "/admin";
 
-// Definicja wiadomości żądania
 message ValidateAdminRequest {
   string email = 1;
   string password = 2;
 }
 
-// Definicja wiadomości odpowiedzi
 message ValidateAdminResponse {
   bool is_valid = 1;
-  int64 admin_id = 2;
-  string message = 3; 
+  string message = 2; 
+  int64 admin_id = 3;
 }
 
-// Definicja serwisu do weryfikacji admina
 service AdminService {
   rpc ValidateAdmin (ValidateAdminRequest) returns (ValidateAdminResponse);
 }

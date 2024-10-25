@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v5.28.2
-// source: admin.proto
+// source: admin/admin.proto
 
 package admin
 
@@ -25,8 +25,6 @@ const (
 // AdminServiceClient is the client API for AdminService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Definicja serwisu do weryfikacji admina
 type AdminServiceClient interface {
 	ValidateAdmin(ctx context.Context, in *ValidateAdminRequest, opts ...grpc.CallOption) (*ValidateAdminResponse, error)
 }
@@ -52,8 +50,6 @@ func (c *adminServiceClient) ValidateAdmin(ctx context.Context, in *ValidateAdmi
 // AdminServiceServer is the server API for AdminService service.
 // All implementations must embed UnimplementedAdminServiceServer
 // for forward compatibility.
-//
-// Definicja serwisu do weryfikacji admina
 type AdminServiceServer interface {
 	ValidateAdmin(context.Context, *ValidateAdminRequest) (*ValidateAdminResponse, error)
 	mustEmbedUnimplementedAdminServiceServer()
@@ -121,5 +117,5 @@ var AdminService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "admin.proto",
+	Metadata: "admin/admin.proto",
 }

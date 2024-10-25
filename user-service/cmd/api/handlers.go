@@ -9,10 +9,10 @@ import (
 	"time"
 	"strconv"
 
-	"user-service/data"
+	"admin-service/data"
 )
 
-// Register handles the registration of new user
+// Register handles the registration of new admin
 func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email    string `json:"email"`
@@ -26,9 +26,9 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = app.Models.User.GetUserByEmail(requestPayload.Email)
+	_, err = app.Models.Admin.GetAdminByEmail(requestPayload.Email)
 	if err == nil {
-		app.errorJSON(w, fmt.Errorf("user with email %s already exists"), http.StatusConflict)
+		app.errorJSON(w, fmt.Errorf("admin with email %s already exists", requestPayload.Email), http.StatusConflict)
 		return
 	}
 
@@ -37,7 +37,7 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newUser := data.User{
+	newAdmin := data.Admin{
 		Email:        requestPayload.Email,
 		UserName:     requestPayload.Username,
 		PasswordHash: requestPayload.Password,
@@ -45,13 +45,13 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt:    time.Now(),
 	}
 
-	userID, err := app.Models.User.InsertUser(newUser)
+	adminID, err := app.Models.Admin.InsertAdmin(newAdmin)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	err = app.logRequest("registration", fmt.Sprintf("User %s registered", newUser.Email))
+	err = app.logRequest("registration", fmt.Sprintf("Admin %s registered", newAdmin.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -59,9 +59,9 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: fmt.Sprintf("User %s registered successfully", newUser.Email),
+		Message: fmt.Sprintf("Admin %s registered successfully", newAdmin.Email),
 		Data: map[string]interface{}{
-			"user_id": userID,
+			"admin_id": adminID,
 		},
 	}
 
@@ -71,10 +71,10 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// GetAll retrieves all users from the database and sends them as a JSON response.
+// GetAll retrieves all admins from the database and sends them as a JSON response.
 func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
-	// Call the GetAllUsers method to fetch the users from the database.
-	users, err := app.Models.User.GetAllUsers()
+	// Call the GetAllAdmins method to fetch the admins from the database.
+	admins, err := app.Models.Admin.GetAllAdmins()
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -82,9 +82,9 @@ func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: "Users retrieved successfully",
+		Message: "Admins retrieved successfully",
 		Data: map[string]interface{}{
-			"users": users,
+			"admins": admins,
 		},
 	}
 
@@ -94,7 +94,7 @@ func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// CheckEmail handles checking if a user with the provided email exists in the database.
+// CheckEmail handles checking if an admin with the provided email exists in the database.
 func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email string `json:"email"`
@@ -106,7 +106,7 @@ func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	exists, err := app.Models.User.EmailExists(requestPayload.Email)
+	exists, err := app.Models.Admin.EmailExists(requestPayload.Email)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -114,9 +114,9 @@ func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 
 	var message string
 	if exists {
-		message = fmt.Sprintf("User with email %s exists", requestPayload.Email)
+		message = fmt.Sprintf("Admin with email %s exists", requestPayload.Email)
 	} else {
-		message = fmt.Sprintf("User with email %s does not exist", requestPayload.Email)
+		message = fmt.Sprintf("Admin with email %s does not exist", requestPayload.Email)
 	}
 
 	payload := jsonResponse{
@@ -133,7 +133,7 @@ func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// ResetPassword handles the request to reset a user's password by generating a token and sending an email.
+// ResetPassword handles the request to reset an admin's password by generating a token and sending an email.
 func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Email string `json:"email"`
@@ -145,17 +145,17 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := app.Models.User.GetUserByEmail(requestPayload.Email)
+	admin, err := app.Models.Admin.GetAdminByEmail(requestPayload.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			app.errorJSON(w, fmt.Errorf("user with email %s does not exist", requestPayload.Email), http.StatusNotFound)
+			app.errorJSON(w, fmt.Errorf("admin with email %s does not exist", requestPayload.Email), http.StatusNotFound)
 			return
 		}
 		app.errorJSON(w, err)
 		return
 	}
 
-	token, err := app.Models.Token.GenerateAndSavePasswordResetToken(requestPayload.Email, int(user.ID))
+	token, err := app.Models.Token.GenerateAndSavePasswordResetToken(requestPayload.Email, int(admin.ID))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -177,7 +177,7 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// SendResetPasswordEmail sends a reset password link with a token to the user's email
+// SendResetPasswordEmail sends a reset password link with a token to the admin's email
 func (app *Config) SendResetPasswordEmail(email, token string) error {
 	type mailMessage struct {
 		From    string `json:"from"`
@@ -222,7 +222,7 @@ func (app *Config) SendResetPasswordEmail(email, token string) error {
 	return nil
 }
 
-// UpdatePassword handles the process of changing the user's password after token verification.
+// UpdatePassword handles the process of changing the admin's password after token verification.
 func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
 		Token    string `json:"token"`
@@ -246,7 +246,7 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = app.Models.User.UpdateUserPassword(requestPayload.Email, requestPayload.Password)
+	err = app.Models.Admin.UpdateAdminPassword(requestPayload.Email, requestPayload.Password)
 	if err != nil {
 		app.errorJSON(w, err)
 		return
@@ -263,16 +263,14 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
-// UpdateUser handles the update of a user's information based on their ID passed in the URL.
-func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
+// UpdateAdmin handles the update of an admin's information based on their ID passed in the URL.
+func (app *Config) UpdateAdmin(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
-	idStr := vars.Get("user_id")
+	idStr := vars.Get("admin_id")
 
-	userID, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || userID < 1 {
-		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
+	adminID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || adminID < 1 {
+		app.errorJSON(w, fmt.Errorf("invalid admin ID"), http.StatusBadRequest)
 		return
 	}
 
@@ -287,20 +285,20 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	updatedUser := data.User{
-		ID:       userID,
+	updatedAdmin := data.Admin{
+		ID:       adminID,
 		Email:    requestPayload.Email,
 		UserName: requestPayload.Username,
 		UpdatedAt: time.Now(),
 	}
 
-	err = app.Models.User.UpdateUser(updatedUser)
+	err = app.Models.Admin.UpdateAdmin(updatedAdmin)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	err = app.logRequest("update_user", fmt.Sprintf("User with ID %d updated", userID))
+	err = app.logRequest("update_admin", fmt.Sprintf("Admin with ID %d updated", adminID))
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
@@ -308,7 +306,7 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: fmt.Sprintf("User with ID %d updated successfully", userID),
+		Message: fmt.Sprintf("Admin with ID %d updated successfully", adminID),
 	}
 
 	err = app.writeJSON(w, http.StatusOK, payload)
@@ -317,32 +315,32 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// DeleteUser handles the deletion of a user based on their ID passed in the URL.
-func (app *Config) DeleteUser(w http.ResponseWriter, r *http.Request) {
+// DeleteAdmin handles the deletion of an admin based on their ID passed in the URL.
+func (app *Config) DeleteAdmin(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
-	idStr := vars.Get("user_id")
+	idStr := vars.Get("admin_id")
 
-	userID, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil || userID < 1 {
-		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
+	adminID, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil || adminID < 1 {
+		app.errorJSON(w, fmt.Errorf("invalid admin ID"), http.StatusBadRequest)
 		return
 	}
 
-	err = app.Models.User.DeleteUserByID(userID)
+	err = app.Models.Admin.DeleteAdminByID(adminID)
 	if err != nil {
-		app.errorJSON(w, err, http.StatusInternalServerError)
+		app.errorJSON(w, err)
 		return
 	}
 
-	err = app.logRequest("delete_user", fmt.Sprintf("User with ID %d deleted", userID))
+	err = app.logRequest("delete_admin", fmt.Sprintf("Admin with ID %d deleted", adminID))
 	if err != nil {
-		app.errorJSON(w, err, http.StatusInternalServerError)
+		app.errorJSON(w, err)
 		return
 	}
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: fmt.Sprintf("User with ID %d deleted successfully", userID),
+		Message: fmt.Sprintf("Admin with ID %d deleted successfully", adminID),
 	}
 
 	err = app.writeJSON(w, http.StatusOK, payload)

@@ -28,7 +28,7 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = app.Models.User.GetUserByEmail(requestPayload.Email)
+	_, err = app.Models.Admin.GetAdminByEmail(requestPayload.Email)
 	if err == nil {
 		app.errorJSON(w, fmt.Errorf("user with email %s already exists"), http.StatusConflict)
 		return

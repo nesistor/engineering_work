@@ -8,7 +8,7 @@ import (
 	"net"
 
 	"admin-service/data"  
-	"admin-service/admin" 
+	"admin-service/admin"
 
 	"google.golang.org/grpc"
 )
