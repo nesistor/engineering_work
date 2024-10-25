@@ -139,14 +139,12 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		Email string `json:"email"`
 	}
 
-	// Read the email from the request payload
 	err := app.readJSON(w, r, &requestPayload)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
 
-	// Get user by email
 	user, err := app.Models.User.GetUserByEmail(requestPayload.Email)
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -157,14 +155,12 @@ func (app *Config) ResetPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Generate and save a password reset token
 	token, err := app.Models.Token.GenerateAndSavePasswordResetToken(requestPayload.Email, int(user.ID))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
 
-	// Integrate email sending into the reset password process
 	if err := app.SendResetPasswordEmail(requestPayload.Email, token.PlainText); err != nil {
 		app.errorJSON(w, err)
 		return
@@ -240,7 +236,6 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Validate the reset token and get the user's email
 	isValidToken, err := app.Models.Token.ValidateResetToken(requestPayload.Email, requestPayload.Token)
 	if err != nil {
 		app.errorJSON(w, err)
@@ -251,7 +246,6 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Update the user's password using the email from the payload
 	err = app.Models.User.UpdateUserPassword(requestPayload.Email, requestPayload.Password)
 	if err != nil {
 		app.errorJSON(w, err)
@@ -273,31 +267,26 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUser handles the update of a user's information based on their ID passed in the URL.
 func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
-	// Extract user ID from the URL path
 	vars := r.URL.Query()
 	idStr := vars.Get("user_id")
 
-	// Convert the user ID from string to int64
 	userID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || userID < 1 {
 		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
 		return
 	}
 
-	// Create a struct to hold the updated user data
 	var requestPayload struct {
 		Email    string `json:"email"`
 		Username string `json:"username"`
 	}
 
-	// Read the JSON payload
 	err = app.readJSON(w, r, &requestPayload)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusBadRequest)
 		return
 	}
 
-	// Create a user object with the updated data
 	updatedUser := data.User{
 		ID:       userID,
 		Email:    requestPayload.Email,
@@ -305,21 +294,18 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 		UpdatedAt: time.Now(),
 	}
 
-	// Call the UpdateUser method from the user model
 	err = app.Models.User.UpdateUser(updatedUser)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	// Log the user update request
 	err = app.logRequest("update_user", fmt.Sprintf("User with ID %d updated", userID))
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	// Respond with a success message
 	payload := jsonResponse{
 		Error:   false,
 		Message: fmt.Sprintf("User with ID %d updated successfully", userID),
@@ -333,32 +319,27 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 // DeleteUser handles the deletion of a user based on their ID passed in the URL.
 func (app *Config) DeleteUser(w http.ResponseWriter, r *http.Request) {
-	// Extract user ID from the URL path
 	vars := r.URL.Query()
 	idStr := vars.Get("user_id")
 
-	// Convert the user ID from string to int64
 	userID, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil || userID < 1 {
 		app.errorJSON(w, fmt.Errorf("invalid user ID"), http.StatusBadRequest)
 		return
 	}
 
-	// Call the DeleteUserByID method from the user model
 	err = app.Models.User.DeleteUserByID(userID)
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	// Log the user deletion request
 	err = app.logRequest("delete_user", fmt.Sprintf("User with ID %d deleted", userID))
 	if err != nil {
 		app.errorJSON(w, err, http.StatusInternalServerError)
 		return
 	}
 
-	// Respond with a success message
 	payload := jsonResponse{
 		Error:   false,
 		Message: fmt.Sprintf("User with ID %d deleted successfully", userID),
