@@ -16,6 +16,7 @@ import (
 
 const (
 	webPort  = "80"
+	gRpcPort = "50003"
 	rpcPort  = "5001"
 	mongoURL = "mongodb://mongo:27017"
 )
@@ -50,7 +51,7 @@ func main() {
 	}
 
 	go app.rpcListen()
-	
+
 	// start web server
 	log.Println("Starting service on port", webPort)
 	srv := &http.Server{

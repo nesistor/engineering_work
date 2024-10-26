@@ -23,7 +23,7 @@ services:
       dockerfile: auth-service.dockerfile
     restart: always
     ports:
-      - "8081:80"
+      - "8080:80"
     deploy:
       mode: replicated
       replicas: 1
@@ -70,7 +70,7 @@ services:
       dockerfile: ./../user-service/user-service.dockerfile
     restart: always
     ports:
-      - "8082:80"
+      - "8081:80"
       - "50001:50001"
     deploy:
       mode: replicated
@@ -92,7 +92,7 @@ services:
     restart: always
     ports:
       - "8082:80"
-      - "50001:50001"
+      - "50002:50001"
     deploy:
       mode: replicated
       replicas: 1
@@ -139,6 +139,18 @@ services:
       POSTGRES_DB: users
     volumes:
       - ./db-data/postgres-users/:/var/lib/postgresql/data/
+
+  postgres-admins:
+    image: 'postgres:14.0'
+    ports:
+      - "5434:5432"
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: admins
+    volumes:
+      - ./db-data/postgres-admins/:/var/lib/postgresql/data/
 
   mongo:
     image: 'mongo:4.2.16-bionic'
