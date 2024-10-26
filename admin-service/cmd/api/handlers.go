@@ -249,7 +249,7 @@ func (app *Config) UpdateAdmin(w http.ResponseWriter, r *http.Request) {
 	updatedAdmin := data.Admin{
 		ID:        adminID,
 		Email:     requestPayload.Email,
-		UserName:  requestPayload.Username,
+		AdminName: requestPayload.Username,
 		UpdatedAt: time.Now(),
 	}
 
@@ -302,6 +302,86 @@ func (app *Config) DeleteAdmin(w http.ResponseWriter, r *http.Request) {
 	payload := jsonResponse{
 		Error:   false,
 		Message: fmt.Sprintf("Admin with ID %d deleted successfully", adminID),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+// InsertNewAdminHandler handles the insertion of a new admin email.
+func (app *Config) AddNewAdmin(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Email string `json:"email"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	err = app.Models.NewAdmin.InsertNewAdmin(requestPayload.Email)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("New admin email %s inserted successfully", requestPayload.Email),
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+// GetAllNewAdminsHandler retrieves all new admin emails and returns them as JSON.
+func (app *Config) GetAllNewAdmins(w http.ResponseWriter, r *http.Request) {
+	newAdmins, err := app.Models.NewAdmin.GetAllNewAdmins()
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "New admins retrieved successfully",
+		Data: map[string]interface{}{
+			"new_admins": newAdmins,
+		},
+	}
+
+	err = app.writeJSON(w, http.StatusOK, payload)
+	if err != nil {
+		app.errorJSON(w, err)
+	}
+}
+
+// DeleteNewAdminHandler handles the deletion of a specific new admin email.
+func (app *Config) DeleteNewAdmin(w http.ResponseWriter, r *http.Request) {
+	var requestPayload struct {
+		Email string `json:"email"`
+	}
+
+	err := app.readJSON(w, r, &requestPayload)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusBadRequest)
+		return
+	}
+
+	err = app.Models.NewAdmin.DeleteNewAdmin(requestPayload.Email)
+	if err != nil {
+		app.errorJSON(w, err, http.StatusInternalServerError)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: fmt.Sprintf("Admin email %s deleted successfully", requestPayload.Email),
 	}
 
 	err = app.writeJSON(w, http.StatusOK, payload)

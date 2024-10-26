@@ -304,3 +304,22 @@ func (a *AdminModel) PasswordMatches(adminID int64, plainText string) (bool, err
 
 	return true, nil
 }
+
+// UpdateAdminPassword updates the admin's password in the database.
+func (a *AdminModel) UpdateAdminPassword(email string, password string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(password), 12)
+	if err != nil {
+		return err
+	}
+
+	stmt := `UPDATE admins SET passwordhash = $1, updated_at = $2 WHERE email = $3`
+	_, err = a.DB.ExecContext(ctx, stmt, hashedPassword, time.Now(), email)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
