@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"time"
 	"strconv"
+	"time"
 
 	"admin-service/data"
 )
@@ -15,9 +15,9 @@ import (
 // Register handles the registration of new admin
 func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 	var requestPayload struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Username string `json:"username"`
+		Email     string `json:"email"`
+		Password  string `json:"password"`
+		AdminName string `json:"admin_name"`
 	}
 
 	err := app.readJSON(w, r, &requestPayload)
@@ -39,7 +39,7 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 
 	newAdmin := data.Admin{
 		Email:        requestPayload.Email,
-		UserName:     requestPayload.Username,
+		AdminName:    requestPayload.AdminName,
 		PasswordHash: requestPayload.Password,
 		CreatedAt:    time.Now(),
 		UpdatedAt:    time.Now(),
@@ -85,45 +85,6 @@ func (app *Config) GetAll(w http.ResponseWriter, r *http.Request) {
 		Message: "Admins retrieved successfully",
 		Data: map[string]interface{}{
 			"admins": admins,
-		},
-	}
-
-	err = app.writeJSON(w, http.StatusOK, payload)
-	if err != nil {
-		app.errorJSON(w, err)
-	}
-}
-
-// CheckEmail handles checking if an admin with the provided email exists in the database.
-func (app *Config) CheckEmail(w http.ResponseWriter, r *http.Request) {
-	var requestPayload struct {
-		Email string `json:"email"`
-	}
-
-	err := app.readJSON(w, r, &requestPayload)
-	if err != nil {
-		app.errorJSON(w, err, http.StatusBadRequest)
-		return
-	}
-
-	exists, err := app.Models.Admin.EmailExists(requestPayload.Email)
-	if err != nil {
-		app.errorJSON(w, err)
-		return
-	}
-
-	var message string
-	if exists {
-		message = fmt.Sprintf("Admin with email %s exists", requestPayload.Email)
-	} else {
-		message = fmt.Sprintf("Admin with email %s does not exist", requestPayload.Email)
-	}
-
-	payload := jsonResponse{
-		Error:   false,
-		Message: message,
-		Data: map[string]interface{}{
-			"exists": exists,
 		},
 	}
 
@@ -286,9 +247,9 @@ func (app *Config) UpdateAdmin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedAdmin := data.Admin{
-		ID:       adminID,
-		Email:    requestPayload.Email,
-		UserName: requestPayload.Username,
+		ID:        adminID,
+		Email:     requestPayload.Email,
+		UserName:  requestPayload.Username,
 		UpdatedAt: time.Now(),
 	}
 

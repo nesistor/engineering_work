@@ -7,26 +7,26 @@ import (
 	"log"
 	"net"
 
-	"admin-service/data"  
-	"admin-service/admin"
+	"admin-service/admins"
+	"admin-service/data"
 
 	"google.golang.org/grpc"
 )
 
 type AdminServer struct {
-	admin.AdminServiceServer
+	admins.AdminServiceServer
 	Models data.Models
 }
 
-func (s *AdminServer) ValidateAdmin(ctx context.Context, req *admin.ValidateAdminRequest) (*admin.ValidateAdminResponse, error) {
+func (s *AdminServer) ValidateAdmin(ctx context.Context, req *admins.ValidateAdminRequest) (*admins.ValidateAdminResponse, error) {
 	email := req.GetEmail()
 	password := req.GetPassword()
 
-	// Pobranie administratora z bazy danych na podstawie emaila
+	// Retrieve admin from the database by email
 	admin, err := s.Models.Admin.GetAdminByEmail(email)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			return &admin.ValidateAdminResponse{
+			return &admins.ValidateAdminResponse{
 				IsValid: false,
 				Message: "Admin not found",
 			}, nil
@@ -34,20 +34,20 @@ func (s *AdminServer) ValidateAdmin(ctx context.Context, req *admin.ValidateAdmi
 		return nil, err
 	}
 
-	// Weryfikacja hasła
+	// Verify password
 	valid, err := s.Models.Admin.PasswordMatches(admin.ID, password)
 	if err != nil || !valid {
-		return &admin.ValidateAdminResponse{
+		return &admins.ValidateAdminResponse{
 			IsValid: false,
 			Message: "Invalid password",
 		}, nil
 	}
 
-	// Odpowiedź, że administrator jest poprawny
-	return &admin.ValidateAdminResponse{
+	// Response confirming admin authentication
+	return &admins.ValidateAdminResponse{
 		IsValid: true,
-		Message: "Admin authenticated successfully",
 		AdminId: admin.ID,
+		Message: "Admin authenticated successfully",
 	}, nil
 }
 
@@ -59,7 +59,7 @@ func (app *Config) gRPCListen() {
 	}
 
 	s := grpc.NewServer()
-	admin.RegisterAdminServiceServer(s, &AdminServer{Models: app.Models})
+	admins.RegisterAdminServiceServer(s, &AdminServer{Models: app.Models})
 
 	log.Printf("gRPC Server started on port %s", gRPCPort)
 

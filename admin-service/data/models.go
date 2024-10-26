@@ -21,14 +21,16 @@ type NewAdminModel struct {
 }
 
 type Models struct {
-	Admin     AdminModel
-	NewAdmin  NewAdminModel
+	Admin    AdminModel
+	NewAdmin NewAdminModel
+	Token    TokenModel
 }
 
 func New(db *sql.DB) Models {
 	return Models{
 		Admin:    AdminModel{DB: db},
 		NewAdmin: NewAdminModel{DB: db},
+		Token:    TokenModel{DB: db},
 	}
 }
 
@@ -44,6 +46,43 @@ type Admin struct {
 // NewAdmin struct for storing email addresses of admins who can create accounts
 type NewAdmin struct {
 	Email string `json:"email"`
+}
+
+// GetAllAdmins returns a slice of all admins, sorted by their admin name
+func (a *AdminModel) GetAllAdmins() ([]*Admin, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), dbTimeout)
+	defer cancel()
+
+	query := `SELECT id, email, admin_name, passwordhash, created_at, updated_at 
+			  FROM admins ORDER BY admin_name`
+
+	rows, err := a.DB.QueryContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var admins []*Admin
+
+	for rows.Next() {
+		var admin Admin
+		err := rows.Scan(
+			&admin.ID,
+			&admin.Email,
+			&admin.AdminName,
+			&admin.PasswordHash,
+			&admin.CreatedAt,
+			&admin.UpdatedAt,
+		)
+		if err != nil {
+			log.Println("Error scanning", err)
+			return nil, err
+		}
+
+		admins = append(admins, &admin)
+	}
+
+	return admins, nil
 }
 
 // InsertNewAdmin inserts a new admin email into the database
