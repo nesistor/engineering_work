@@ -1,2 +1,25 @@
 project/db-data/*
 project/vault/*
+/frontend/.DS_Store
+frontend/node_modules
+frontend/dist
+
+
+# local env files
+frontned/.env.local
+frontend/.env.*.local
+
+# Log files
+frontned/npm-debug.log*
+frontned/yarn-debug.log*
+frontned/yarn-error.log*
+frontned/pnpm-debug.log*
+
+# Editor directories and files
+frontned/.idea
+frontned/.vscode
+frontned/*.suo
+frontned/*.ntvs*
+frontned/*.njsproj
+frontned/*.sln
+frontned/*.sw?
