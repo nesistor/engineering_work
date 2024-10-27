@@ -1,0 +1,23 @@
+.about-me {
+    padding: 40px 20px; /* Dodatkowe odstępy wewnętrzne */
+    background-color: #f0f0f0; /* Jasnoszare tło */
+    display: flex; /* Użycie flexbox */
+    flex-direction: column; /* Ustawienie kierunku kolumny */
+    align-items: flex-start; /* Wyrównanie do lewej */
+    justify-content: flex-start; /* Wyrównanie do góry */
+    margin-top: 50px; /* Usunięcie domyślnego marginesu */
+    margin-left: calc(50% - 200px);; /* Odstęp od lewej */
+    max-width: calc(100% - 300px); /* Ustaw maksymalną szerokość, aby nie przekraczała szerokości ekranu */
+  }
+  
+  h1 {
+    margin: 0; /* Usunięcie domyślnego marginesu */
+    font-size: 2rem; /* Rozmiar czcionki dla nagłówka */
+  }
+  
+  p {
+    margin-top: 10px; /* Odstęp między nagłówkiem a akapitem */
+    line-height: 1.5; /* Interlinia dla lepszej czytelności */
+    max-width: 600px; /* Maksymalna szerokość akapitu */
+  }
+  

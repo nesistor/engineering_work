@@ -1,0 +1,16 @@
+.tech-stack {
+    padding: 20px;
+    text-align: left;
+  }
+
+  h1 {
+    margin: 0; /* Usunięcie domyślnego marginesu */
+    font-size: 2rem;
+    text-align: left; 
+  }
+  
+  p {
+    margin-top: 10px; /* Odstęp między nagłówkiem a akapitem */
+    line-height: 1.5; /* Interlinia dla lepszej czytelności */
+    max-width: 600px; /* Maksymalna szerokość akapitu */
+  }

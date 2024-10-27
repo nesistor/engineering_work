@@ -1,0 +1,47 @@
+.contact-form {
+    background-color: black; /* Czarny kolor tła */
+    border-radius: 15px; /* Zaokrąglone rogi */
+    border: 2px solid silver; /* Srebrne obramowanie */
+    padding: 20px;
+    margin: 20px auto; /* Automatyczne marginesy w poziomie dla centrowania */
+    width: 50%; /* Ustawia szerokość formularza na 50% */
+    max-width: 100%; /* Maksymalna szerokość formularza */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Opcjonalny cień */
+    text-align: left; /* Wyrównuje tekst do lewej */
+}
+
+h2 {
+    color: white; /* Kolor tekstu nagłówka */
+    text-align: center; /* Wyśrodkowanie nagłówka */
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block; /* Ustawienie label jako block, aby zajmował całą szerokość */
+    color: white; /* Kolor etykiety */
+}
+
+input, textarea {
+    width: 100%; /* Szerokość 100% */
+    padding: 10px; /* Wewnętrzne odstępy */
+    border-radius: 5px; /* Zaokrąglone rogi dla inputów */
+    border: 1px solid silver; /* Obramowanie inputów */
+    background-color: #333; /* Ciemne tło dla inputów */
+    color: white; /* Kolor tekstu */
+}
+
+button {
+    background-color: silver; /* Kolor tła przycisku */
+    color: black; /* Kolor tekstu przycisku */
+    padding: 10px 20px; /* Wewnętrzne odstępy */
+    border: none; /* Brak obramowania */
+    border-radius: 5px; /* Zaokrąglone rogi dla przycisku */
+    cursor: pointer; /* Kursor wskazujący */
+}
+
+button:hover {
+    background-color: #ccc; /* Jaśniejszy kolor tła przycisku przy najechaniu */
+}

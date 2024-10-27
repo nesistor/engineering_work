@@ -1,0 +1,27 @@
+html, body {
+  height: 100%; /* Ustawia wysokość na 100% dla html i body */
+  margin: 0; /* Usunięcie domyślnych marginesów */
+}
+
+#app {
+  display: flex;
+    flex-direction: column;
+  font-family: 'Montserrat', sans-serif;
+  color: #2c3e50;
+  margin-top: 0;
+   /* Zmniejszenie marginesu dla lepszego wyrównania */
+}
+
+
+.section {
+  width: 100%; /* Maksymalna szerokość */
+  max-width: 100%; /* Maksymalna szerokość */
+  background-color: #f0f0f0; /* Szare tło dla sekcji */
+  box-sizing: border-box; /* Upewnij się, że padding i border są wliczane w szerokość */
+}
+
+
+.about-me, .tech-stack, .contact {
+  width: 100%; /* Pełna szerokość dla sekcji */
+  max-width: none; /* Brak ograniczeń maksymalnej szerokości */
+}
