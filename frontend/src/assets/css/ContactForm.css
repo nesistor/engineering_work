@@ -28,7 +28,6 @@
 }
 
 .contact-text {
-    padding-top: 10px;
     margin: 0 10px;
     white-space: nowrap;
     opacity: 0; /* Ukrycie tekstu */
@@ -51,7 +50,7 @@
     left: 50%; /* Ustawiamy formularz na środek */
     transform: translate(-50%, -50%); /* Przesuwamy formularz do środka */
     color: #fff;
-    border: 1px solid #888;  /* Szare obramowanie */
+    border: px solid #888;  /* Szare obramowanie */
 }
 
 /* Nagłówek i stylowy przycisk zamykający */
