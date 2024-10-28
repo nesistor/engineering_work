@@ -2,7 +2,7 @@
   <nav>
     <div class="navbar-logo">
       <img src="@/assets/images/logo_km.svg" alt="Logo" class="logo-icon" />
-      <img src="@/assets/images/name.svg" alt="Name" class="name-icon" />
+      <span class="name-text">Karol Malicki</span> <!-- Zmiana na zwykły tekst -->
     </div>
     <ul>
       <li><a href="#about">About Me</a></li>

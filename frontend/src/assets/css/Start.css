@@ -3,7 +3,8 @@
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background-image: url('../images/background.svg'); 
+    background-image: url('../images/background.svg');
+    background-color: black; /* Czarne tło */
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -13,8 +14,6 @@
     text-align: center;
     color: white;
     padding: 20px;
-    background: rgba(0, 0, 0, 0.5); /* Półprzezroczyste tło */
-    border-radius: 8px;
   }
   
   .main-heading {

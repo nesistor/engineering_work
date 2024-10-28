@@ -6,7 +6,7 @@ nav {
     background-color: #000;
     padding: 0.8rem;
     z-index: 1000;
-    border-bottom: 2px solid #fff;
+    border-bottom: 1px solid #fff; /* Zmniejszona grubość linii */
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -17,18 +17,20 @@ nav {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-right: 2rem; /* Większy odstęp między logo a prawą częścią ekranu */
+    margin-right: 2rem;
 }
 
 .logo-icon {
     width: 30px;
     height: 30px;
 }
-
-.name-icon {
-    width: auto;
-    height: 36px;
-    margin-left: 0.5rem;
+.name-text {
+    font-weight: bold; /* Pogrubiona czcionka */
+    color: #fff; /* Kolor czcionki */
+    margin-left: 0.5rem; /* Odstęp od logo */
+    font-size: 1.5rem; /* Rozmiar czcionki */
+    display: inline; /* Zapewnia, że tekst będzie w tej samej linii */
+    white-space: nowrap; /* Zapobiega łamaniu tekstu */
 }
 
 ul {
