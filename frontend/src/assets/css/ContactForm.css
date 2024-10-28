@@ -1,47 +1,135 @@
+/* Pasek kontaktowy - widoczna sama ikona, a napis rozwija się po najechaniu */
+.contact-bar {
+  position: fixed;
+  top: 80.5%; /* Ustawienie na środek ekranu */
+  right: 0;
+  background-color: #000;
+  color: #fff;
+  font-size: 18px;
+  padding: 10px;
+  border-radius: 10px 0 0 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: width 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  width: 30px; /* Szerokość paska tylko dla ikony */
+  overflow: hidden; /* Ukrycie tekstu poza paskiem */
+}
+
+.contact-bar:hover {
+  background-color: #666;
+  width: 140px; /* Szerokość paska z napisem */
+}
+
+.contact-icon {
+  width: 30px; /* Rozmiar ikony */
+  height: 30px;
+}
+
+.contact-text {
+    padding-top: 10px;
+    margin: 0 10px;
+    white-space: nowrap;
+    opacity: 0; /* Ukrycie tekstu */
+    transition: opacity 0.3s ease;
+}
+
+.contact-bar:hover .contact-text {
+    opacity: 1; /* Tekst pojawia się po najechaniu */
+}
 .contact-form {
-    background-color: black; /* Czarny kolor tła */
-    border-radius: 15px; /* Zaokrąglone rogi */
-    border: 2px solid silver; /* Srebrne obramowanie */
-    padding: 20px;
-    margin: 20px auto; /* Automatyczne marginesy w poziomie dla centrowania */
-    width: 50%; /* Ustawia szerokość formularza na 50% */
-    max-width: 100%; /* Maksymalna szerokość formularza */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Opcjonalny cień */
-    text-align: left; /* Wyrównuje tekst do lewej */
+    display: flex;
+    flex-direction: column;
+    background-color: #000;
+    border-radius: 15px;
+    max-width: 500px; /* Zwiększono maksymalną szerokość formularza */
+    width: 90%; /* Dodano szerokość formularza, aby lepiej pasował do różnych ekranów */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: fixed;
+    top: 50%; /* Ustawiamy formularz na środek */
+    left: 50%; /* Ustawiamy formularz na środek */
+    transform: translate(-50%, -50%); /* Przesuwamy formularz do środka */
+    color: #fff;
+    border: 1px solid #888;  /* Szare obramowanie */
 }
 
-h2 {
-    color: white; /* Kolor tekstu nagłówka */
-    text-align: center; /* Wyśrodkowanie nagłówka */
+/* Nagłówek i stylowy przycisk zamykający */
+.form-header {
+    background-color: #fff;
+  display: flex;
+  justify-content: space-between;
 }
 
-.form-group {
-    margin-bottom: 15px;
+.contact-form h2 {
+    padding-left: 10px;
+    color: #000;
+    font-size: 1.5rem;
+    margin: 0;
+  }
+  
+.close-button { background-color: #fff;
+    border: none; /* Brak obramowania */
+    cursor: pointer; /* Wskaźnik kursora */
+    width: 30px; /* Szerokość przycisku (kwadrat) */
+    height: 30px; /* Wysokość przycisku (kwadrat) */
+    padding: 0; /* Usunięcie paddingu */
+    margin: 0; /* Usunięcie marginesu */
+    transition: transform 0.3s ease; /* Dodanie animacji transform */
+}
+
+.close-button:hover {
+    transform: scale(1.1); /* Lekka animacja powiększenia */
+}
+
+/* Linie oddzielająca nagłówek */
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: #fff;
+  margin-bottom: 10px;
 }
 
 label {
-    display: block; /* Ustawienie label jako block, aby zajmował całą szerokość */
-    color: white; /* Kolor etykiety */
+  color: #fff;
+  font-weight: bold;
+  margin-bottom: 5px;
 }
 
-input, textarea {
-    width: 100%; /* Szerokość 100% */
-    padding: 10px; /* Wewnętrzne odstępy */
-    border-radius: 5px; /* Zaokrąglone rogi dla inputów */
-    border: 1px solid silver; /* Obramowanie inputów */
-    background-color: #333; /* Ciemne tło dla inputów */
-    color: white; /* Kolor tekstu */
+input,
+textarea {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  background-color: #333;
+  color: #fff;
+  font-size: 0.9rem;
 }
+.form-group {
+    padding-left: 20px;
+    padding-right: 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    
+  }
 
-button {
-    background-color: silver; /* Kolor tła przycisku */
-    color: black; /* Kolor tekstu przycisku */
-    padding: 10px 20px; /* Wewnętrzne odstępy */
-    border: none; /* Brak obramowania */
-    border-radius: 5px; /* Zaokrąglone rogi dla przycisku */
-    cursor: pointer; /* Kursor wskazujący */
-}
 
-button:hover {
-    background-color: #ccc; /* Jaśniejszy kolor tła przycisku przy najechaniu */
-}
+.send-button {
+    margin-left: auto;
+    background-color: #000; /* Kolor tła */
+    display: inline-block;
+    color: #fff; /* Kolor tekstu */
+    padding: 8px 15px; /* Padding wewnętrzny */
+    border: 1px solid #fff; /* Obramowanie */
+    border-radius: 5px; /* Zaokrąglenie rogów */
+    cursor: pointer; /* Wskaźnik kursora */
+    transition: transform 0.3s ease; /* Animacja koloru tła */
+    display: inline-block; /* Umożliwia dopasowanie do zawartości */
+  }
+  
+ .send-button:hover {
+    transform: scale(1.1); /* Kolor przycisku po najechaniu */
+  }
+  

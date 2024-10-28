@@ -1,6 +1,6 @@
 <template>
     <section class="experience">
-      <h1>Experience</h1>
+      <h1>My bite adventure</h1>
   
       <!-- Pojedyncza pozycja doświadczenia zawodowego -->
       <div class="experience-item">
@@ -32,7 +32,7 @@
   </template>
   
   <script>
-  import '../assets/css/Experience.css';
+  import '../../assets/css/Experience.css';
   export default {
     name: 'MyExperience',
   };

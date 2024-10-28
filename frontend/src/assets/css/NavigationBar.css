@@ -24,10 +24,20 @@ li {
     padding: 0;
 }
 
-/* Klasa dla linku login */
-.login {
-    margin-left: auto; /* Przenosi element na koniec (prawo) */
-    margin-right: 30px; /* Dodaje margines z prawej strony */
+/* Klasa dla linku Contact */
+.contact-link {
+    color: #fff; /* Biały kolor linku */
+    text-decoration: none;
+    padding: 0.5rem 1rem; /* Dodaje padding do linku */
+    border: 1px solid #fff; /* Białe obramowanie */
+    border-radius: 10px; /* Zaokrąglenie rogów */
+    transition: background-color 0.3s, color 0.3s; /* Animacja dla hover */
+}
+
+/* Efekt hover dla linku Contact */
+.contact-link:hover {
+    background-color: rgba(255, 255, 255, 0.2); /* Efekt hover */
+    color: #000; /* Zmiana koloru tekstu na czarny przy hover */
 }
 
 a {

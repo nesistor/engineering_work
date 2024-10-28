@@ -8,6 +8,11 @@
       <AboutMe />
     </section>
 
+    <!-- Contact Form Section -->
+    <section class="section" id="chat">
+      <ChatApp />
+    </section>
+
     <!-- Footer Section -->
     <section class="section" id="experience">
       <MyExperience />
@@ -17,6 +22,8 @@
     <section class="section" id="tech-stack">
       <TechStack />
     </section>
+
+    
 
     <!-- Contact Form Section -->
     <section class="section" id="contact">
@@ -31,12 +38,13 @@
 </template>
 
 <script>
-import AboutMe from './components/AboutMe.vue';
-import TechStack from './components/TechStack.vue';
-import ContactForm from './components/ContactForm.vue';
-import NavigationBar from './components/NavigationBar.vue';
-import AppFooter from './components/Footer.vue';
-import MyExperience from './components/Experience.vue';
+import AboutMe from './components/Home/AboutMe.vue';
+import TechStack from './components/Home/TechStack.vue';
+import ContactForm from './components/Home/ContactForm.vue';
+import NavigationBar from './components/Home/NavigationBar.vue';
+import AppFooter from './components/Home/Footer.vue';
+import MyExperience from './components/Home/Experience.vue';
+import ChatApp from './components/Home/Chat.vue';
 import './assets/css/App.css';
 
 export default {
@@ -48,6 +56,7 @@ export default {
     NavigationBar,
     AppFooter,
     MyExperience,
+    ChatApp,
   },
   mounted() {
     window.scrollTo(0, 0); // Resetuje scroll na górę strony po załadowaniu

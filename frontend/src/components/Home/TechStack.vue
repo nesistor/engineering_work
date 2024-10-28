@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import '../assets/css/TechStack.css';
+import '../../assets/css/TechStack.css';
 
 export default {
   name: 'TechStack'

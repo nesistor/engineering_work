@@ -7,12 +7,8 @@
 </template>
 
 <script>
-import '../assets/css/AboutMe.css';
+import '../../assets/css/AboutMe.css';
 export default {
   name: 'AboutMe'
 }
 </script>
-
-<style scoped>
-@import '../assets/css/AboutMe.css'; /* Upewnij się, że ścieżka do pliku CSS jest poprawna */
-</style>
