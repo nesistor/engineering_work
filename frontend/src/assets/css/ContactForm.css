@@ -37,6 +37,7 @@
 .contact-bar:hover .contact-text {
     opacity: 1; /* Tekst pojawia się po najechaniu */
 }
+
 .contact-form {
     display: flex;
     flex-direction: column;
@@ -46,11 +47,13 @@
     width: 90%; /* Dodano szerokość formularza, aby lepiej pasował do różnych ekranów */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     position: fixed;
-    top: 50%; /* Ustawiamy formularz na środek */
-    left: 50%; /* Ustawiamy formularz na środek */
-    transform: translate(-50%, -50%); /* Przesuwamy formularz do środka */
+    top: 0; /* Ustawiamy formularz poniżej paska nawigacyjnego */
+    right: 0; /* Ustawiamy formularz po prawej stronie */
+    transform: translate(0, 0); /* Usunięto przesunięcie */
     color: #fff;
-    border: px solid #888;  /* Szare obramowanie */
+    border: 1px solid #888; /* Szare obramowanie */
+    margin: 20px; /* Dodałem margines, aby nie przylegał do krawędzi */
+    z-index: 3000; /* Ustawiamy z-index wyższy niż navbar */
 }
 
 /* Nagłówek i stylowy przycisk zamykający */
@@ -121,8 +124,8 @@ textarea {
     display: inline-block;
     color: #fff; /* Kolor tekstu */
     padding: 8px 15px; /* Padding wewnętrzny */
-    border: 1px solid #fff; /* Obramowanie */
-    border-radius: 5px; /* Zaokrąglenie rogów */
+    border: 5px solid #fff; /* Obramowanie */
+    border-radius: 20px; /* Zaokrąglenie rogów */
     cursor: pointer; /* Wskaźnik kursora */
     transition: transform 0.3s ease; /* Animacja koloru tła */
     display: inline-block; /* Umożliwia dopasowanie do zawartości */

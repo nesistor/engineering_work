@@ -3,6 +3,11 @@
     <!-- Navigation Section -->
     <NavigationBar />
 
+        <!-- Start Section -->
+        <section class="section" id="start">
+      <Start />
+    </section>
+
     <!-- About Me Section -->
     <section class="section" id="about">
       <AboutMe />
@@ -45,6 +50,7 @@ import NavigationBar from './components/Home/NavigationBar.vue';
 import AppFooter from './components/Home/Footer.vue';
 import MyExperience from './components/Home/Experience.vue';
 import ChatApp from './components/Home/Chat.vue';
+import Start from './components/Home/Start.vue';
 import './assets/css/App.css';
 
 export default {
@@ -57,6 +63,7 @@ export default {
     AppFooter,
     MyExperience,
     ChatApp,
+    Start,
   },
   mounted() {
     window.scrollTo(0, 0); // Resetuje scroll na górę strony po załadowaniu

@@ -1,52 +1,74 @@
 nav {
-    position: fixed; /* Utrzymuje navbar na górze */
-    top: 0; /* Ustawia navbar na górze */
+    position: fixed;
+    top: 0;
     left: 0;
     width: 100%;
-    background-color: #000; /* Czarny kolor tła */
-    padding: 1rem;
-    z-index: 1000; /* Upewnij się, że navbar jest nad innymi elementami */
-    border-bottom: 2px solid #fff; /* Biała linia podkreślająca */
+    background-color: #000;
+    padding: 0.8rem;
+    z-index: 1000;
+    border-bottom: 2px solid #fff;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 2rem; /* Większy odstęp między logo a prawą częścią ekranu */
+}
+
+.logo-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.name-icon {
+    width: auto;
+    height: 36px;
+    margin-left: 0.5rem;
 }
 
 ul {
     list-style-type: none;
-    display: flex; /* Flexbox dla układu */
-    gap: 1rem; /* Odstęp między elementami listy */
-    justify-content: flex-start; /* Wyrównuje linki do lewej */
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
     margin: 0;
-    padding: 0;
-    width: 100%; /* Umożliwia wykorzystanie pełnej szerokości */
+    padding: 0 1rem 0 0;
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/* Pozostałe style bez zmian */
 li {
     margin: 0;
     padding: 0;
 }
 
-/* Klasa dla linku Contact */
 .contact-link {
-    color: #fff; /* Biały kolor linku */
+    color: #fff;
     text-decoration: none;
-    padding: 0.5rem 1rem; /* Dodaje padding do linku */
-    border: 1px solid #fff; /* Białe obramowanie */
-    border-radius: 10px; /* Zaokrąglenie rogów */
-    transition: background-color 0.3s, color 0.3s; /* Animacja dla hover */
+    padding: 0.5rem 1rem;
+    border: 1px solid #fff;
+    border-radius: 10px;
+    transition: background-color 0.3s, color 0.3s;
 }
 
-/* Efekt hover dla linku Contact */
 .contact-link:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Efekt hover */
-    color: #000; /* Zmiana koloru tekstu na czarny przy hover */
+    background-color: rgba(255, 255, 255, 0.2);
+    color: #000;
 }
 
 a {
-    color: #fff; /* Biały kolor linków */
+    color: #fff;
     text-decoration: none;
-    padding: 0.5rem 1rem; /* Dodaje padding do linków */
-    transition: background-color 0.3s; /* Animacja dla hover */
+    padding: 0.5rem 1rem;
+    transition: background-color 0.3s;
 }
 
 a:hover {
-    background-color: rgba(255, 255, 255, 0.2); /* Efekt hover */
+    background-color: rgba(255, 255, 255, 0.2);
 }
