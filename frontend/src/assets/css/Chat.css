@@ -1,15 +1,29 @@
-.chat-container {
+/* Full-page background styling */
+.page-background {
+    height: 100vh;
+    width: 100vw;
+    background: url('@/assets/images/castle_background.svg') no-repeat center center;
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Chat container */
+  .chat-container {
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 90vh;
     width: 100%;
-    max-width: 600px;
+    max-width: 800px; /* Adjusted width */
     margin: 0 auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow: hidden;
+    background-color: #ffffff;
   }
   
+  /* Header styling */
   .header {
     text-align: center;
     padding: 20px;
@@ -29,10 +43,11 @@
     color: #555;
   }
   
+  /* Messages container */
   .messages-container {
     flex: 1;
     padding: 10px;
-    background-color: #f9f9f9;
+    background-color: rgba(0, 0, 0, 0.05); /* Semi-transparent for readability */
     overflow-y: auto;
   }
   
@@ -56,12 +71,12 @@
   }
   
   .llama-message {
-    flex-direction: row; /* Ikona lamy po lewej */
+    flex-direction: row;
     color: #0c5460;
   }
   
   .user-message {
-    flex-direction: row-reverse; /* Ikona użytkownika po prawej */
+    flex-direction: row-reverse;
     color: #333;
   }
   
@@ -81,6 +96,7 @@
     background-color: #e0e0e0;
   }
   
+  /* Input container */
   .input-container {
     display: flex;
     padding: 10px;
