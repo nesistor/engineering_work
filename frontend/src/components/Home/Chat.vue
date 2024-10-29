@@ -40,7 +40,7 @@
             @keyup.enter="sendMessage"
             placeholder="Napisz wiadomość..."
           />
-          <button @click="sendMessage">Wyślij</button>
+          <button @click="sendMessage">Send</button>
         </div>
       </div>
     </div>

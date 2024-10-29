@@ -1,0 +1,89 @@
+.service-background {
+    min-height: 100vh; /* Pełna wysokość */
+    width: 100vw;
+    background-image: url('@/assets/images/background/myExperience_background.svg'); /* Ścieżka do obrazu tła */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; 
+    background-color: #000; /* Czarny kolor tła jako zapas */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
+  
+  /* Ograniczenie rozmiaru kontenera */
+  .service-container {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(0, 0, 0, 0.8); /* Ustawienie tła z lekką przezroczystością */
+    color: #fff;
+    padding: 20px;
+    max-width: 800px; /* Maksymalna szerokość kontenera */
+    width: 100%; /* Ustawienie szerokości na 100% */
+    margin: 20px; /* Dodanie marginesu */
+    border: none; /* Usunięcie obramowania */
+    overflow: hidden; /* Ukrycie nadmiaru */
+  }
+  
+  /* Stylizacja formularza wyboru serwisu */
+  .service-form {
+    margin-bottom: 20px;
+  }
+  
+  .service-form label {
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+  
+  .service-form select {
+    padding: 10px;
+    font-size: 1rem;
+    color: #fff;
+    background-color: #333;
+    border: 1px solid #fff;
+    border-radius: 5px;
+  }
+  
+  /* Sekcje request i response */
+  .request-response {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .request,
+  .response {
+    width: 48%;
+    border: 1px solid #fff;
+    border-radius: 5px;
+    padding: 20px;
+  }
+  
+  h2 {
+    color: #fff;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  pre {
+    background-color: #111;
+    padding: 10px;
+    border-radius: 5px;
+    color: #ddd;
+    overflow-x: auto;
+  }
+  
+  button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #333;
+    color: #fff;
+    border: 1px solid #fff;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  button:hover {
+    background-color: #555;
+  }
+  

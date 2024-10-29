@@ -18,6 +18,10 @@
       <ChatApp />
     </section>
 
+    <section class="section" id="services">
+      <TestServices />
+    </section>
+
     <!-- Footer Section -->
     <section class="section" id="experience">
       <MyExperience />
@@ -51,6 +55,7 @@ import AppFooter from './components/Home/Footer.vue';
 import MyExperience from './components/Home/Experience.vue';
 import ChatApp from './components/Home/Chat.vue';
 import Start from './components/Home/Start.vue';
+import TestServices from './components/Home/Services.vue';
 import './assets/css/App.css';
 
 export default {
@@ -64,6 +69,7 @@ export default {
     MyExperience,
     ChatApp,
     Start,
+    TestServices,
   },
   mounted() {
     window.scrollTo(0, 0); // Resetuje scroll na górę strony po załadowaniu
