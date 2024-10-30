@@ -7,8 +7,17 @@
         I am very attentive to detail and consider the many factors necessary to prevent future issues. I strive for efficiency in all I do.
       </p>
     </section>
+    
+    <!-- Nowa sekcja po prawej stronie -->
+    <section id="new-section" class="new-section">
+      <h2>New Adventures Await</h2>
+      <p>
+        This is where I dive into my next projects and explore new territories in tech. I am always on the lookout for groundbreaking solutions and strive to bring innovative projects to life.
+      </p>
+    </section>
   </div>
 </template>
+
 
 <script>
 import '../../assets/css/AboutMe.css';
@@ -18,24 +27,27 @@ export default {
   methods: {
     triggerAnimation() {
       const aboutSection = document.querySelector('#about-me');
-      aboutSection.classList.remove('slide-in'); // Resetuje animację
+      const newSection = document.querySelector('#new-section');
+      
+      // Resetowanie animacji
+      aboutSection.classList.remove('slide-in');
+      newSection.classList.remove('slide-in');
+      
       setTimeout(() => {
         aboutSection.classList.add('slide-in');
-      }, 50); // Krótkie opóźnienie dla płynności efektu
+        newSection.classList.add('slide-in');
+      }, 50);
     }
   },
   mounted() {
-    // Animacja przy załadowaniu komponentu
     this.triggerAnimation();
 
-    // Nasłuchiwanie kliknięcia na link About Me w navbarze
     const aboutLink = document.querySelector('a[href="#about-me"]');
     if (aboutLink) {
       aboutLink.addEventListener('click', this.triggerAnimation);
     }
   },
   beforeUnmount() {
-    // Usuwanie nasłuchiwania zdarzeń przy usuwaniu komponentu
     const aboutLink = document.querySelector('a[href="#about-me"]');
     if (aboutLink) {
       aboutLink.removeEventListener('click', this.triggerAnimation);

@@ -7,11 +7,11 @@
     background-color: #000;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
     padding: 20px;
     box-sizing: border-box;
-  }
+}
   
   /* Stylizacja sekcji About Me */
   .about-me {
@@ -43,3 +43,20 @@
     color: #ddd;
   }
   
+  .new-section {
+    padding: 40px 20px;
+    background-color: #fff; /* Białe tło */
+    max-width: calc(100% - 300px);
+    border-radius: 10px;
+    color: #333;
+    margin-left: 20px; /* Odstęp między sekcjami */
+    opacity: 0;
+    transform: translateX(100%);
+    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+}
+
+/* Animacja dla nowej sekcji */
+.new-section.slide-in {
+    transform: translateX(0);
+    opacity: 1;
+}

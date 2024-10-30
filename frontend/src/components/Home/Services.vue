@@ -3,34 +3,32 @@
       <div class="service-container">
         <!-- Nagłówek -->
         <header class="header">
-          <h1>Wybór Serwisu</h1>
-          <p>Wybierz serwis, aby zobaczyć szczegóły.</p>
+          <h1>Microservices</h1>
+          <p>You can test queries to several of my microservices here.</p>
         </header>
   
-        <!-- Tło serwisu -->
-        <div class="test-services">
-          <!-- Formularz wyboru serwisu -->
-          <div class="service-form">
-            <label for="service-select">Select Service:</label>
-            <select id="service-select" v-model="selectedService">
-              <option v-for="(service, index) in services" :key="index" :value="index">
+        <!-- Lista przycisków wyboru serwisu -->
+        <div class="service-list">
+          <ul>
+            <li v-for="(service, index) in services" :key="index">
+              <button @click="selectService(index)">
                 {{ service.name }}
-              </option>
-            </select>
+              </button>
+            </li>
+          </ul>
+        </div>
+  
+        <!-- Widok dla wybranego serwisu -->
+        <div class="request-response">
+          <div class="request">
+            <h2>Request</h2>
+            <pre>{{ services[selectedService].request }}</pre>
+            <button @click="sendRequest">Send</button>
           </div>
   
-          <!-- Widok dla wybranego serwisu -->
-          <div class="request-response">
-            <div class="request">
-              <h2>Request</h2>
-              <pre>{{ services[selectedService].request }}</pre>
-              <button @click="sendRequest">Send</button>
-            </div>
-  
-            <div class="response">
-              <h2>Response</h2>
-              <pre>{{ response }}</pre>
-            </div>
+          <div class="response">
+            <h2>Response</h2>
+            <pre>{{ response }}</pre>
           </div>
         </div>
       </div>
