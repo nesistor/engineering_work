@@ -3,6 +3,7 @@ project/vault/*
 /frontend/.DS_Store
 frontend/node_modules
 frontend/dist
+finetune-llama3.2-1B/*
 
 
 # local env files
