@@ -4,7 +4,7 @@
       <!-- Application Header -->
       <header class="header">
         <h1>Llama Assistant</h1>
-        <p>Twój osobisty asystent do zadań specjalnych. Zapytaj, a uzyskasz odpowiedź!</p>
+        <p>Ask About My Interests, Projects, Recipes, or Send a Message Through My Assistant.</p>
       </header>
 
       <!-- Messages Container -->

@@ -5,7 +5,7 @@
         <p class="description">Discover more about my work and projects below.</p>
         <div class="button-container">
           <button class="cta-button">Discover More</button>
-          <button class="cta-button">Get in Touch</button>
+          <button class="cta-button">Load Reasume</button>
         </div>
       </div>
     </section>
