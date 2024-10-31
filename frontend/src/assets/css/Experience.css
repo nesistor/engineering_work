@@ -1,72 +1,104 @@
 /* Tło strony */
 .experience-background {
-    background-image: url('@/assets/images/background/myExperience_background.svg'); /* Ścieżka do obrazu tła */
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed; 
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-  }
-  
-  /* Stylizacja sekcji Experience */
-  .experience {
-    padding: 40px 20px;
-    background-color: rgba(240, 240, 240, 0.9); /* Lekko przezroczyste tło sekcji */
-    max-width: 800px;
-    width: 100%;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  }
-  
-  /* Stylizacja nagłówka */
-  .experience h1 {
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-align: left;
-  }
-  
-  /* Pojedyncza pozycja doświadczenia */
-  .experience-item {
-    background-color: #ffffff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  /* Nagłówek pozycji doświadczenia */
-  .experience-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-  }
-  
-  /* Stylizacja nazwy firmy */
-  .company-name {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #333;
-  }
-  
-  /* Stylizacja daty zatrudnienia */
-  .employment-dates {
-    font-size: 0.9rem;
-    color: #666;
-    font-style: italic;
-  }
-  
-  /* Stylizacja opisu obowiązków */
-  .job-description {
-    font-size: 1rem;
-    line-height: 1.6;
-    color: #333;
-    margin-top: 10px;
-    text-align: left;
-  }
-  
+  min-height: 100vh; /* Pełna wysokość */
+  width: 100vw;
+  background-image: url('@/assets/images/background/myExperience_background.svg'); /* Ścieżka do obrazu tła */
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed; 
+  background-color: #000; /* Czarny kolor tła jako zapas */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+
+/* Sekcja doświadczenia */
+.experience {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Dwie kolumny */
+  gap: 20px; /* Odstęp między kolumnami */
+  max-width: 800px;
+  width: 100%;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+/* Nagłówek */
+.experience h1 {
+  grid-column: span 2;
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #fff;
+}
+
+/* Pojedyncza pozycja doświadczenia */
+.experience-item {
+  background-color: #000; /* Czarny kolor tła kart */
+  color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #fff; /* Biała obwódka */
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  position: relative;
+  cursor: pointer;
+  perspective: 1000px;
+}
+
+/* Efekt hover */
+.experience-item:hover {
+  transform: scale(1.05); /* Delikatne powiększenie na hover */
+  box-shadow: 0 8px 15px rgba(255, 255, 255, 0.2);
+}
+
+/* Glow efekt */
+.experience-item .glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 8px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 20%, transparent 80%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.experience-item:hover .glow {
+  opacity: 1;
+}
+
+/* Nagłówek pozycji doświadczenia */
+.experience-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+/* Stylizacja nazwy firmy */
+.company-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #fff;
+}
+
+/* Stylizacja daty zatrudnienia */
+.employment-dates {
+  font-size: 0.9rem;
+  color: #aaa;
+  font-style: italic;
+}
+
+/* Stylizacja opisu obowiązków */
+.job-description {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #fff;
+  margin-top: 10px;
+  text-align: left;
+}

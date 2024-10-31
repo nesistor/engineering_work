@@ -2,39 +2,70 @@
   <div class="experience-background">
     <section class="experience">
       <h1>My Bite Adventure</h1>
-
-      <!-- Pojedyncza pozycja doświadczenia zawodowego -->
-      <div class="experience-item">
+      <div
+        class="experience-item"
+        v-for="(experience, index) in experiences"
+        :key="index"
+        @mousemove="handleMouseMove"
+        @mouseleave="handleMouseLeave"
+        @mouseover="handleMouseOver"
+        ref="experienceItem"
+      >
         <div class="experience-header">
-          <span class="company-name">Tech Solutions Inc.</span>
-          <span class="employment-dates">Jan 2020 - Dec 2022</span>
+          <span class="company-name">{{ experience.company }}</span>
+          <span class="employment-dates">{{ experience.dates }}</span>
         </div>
-        <p class="job-description">
-          - Led a team to implement CI/CD pipelines and automation.<br />
-          - Collaborated with cross-functional teams to improve efficiency.<br />
-          - Developed backend services and APIs in Node.js and GoLang.
-        </p>
-      </div>
-
-      <!-- Dodaj więcej doświadczeń zawodowych w tym samym formacie -->
-      <div class="experience-item">
-        <div class="experience-header">
-          <span class="company-name">Innovatech Corp.</span>
-          <span class="employment-dates">Feb 2018 - Dec 2019</span>
-        </div>
-        <p class="job-description">
-          - Designed and maintained cloud infrastructure solutions.<br />
-          - Optimized application performance and reliability.<br />
-          - Provided training for new hires on DevOps best practices.
-        </p>
+        <p class="job-description">{{ experience.description }}</p>
+        <div class="glow" />
       </div>
     </section>
   </div>
 </template>
 
 <script>
-import '../../assets/css/Experience.css';
 export default {
-  name: 'MyExperience',
+  name: "MyExperience",
+  data() {
+    return {
+      experiences: [
+        {
+          company: "Tech Solutions Inc.",
+          dates: "Jan 2020 - Dec 2022",
+          description: `- Led a team to implement CI/CD pipelines and automation.
+            - Collaborated with cross-functional teams to improve efficiency.
+            - Developed backend services and APIs in Node.js and GoLang.`,
+        },
+        {
+          company: "Innovatech Corp.",
+          dates: "Feb 2018 - Dec 2019",
+          description: `- Designed and maintained cloud infrastructure solutions.
+            - Optimized application performance and reliability.
+            - Provided training for new hires on DevOps best practices.`,
+        },
+      ],
+    };
+  },
+  methods: {
+    handleMouseOver(event) {
+      const glow = event.currentTarget.querySelector(".glow");
+      glow.style.opacity = 1;
+    },
+    handleMouseLeave(event) {
+      const card = event.currentTarget;
+      const glow = card.querySelector(".glow");
+      card.style.transform = `perspective(500px) scale(1) rotateX(0) rotateY(0)`;
+      glow.style.opacity = 0;
+    },
+    handleMouseMove(event) {
+      const card = event.currentTarget;
+      const relX = (event.offsetX + 1) / card.offsetWidth;
+      const relY = (event.offsetY + 1) / card.offsetHeight;
+      const rotY = `rotateY(${(relX - 0.5) * 30}deg)`;
+      const rotX = `rotateX(${(relY - 0.5) * -30}deg)`;
+      card.style.transform = `perspective(500px) scale(1.05) ${rotY} ${rotX}`;
+    },
+  },
 };
 </script>
+
+<style scoped src="../../assets/css/Experience.css"></style>
