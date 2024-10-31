@@ -25,14 +25,14 @@
 
           <!-- Wyświetlany endpoint -->
           <p>Endpoint: {{ currentEndpoint.name }}</p>
-
-          <p>Headers:</p>
-          <pre>{{ JSON.stringify(currentEndpoint.headers, null, 2) }}</pre>
-
           
           <!-- Nagłówek dla JSON -->
           <p>JSON:</p>
           <pre>{{ JSON.stringify(JSON.parse(currentEndpoint.request), null, 2) }}</pre>
+
+          <!-- Wyświetlane nagłówki -->
+          <p>Headers:</p>
+          <pre>{{ JSON.stringify(currentEndpoint.headers, null, 2) }}</pre>
 
           <button @click="sendRequest">Send</button>
         </div>
@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import axios from 'axios';
 import '../../assets/css/Services.css';
 export default {
   name: 'TestServices',
@@ -183,36 +184,42 @@ export default {
     },
   },
   methods: {
-    selectService(index) {
-      this.selectedService = index;
-      this.selectedEndpoint = 0; // Resetuj wybrany endpoint przy zmianie serwisu
-    },
-    sendRequest() {
-      // Symulujemy response, tutaj można podpiąć API
-      this.response = {
-        message: `Response from ${this.currentEndpoint.name}`,
-        data: {
-          status: "success",
-          result: {
-            userId: "12345",
-            action: "logged in",
-            timestamp: new Date().toISOString(),
-          },
-        },
-      };
-
-      // Zmieniamy endpoint na kolejny
-      if (this.selectedEndpoint < this.services[this.selectedService].endpoints.length - 1) {
-        this.selectedEndpoint++;
-      } else {
-        // Jeśli to ostatni endpoint, wróć do pierwszego
-        this.selectedEndpoint = 0;
-      }
-    },
-    formatResponse(response) {
-      // Zwracamy ładnie sformatowany JSON
-      return JSON.stringify(response, null, 2);
-    },
+  selectService(index) {
+    this.selectedService = index;
+    this.selectedEndpoint = 0; // Reset selected endpoint on service change
   },
+  async sendRequest() {
+    // Parse the JSON request body from the current endpoint
+    const requestBody = JSON.parse(this.currentEndpoint.request);
+
+    try {
+      // Send the request using Axios with real API interaction
+      const res = await axios({
+        method: 'post', // Use 'post' as the default or update per endpoint requirements
+        url: `http://localhost:8080${this.currentEndpoint.name}`, // Replace with your API base URL
+        headers: this.currentEndpoint.headers,
+        data: requestBody
+      });
+
+      // Store the actual response data
+      this.response = res.data;
+
+    } catch (error) {
+      // Handle errors gracefully and display error messages
+      this.response = error.response ? error.response.data : 'Request failed. Please check the API URL and try again.';
+    }
+
+    // Automatically switch to the next endpoint, or reset if it's the last one
+    if (this.selectedEndpoint < this.services[this.selectedService].endpoints.length - 1) {
+      this.selectedEndpoint++;
+    } else {
+      this.selectedEndpoint = 0;
+    }
+  },
+  formatResponse(response) {
+    // Format the response in JSON with 2 spaces indentation for better readability
+    return JSON.stringify(response, null, 2);
+  },
+},
 };
 </script>

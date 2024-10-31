@@ -1,62 +1,59 @@
-/* Ustawienia tła dla sekcji profilowej */
 .profile-background {
-    background-image: url('@/assets/images/background/aboutMe_background.svg'); /* Ścieżka do obrazu */
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
-    background-color: #000;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
-    padding: 20px;
-    box-sizing: border-box;
-}
-  
-  /* Stylizacja sekcji About Me */
-  .about-me {
-    padding: 40px 20px;
-    background-color: rgba(0, 0, 0, 0.8); /* Ciemne, półprzezroczyste tło */
-    max-width: calc(100% - 300px);
-    border-radius: 10px;
-    opacity: 0;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
-    color: #fff;
-  }
-  
-  .about-me.slide-in {
-    transform: translateX(0);
-    opacity: 1;
-  }
-  
-  .about-me h1 {
-    margin: 0;
-    font-size: 2rem;
-    color: #fff;
-  }
-  
-  .about-me p {
-    margin-top: 10px;
-    line-height: 1.5;
-    max-width: 600px;
-    color: #ddd;
-  }
-  
-  .new-section {
-    padding: 40px 20px;
-    background-color: #fff; /* Białe tło */
-    max-width: calc(100% - 300px);
-    border-radius: 10px;
-    color: #333;
-    margin-left: 20px; /* Odstęp między sekcjami */
-    opacity: 0;
-    transform: translateX(100%);
-    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  background-image: url('@/assets/images/background/aboutMe_background.svg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Wyśrodkowanie pionowe */
+  min-height: 120vh;/* Ustawienie pełnej wysokości ekranu */
+  padding: 0; /* Usuń padding, aby sekcja zajmowała pełne 100vh */
+  box-sizing: border-box;
+  overflow-y: hidden; /* Ukryj przewijanie wewnątrz sekcji */
 }
 
-/* Animacja dla nowej sekcji */
+/* Stylizacja sekcji About Me */
+.about-me {
+  padding: 40px 20px;
+  background-color: rgba(0, 0, 0, 0.8); /* Ciemne, półprzezroczyste tło */
+  max-width: 600px; /* Ustalona szerokość sekcji */
+  border-radius: 10px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  color: #fff;
+}
+
+.about-me.slide-in {
+  transform: translateX(0);
+  opacity: 1;
+}
+/* New section styling */
+.new-section {
+  padding: 40px 20px;
+  background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+  max-width: 600px;
+  border-radius: 10px;
+  color: #fff; /* White text */
+  margin-left: 20px;
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+  position: relative;
+  text-align: center; /* Center-aligns text and image */
+}
+
+/* Image styling */
+.section-image {
+  width: 100px; /* Adjust as needed */
+  height: auto;
+  margin-bottom: 20px; /* Space between image and text */
+  border-radius: 10%; /* Optional rounded corners */
+}
+
+/* Animation for the new section */
 .new-section.slide-in {
-    transform: translateX(0);
-    opacity: 1;
+  transform: translateX(0);
+  opacity: 1;
 }

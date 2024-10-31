@@ -8,8 +8,9 @@
       </p>
     </section>
     
-    <!-- Nowa sekcja po prawej stronie -->
+    <!-- New section with an image above the text -->
     <section id="new-section" class="new-section">
+      <img src="@/assets/images/wolf.svg" alt="Image Description" class="section-image" />
       <h2>New Adventures Await</h2>
       <p>
         This is where I dive into my next projects and explore new territories in tech. I am always on the lookout for groundbreaking solutions and strive to bring innovative projects to life.
@@ -17,7 +18,6 @@
     </section>
   </div>
 </template>
-
 
 <script>
 import '../../assets/css/AboutMe.css';

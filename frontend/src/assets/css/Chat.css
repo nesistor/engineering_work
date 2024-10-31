@@ -1,13 +1,17 @@
 /* Full-page background styling */
 .page-background {
-  height: 100vh;
-  width: 100vw;
-  background: url('@/assets/images/castle_background.svg') no-repeat center center;
-  background-size: cover;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+    min-height: 100vh; /* Pełna wysokość */
+    width: 100vw;
+    background-image: url('@/assets/images/background/myExperience_background.svg'); /* Ścieżka do obrazu tła */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; 
+    background-color: #000; /* Czarny kolor tła jako zapas */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+  }
 
 /* Chat container */
 .chat-container {

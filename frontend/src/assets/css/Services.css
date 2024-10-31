@@ -51,11 +51,23 @@
     justify-content: space-between;
   }
   
-  .request,
+  .request {
+    width: 48%;
+    border: 1px solid #fff;
+    border-top-left-radius: 5px; /* Rounded top-left corner */
+    border-bottom-left-radius: 5px; /* Rounded bottom-left corner */
+    border-top-right-radius: 0; /* No rounding on the right */
+    border-bottom-right-radius: 0; /* No rounding on the right */
+    padding: 20px;
+  }
+  
   .response {
     width: 48%;
     border: 1px solid #fff;
-    border-radius: 5px;
+    border-top-right-radius: 5px; /* Rounded top-right corner */
+    border-bottom-right-radius: 5px; /* Rounded bottom-right corner */
+    border-top-left-radius: 0; /* No rounding on the left */
+    border-bottom-left-radius: 0; /* No rounding on the left */
     padding: 20px;
   }
   
