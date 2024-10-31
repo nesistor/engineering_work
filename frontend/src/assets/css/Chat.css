@@ -1,122 +1,116 @@
 /* Full-page background styling */
 .page-background {
-    height: 100vh; /* Pełna wysokość */
-    width: 100vw; /* Pełna szerokość */
+    height: 100vh;
+    width: 100vw;
     background: url('@/assets/images/castle_background.svg') no-repeat center center;
-    background-size: cover; /* Pokrywa całą stronę */
-    background-position: center;
-    background-attachment: fixed;
+    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
-    box-sizing: border-box;
-    margin: 0; /* Usunięcie domyślnego marginesu */
-}
-
-/* Chat container */
-.chat-container {
+  }
+  
+  /* Chat container */
+  .chat-container {
     display: flex;
     flex-direction: column;
-    height: 100%; /* Ustawienie na 100% wysokości kontenera rodzica */
+    height: 90vh;
     width: 100%;
-    max-width: 800px; /* Maksymalna szerokość */
-    margin: 0; /* Usunięcie domyślnego marginesu */
-    border: none; /* Usunięcie obramowania */
+    max-width: 800px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
     overflow: hidden;
-    background-color: black; /* Ustawienie tła na czarne */
-}
-
-/* Header styling */
-.header {
-    text-align: center;
-    padding: 20px;
-    background-color: #333; /* Ustawienie tła na ciemniejsze dla nagłówka */
-}
-
-.header h1 {
+    background-color: #ffffff;
+  }
+  
+  /* Header styling */
+  .header {
+    background-color: black;
+    padding: 10px;
+  }
+  
+  .header h1 {
     margin: 0;
     font-size: 24px;
-    color: white; /* Ustawienie koloru czcionki na biały */
-}
-
-.header p {
+    color: #ffffff;
+  }
+  
+  .header p {
     margin: 5px 0 0;
     font-size: 14px;
-    color: #ddd; /* Ustawienie koloru czcionki na jasnoszary */
-}
-
-/* Messages container */
-.messages-container {
-    flex: 1; /* Rozszerza się, aby zająć pozostałą przestrzeń */
+    color: #555;
+  }
+  
+  /* Messages container */
+  .messages-container {
+    flex: 1;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.05); /* Półprzezroczyste tło */
+    background-color: rgba(255, 255, 255, 0.05);
     overflow-y: auto;
-}
-
-.message {
+  }
+  
+  /* Message styling */
+  .message {
     display: flex;
     align-items: center;
     margin: 10px 0;
-}
-
-.icon {
+  }
+  
+  .icon {
     width: 40px;
     height: 40px;
-    border-radius: 50%; /* Usunięcie zaokrąglenia */
+    border-radius: 50%;
     overflow: hidden;
-}
-
-.user-icon {
+  }
+  
+  .user-icon {
     width: 100%;
     height: auto;
-    border-radius: 50%; /* Usunięcie zaokrąglenia */
-}
-
-.llama-message {
-    flex-direction: row;
-    color: #0c5460; /* Kolor czcionki dla wiadomości Llama */
-}
-
-.user-message {
+    border-radius: 50%;
+  }
+  
+  .llama-message {
+    color: #0c5460;
+  }
+  
+  .user-message {
     flex-direction: row-reverse;
-    color: #fff; /* Ustawienie koloru czcionki na biały dla wiadomości użytkownika */
-}
-
-.message-content {
+    color: #333;
+  }
+  
+  .message-content {
     max-width: 70%;
     padding: 10px;
-    border-radius: 0; /* Usunięcie zaokrąglenia */
-    background-color: rgba(255, 255, 255, 0.1); /* Półprzezroczyste tło dla wiadomości */
+    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.1);
     margin: 0 10px;
-    color: white; /* Ustawienie koloru czcionki na biały */
-}
-
-/* Input container */
-.input-container {
+    color: #000; /* Set to black for better visibility */
+  }
+  
+  /* Input container */
+  .input-container {
     display: flex;
     padding: 10px;
-    background-color: #222; /* Ciemniejsze tło dla kontenera wejściowego */
-}
-
-.input-container input {
+    background-color: #fff;
+  }
+  
+  .input-container input {
     flex: 1;
     padding: 10px;
-    border: 1px solid #555; /* Ciemne obramowanie */
-    border-radius: 0; /* Usunięcie zaokrąglenia */
-    color: white; /* Ustawienie koloru czcionki na biały */
-    background-color: #333; /* Ciemniejsze tło dla inputa */
-}
-
-.input-container button {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .input-container button {
     margin-left: 10px;
     padding: 10px 15px;
-    border: 2px solid white; /* Białe obramowanie */
-    border-radius: 0; /* Usunięcie zaokrąglenia */
-    background-color: black; /* Czarne tło */
-    color: white; /* Ustawienie koloru czcionki na biały */
+    border: none;
+    border-radius: 4px;
+    background-color: black; /* Use one background color */
+    color: white;
     cursor: pointer;
-}
-
-.input-container button:hover {
-    background-color: #333; /* Ciemniejszy odcień przycisku przy najechaniu */
-}
+  }
+  
+  .input-container button:hover {
+    background-color: #333; /* Darker shade on hover */
+  }
