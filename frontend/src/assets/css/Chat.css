@@ -24,7 +24,7 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
-  background-color: #ffffff;
+  background-color: #000;
 }
 
 /* Header styling */
@@ -36,7 +36,7 @@
 .header h1 {
   margin: 0;
   font-size: 24px;
-  color: #ffffff;
+  color: #fff;
 }
 
 .header p {
@@ -86,7 +86,7 @@
   max-width: 70%;
   padding: 10px;
   border-radius: 10px;
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: #fff;
   margin: 0 10px;
   color: #000; /* Set to black for better visibility */
 }
@@ -94,13 +94,13 @@
 /* Input container */
 .input-container {
   display: flex;
-  padding: 10px;
-  background-color: #fff;
+  padding: 10px 15px;
+  background-color: #000;
 }
 
 .input-container input {
   flex: 1;
-  padding: 10px;
+  padding: 10px 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
 }

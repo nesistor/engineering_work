@@ -85,6 +85,14 @@
   font-size: 1.2rem;
   font-weight: bold;
   color: #fff;
+  text-align: left;
+}
+
+.company-icon {
+  width: 60px; /* Dostosowanie rozmiaru ikony */
+  height: 60px;
+  object-fit: contain; /* Skaluje ikonę, aby mieściła się w kontenerze */
+  margin-bottom: 5px; /* Przestrzeń między ikoną a nazwą firmy */
 }
 
 /* Stylizacja daty zatrudnienia */
@@ -92,6 +100,8 @@
   font-size: 0.9rem;
   color: #aaa;
   font-style: italic;
+  text-align: right;
+  margin-top: 3px;
 }
 
 /* Stylizacja opisu obowiązków */

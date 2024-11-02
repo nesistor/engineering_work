@@ -5,7 +5,7 @@
       <p class="description">Discover more about my work and projects below.</p>
       <div class="button-container">
         <button class="cta-button" @click="scrollToAboutMe">Discover More</button>
-        <button class="cta-button">Load Resume</button>
+        <a href="/files/Karol_Malicki_Reasume.pdf" download class="cta-button">Load Resume</a>
       </div>
     </div>
   </section>
@@ -15,25 +15,21 @@
 export default {
   name: "StartApp",
   methods: {
-  scrollToAboutMe() {
-    const aboutMeSection = document.querySelector('#about-me');
-    if (aboutMeSection) {
-      // Oblicz pozycję sekcji o kilka pikseli wyżej
-      const offset = 300; // Ustawienie przesunięcia w pikselach
-      const elementPosition = aboutMeSection.getBoundingClientRect().top + window.scrollY;
-      const offsetPosition = elementPosition - offset;
+    scrollToAboutMe() {
+      const aboutMeSection = document.querySelector('#about-me');
+      if (aboutMeSection) {
+        const offset = 300; 
+        const elementPosition = aboutMeSection.getBoundingClientRect().top + window.scrollY;
+        const offsetPosition = elementPosition - offset;
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth' // Płynne przewijanie
-      });
-    }
+        window.scrollTo({
+          top: offsetPosition,
+          behavior: 'smooth'
+        });
+      }
+    },
   },
-},
-
 };
 </script>
 
-
-  <style src="../../assets/css/Start.css"></style>
-  
+<style src="../../assets/css/Start.css"></style>

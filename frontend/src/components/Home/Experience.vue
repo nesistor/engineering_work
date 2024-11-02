@@ -12,10 +12,13 @@
         ref="experienceItem"
       >
         <div class="experience-header">
+          <!-- Wyświetlanie unikalnej ikony dla każdej pracy -->
+          <img :src="experience.icon" alt="Company Icon" class="company-icon" />
           <span class="company-name">{{ experience.company }}</span>
           <span class="employment-dates">{{ experience.dates }}</span>
         </div>
-        <p class="job-description">{{ experience.description }}</p>
+        <!-- Opis pracy -->
+        <p class="job-description" v-html="experience.description"></p>
         <div class="glow" />
       </div>
     </section>
@@ -29,18 +32,25 @@ export default {
     return {
       experiences: [
         {
-          company: "Tech Solutions Inc.",
-          dates: "Jan 2020 - Dec 2022",
-          description: `- Led a team to implement CI/CD pipelines and automation.
-            - Collaborated with cross-functional teams to improve efficiency.
-            - Developed backend services and APIs in Node.js and GoLang.`,
+          company: "Vocale Sp.z.o.o",
+          dates: "Jan 2023 - Jun 2023",
+          icon: require('@/assets/images/company/1.svg'), // Ścieżka do ikony Vocale
+          description: `At this company, I developed a complete application from start to finish.<br><br>
+          - I created responsive widgets that matched Figma designs precisely.<br>
+          - I built a chat page, presenting state management solutions like Bloc and Provider to the team.<br>
+          - My role involved extensive application testing to ensure quality.<br>
+          - This experience strengthened my ability to deliver high-quality applications.`,
         },
         {
-          company: "Innovatech Corp.",
-          dates: "Feb 2018 - Dec 2019",
-          description: `- Designed and maintained cloud infrastructure solutions.
-            - Optimized application performance and reliability.
-            - Provided training for new hires on DevOps best practices.`,
+          company: "Marchesini Group S.p.A",
+          dates: "Jun 2024 - Jun 2024",
+          icon: require('@/assets/images/company/2.svg'), // Ścieżka do ikony Marchesini
+          description: `At this company, I had the opportunity to collaborate with my team to create a comprehensive pitch deck and a demo product.<br><br>
+          - Developed innovative concepts for automated pharmaceutical packaging machinery.<br>
+          - Demonstrated the use of Document AI combined with NLP techniques to process prescription data and extract relevant information for storage in a database.<br>
+          - Designed a program in C++ for Arduino that controls the display of specific LEDs at designated times.<br>
+          - Applied Industrial Innovation techniques for Idea Validation Conducted Market Research and Competitor Analysis.<br>
+          - Created and presented a Pitch Deck for the final evaluation.`,
         },
       ],
     };

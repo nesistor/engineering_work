@@ -18,7 +18,6 @@
   padding: 40px 20px;
   background-color: rgba(0, 0, 0, 0.8); /* Ciemne, półprzezroczyste tło */
   max-width: 600px; /* Ustalona szerokość sekcji */
-  border-radius: 10px;
   opacity: 0;
   transform: translateX(100%);
   transition: transform 0.5s ease-out, opacity 0.5s ease-out;
@@ -34,7 +33,6 @@
   padding: 40px 20px;
   background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
   max-width: 600px;
-  border-radius: 10px;
   color: #fff; /* White text */
   margin-left: 20px;
   opacity: 0;
