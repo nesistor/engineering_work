@@ -19,7 +19,7 @@ const webPort = "80"
 type Config struct {
 	RedisClient *redis.Client
 	Models      data.Models
-	KeyManager  *data.KeyManager 
+	KeyManager  *data.KeyManager
 }
 
 func main() {
@@ -63,7 +63,7 @@ func main() {
 
 func connectToRedis() *redis.Client {
 	ctx := context.Background()
-	redisAddr := os.Getenv("REDIS_ADDR")
+	redisAddr := os.Getenv("REDIS_URL")
 	if redisAddr == "" {
 		redisAddr = "localhost:6379"
 	}

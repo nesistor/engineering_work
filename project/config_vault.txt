@@ -1,0 +1,9 @@
+export VAULT_ADDR=http://localhost:8200
+vault login root_token
+
+vault secrets enable -path=jwt_keys kv
+vault policy write jwt_policy ~/vault/jwt_policy.hcl
+vault kv put jwt_keys/public_keys public_key=@public_key.pem
+vault kv put jwt_keys/private_key private_key=@private_key.pem
+
+vault kv get jwt_keys/private_key 

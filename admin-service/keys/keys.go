@@ -17,13 +17,13 @@ type VaultConfig struct {
 	Token   string
 }
 
-// KeyManager is responsible for managing and rotating RSA public keys loaded from Vault.
+// KeyManager is responsible for managing and rotating RSA keys loaded from Vault.
 type KeyManager struct {
-	vaultConfig     VaultConfig
-	publicKeys      map[string]*rsa.PublicKey
-	adminPublicKey  *rsa.PublicKey
-	mu              sync.RWMutex
-	refreshCycle    time.Duration
+	vaultConfig  VaultConfig
+	privateKey   *rsa.PrivateKey
+	publicKeys   map[string]*rsa.PublicKey
+	mu           sync.RWMutex
+	refreshCycle time.Duration
 }
 
 // NewKeyManager initializes a KeyManager and starts the key rotation mechanism.
@@ -44,7 +44,7 @@ func NewKeyManager(vaultConfig VaultConfig, refreshCycle time.Duration) (*KeyMan
 	return km, nil
 }
 
-// loadKeys loads RSA public keys from Vault and stores them in KeyManager.
+// loadKeys loads RSA private and public keys from Vault and stores them in KeyManager.
 func (km *KeyManager) loadKeys() error {
 	client, err := vault.NewClient(&vault.Config{
 		Address: km.vaultConfig.Address,
@@ -55,54 +55,53 @@ func (km *KeyManager) loadKeys() error {
 
 	client.SetToken(km.vaultConfig.Token)
 
-	// Load public keys for users
-	secretPublic, err := client.Logical().List("jwt_keys/public_keys")
+	// Load the private key
+	secretPrivate, err := client.Logical().Read("jwt_keys/private_key")
 	if err != nil {
-		return fmt.Errorf("failed to list public keys from Vault: %w", err)
+		return fmt.Errorf("failed to read private key from Vault: %w", err)
+	}
+	if secretPrivate == nil {
+		return fmt.Errorf("private key not found in Vault")
+	}
+
+	privateKeyData, ok := secretPrivate.Data["private_key"].(string)
+	if !ok {
+		return fmt.Errorf("unexpected format for private key data")
+	}
+
+	privateKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(privateKeyData))
+	if err != nil {
+		return fmt.Errorf("failed to parse private key: %w", err)
+	}
+
+	// Load public keys
+	secretPublic, err := client.Logical().Read("jwt_keys/public_keys")
+	if err != nil {
+		return fmt.Errorf("failed to read public keys from Vault: %w", err)
 	}
 	if secretPublic == nil {
 		return fmt.Errorf("public keys not found in Vault")
 	}
 
-	publicKeys := make(map[string]*rsa.PublicKey)
-	for kid, publicKeyData := range secretPublic.Data {
-		keyDataStr, ok := publicKeyData.(string)
-		if !ok {
-			return fmt.Errorf("unexpected format for public key data for kid: %s", kid)
-		}
-		publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(keyDataStr))
-		if err != nil {
-			return fmt.Errorf("failed to parse public key for kid %s: %w", kid, err)
-		}
-		publicKeys[kid] = publicKey
-	}
-
-	// Load the admin public key
-	secretAdminPublic, err := client.Logical().Read("jwt_keys/admin_public_key")
-	if err != nil {
-		return fmt.Errorf("failed to read admin public key from Vault: %w", err)
-	}
-	if secretAdminPublic == nil {
-		return fmt.Errorf("admin public key not found in Vault")
-	}
-
-	adminPublicKeyData, ok := secretAdminPublic.Data["data"].(string)
+	// Extract the public key
+	publicKeyData, ok := secretPublic.Data["public_key"].(string)
 	if !ok {
-		return fmt.Errorf("unexpected format for admin public key data")
+		return fmt.Errorf("unexpected format for public key data")
 	}
-
-	adminPublicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(adminPublicKeyData))
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicKeyData))
 	if err != nil {
-		return fmt.Errorf("failed to parse admin public key: %w", err)
+		return fmt.Errorf("failed to parse public key: %w", err)
 	}
 
 	km.mu.Lock()
 	defer km.mu.Unlock()
 
-	km.publicKeys = publicKeys
-	km.adminPublicKey = adminPublicKey
+	km.privateKey = privateKey
+	km.publicKeys = map[string]*rsa.PublicKey{
+		"default": publicKey, // Use a default kid for now
+	}
 
-	log.Println("Public keys successfully loaded and updated from Vault")
+	log.Println("Keys successfully loaded and updated from Vault")
 	return nil
 }
 
@@ -121,6 +120,14 @@ func (km *KeyManager) startKeyRotation() {
 	}
 }
 
+// GetPrivateKey safely retrieves the private key.
+func (km *KeyManager) GetPrivateKey() *rsa.PrivateKey {
+	km.mu.RLock()
+	defer km.mu.RUnlock()
+
+	return km.privateKey
+}
+
 // GetPublicKey safely retrieves a public key by its kid.
 func (km *KeyManager) GetPublicKey(kid string) (*rsa.PublicKey, error) {
 	km.mu.RLock()
@@ -132,14 +139,6 @@ func (km *KeyManager) GetPublicKey(kid string) (*rsa.PublicKey, error) {
 	}
 
 	return publicKey, nil
-}
-
-// GetAdminPublicKey safely retrieves the admin public key.
-func (km *KeyManager) GetAdminPublicKey() *rsa.PublicKey {
-	km.mu.RLock()
-	defer km.mu.RUnlock()
-
-	return km.adminPublicKey
 }
 
 // GetPublicKeys returns all public keys loaded in the manager.

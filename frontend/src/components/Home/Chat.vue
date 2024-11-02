@@ -15,7 +15,7 @@
             <img src="@/assets/images/llama-icon.png" alt="Llama Icon" class="user-icon" />
           </div>
           <span class="message-content">
-            Hej, jestem osobistym asystentem pana Karola. Czego chciałbyś się dowiedzieć o jego umiejętnościach?
+            Hello, I am Mr. Karol's personal assistant. What would you like to know about his skills?
           </span>
         </div>
 

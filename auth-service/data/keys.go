@@ -64,7 +64,7 @@ func (km *KeyManager) loadKeys() error {
 		return fmt.Errorf("private key not found in Vault")
 	}
 
-	privateKeyData, ok := secretPrivate.Data["data"].(string)
+	privateKeyData, ok := secretPrivate.Data["private_key"].(string)
 	if !ok {
 		return fmt.Errorf("unexpected format for private key data")
 	}
@@ -75,32 +75,31 @@ func (km *KeyManager) loadKeys() error {
 	}
 
 	// Load public keys
-	secretPublic, err := client.Logical().List("jwt_keys/public_keys")
+	secretPublic, err := client.Logical().Read("jwt_keys/public_keys")
 	if err != nil {
-		return fmt.Errorf("failed to list public keys from Vault: %w", err)
+		return fmt.Errorf("failed to read public keys from Vault: %w", err)
 	}
 	if secretPublic == nil {
 		return fmt.Errorf("public keys not found in Vault")
 	}
 
-	publicKeys := make(map[string]*rsa.PublicKey)
-	for kid, publicKeyData := range secretPublic.Data {
-		keyDataStr, ok := publicKeyData.(string)
-		if !ok {
-			return fmt.Errorf("unexpected format for public key data for kid: %s", kid)
-		}
-		publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(keyDataStr))
-		if err != nil {
-			return fmt.Errorf("failed to parse public key for kid %s: %w", kid, err)
-		}
-		publicKeys[kid] = publicKey
+	// Extract the public key
+	publicKeyData, ok := secretPublic.Data["public_key"].(string)
+	if !ok {
+		return fmt.Errorf("unexpected format for public key data")
+	}
+	publicKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(publicKeyData))
+	if err != nil {
+		return fmt.Errorf("failed to parse public key: %w", err)
 	}
 
 	km.mu.Lock()
 	defer km.mu.Unlock()
 
 	km.privateKey = privateKey
-	km.publicKeys = publicKeys
+	km.publicKeys = map[string]*rsa.PublicKey{
+		"default": publicKey, // Use a default kid for now
+	}
 
 	log.Println("Keys successfully loaded and updated from Vault")
 	return nil

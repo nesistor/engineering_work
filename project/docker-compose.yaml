@@ -23,12 +23,12 @@ services:
       dockerfile: auth-service.dockerfile
     restart: always
     ports:
-      - "8080:80"
+      - "8083:80"
     deploy:
       mode: replicated
       replicas: 1
     environment:
-      REDIS_URL: "redis://redis:6379"
+      REDIS_URL: "redis:6379"
       VAULT_ADDR: "http://vault:8200"
       VAULT_TOKEN: root_token
     depends_on:
