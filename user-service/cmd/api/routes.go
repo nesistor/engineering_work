@@ -24,7 +24,7 @@ func (app *Config) routes() http.Handler {
 
 	mux.Post("/api/login/register", app.Register)
 	mux.Get("/api/login/check-email", app.CheckEmail)
-	mux.Post("api/login/reset-password", app.ResetPassword)
+	mux.Post("/api/login/reset-password", app.ResetPassword)
 
 	mux.Route("/api/login", func(mux chi.Router) {
 		mux.Use(app.AuthMiddleware("user"))
