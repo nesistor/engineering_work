@@ -63,7 +63,9 @@ build_logger:
 
 
 ---------------------------------KUBECTL----------------------------------------------
-
+# Możesz ustawić tutaj inną komendę, np.:
+# KUBECTL=k3s kubectl  # dla K3s
+# KUBECTL=oc           # dla OpenShift
 KUBECTL=kubectl
 
 # Deploy all services

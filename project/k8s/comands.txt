@@ -1,0 +1,4 @@
+## There is a lot of interesting comands to test the pods 
+kubectl port-forward <nazwa-poda> <port-lokalny>:<port-docelowy>
+
+kubectl run -it --rm debug-pod --image=appropriate/curl -- /bin/sh
