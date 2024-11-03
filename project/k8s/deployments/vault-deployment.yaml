@@ -1,8 +1,9 @@
-# k8s/vault.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: vault
+  labels:
+    app: vault
 spec:
   replicas: 1
   selector:
@@ -25,25 +26,13 @@ spec:
               value: "http://localhost:8200"
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "root_token"
+          securityContext:
+            capabilities:
+              add: ["IPC_LOCK"]
           volumeMounts:
             - name: vault-data
               mountPath: /vault/file
-          command: ["server", "-dev", "-dev-root-token-id=root_token"]
-          securityContext:
-            capabilities:
-              add:
-                - IPC_LOCK
       volumes:
         - name: vault-data
-          emptyDir: {}  # Możesz użyć PersistentVolumeClaim dla dłuższego przechowywania danych
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: vault
-spec:
-  ports:
-    - port: 8200
-      targetPort: 8200
-  selector:
-    app: vault
+          persistentVolumeClaim:
+            claimName: vault-pvc
