@@ -5,9 +5,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
-	"time"
 	"strconv"
+	"time"
 
 	"user-service/data"
 )
@@ -51,11 +52,14 @@ func (app *Config) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	start := time.Now()
 	err = app.logRequest("registration", fmt.Sprintf("User %s registered", newUser.Email))
 	if err != nil {
 		app.errorJSON(w, err)
 		return
 	}
+	elapsed := time.Since(start)
+	log.Printf("Czas na wyslanie logu do logger-service: %s", elapsed)
 
 	payload := jsonResponse{
 		Error:   false,
@@ -263,8 +267,6 @@ func (app *Config) UpdatePassword(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-
-
 // UpdateUser handles the update of a user's information based on their ID passed in the URL.
 func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	vars := r.URL.Query()
@@ -288,9 +290,9 @@ func (app *Config) UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	updatedUser := data.User{
-		ID:       userID,
-		Email:    requestPayload.Email,
-		UserName: requestPayload.Username,
+		ID:        userID,
+		Email:     requestPayload.Email,
+		UserName:  requestPayload.Username,
 		UpdatedAt: time.Now(),
 	}
 

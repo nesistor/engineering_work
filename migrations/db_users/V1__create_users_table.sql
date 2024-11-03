@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS users (
     city VARCHAR(100),
     state VARCHAR(100),
     zip_code VARCHAR(20),
+    passwordhash VARCHAR(255) NOT NULL, 
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

@@ -133,7 +133,7 @@ services:
     restart: on-failure
     networks:
       - postgres-net
-      
+
   mailhog:
     image: 'mailhog/mailhog:latest'
     ports:
@@ -180,7 +180,7 @@ services:
     volumes:
       - ./db-data/mongo/:/data/db
     networks:
-      - postgres-net
+      - default
 
 networks:
   default:
