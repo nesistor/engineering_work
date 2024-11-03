@@ -18,6 +18,8 @@ up_build: build_auth build_user	build_admin build_mail build_logger
 	docker-compose up --build -d
 	@echo "Docker images built and started!"
 
+
+
 ## down: stop docker compose
 down:
 	@echo "Stopping docker compose..."
@@ -66,7 +68,7 @@ build_logger:
 # Możesz ustawić tutaj inną komendę, np.:
 # KUBECTL=k3s kubectl  # dla K3s
 # KUBECTL=oc           # dla OpenShift
-KUBECTL=kubectl
+KUBECTL=kubectl	
 
 # Deploy all services
 deploy:

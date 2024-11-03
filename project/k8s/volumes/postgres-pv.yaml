@@ -9,3 +9,5 @@ spec:
     - ReadWriteOnce
   hostPath:
     path: /data/postgres
+  # In AWS Cloud you can add 
+  #awsElasticBlockStore:

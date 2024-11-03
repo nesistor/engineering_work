@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_REGISTRY = "docker.io/yourusername"
-        KUBECTL_PATH = "/usr/local/bin/kubectl"  // Ścieżka do narzędzia kubectl na Jenkinsie
-        KUBECONFIG = credentials('K8S_CONFIG')   // Kredencje Kubernetes (plik kubeconfig)
-        VAULT_TOKEN = credentials('VAULT_TOKEN') // Token do autoryzacji Vaulta
+        DOCKER_REGISTRY = "docker.io/nesistor"
+        KUBECTL_PATH = "/usr/local/bin/kubectl" 
+        KUBECONFIG = credentials('K8S_CONFIG')   
+        VAULT_TOKEN = credentials('VAULT_TOKEN') 
     }
 
     stages {
@@ -36,7 +36,6 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    // Aplikacja konfiguracji (ConfigMaps, Secrets) oraz deploymentów na Kubernetes
                     sh "${KUBECTL_PATH} apply -f k8s/configmaps"
                     sh "${KUBECTL_PATH} apply -f k8s/secrets"
                     sh "${KUBECTL_PATH} apply -f k8s/volumes"
