@@ -1,0 +1,3 @@
+helm install my-app ./my-app-chart
+helm upgrade my-app ./my-app-chart
+kubectl get all

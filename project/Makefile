@@ -18,6 +18,9 @@ up_build: build_auth build_user	build_admin build_mail build_logger
 	docker compose up --build -d
 	@echo "Docker images built and started!"
 
+## build: create new version apps:
+build: build_auth build_user build_admin build_mail build_logger
+	@echo "Succesfully compiled apps from binary!"
 
 
 ## down: stop docker compose

@@ -1,11 +1,13 @@
 pipeline {
     agent any
+
     environment {
-        DOCKER_REGISTRY = "docker.io/your-repo"
+        DOCKER_REGISTRY = "docker.io/nesistor"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
-        HELM_PATH = "/usr/local/bin/helm"  
         KUBECONFIG = credentials('K8S_CONFIG')
+        VAULT_TOKEN = credentials('VAULT_TOKEN')
     }
+
     stages {
         stage('Build') {
             steps {
@@ -19,7 +21,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Push') {
             steps {
                 script {
@@ -30,13 +32,30 @@ pipeline {
                 }
             }
         }
-        
-        stage('Deploy with Helm') {
+
+        stage('Deploy') {
             steps {
                 script {
-                    sh "${HELM_PATH} upgrade --install my-app ./my-app-chart --namespace your-namespace"
+                    sh "${KUBECTL_PATH} apply -f k8s/configmaps"
+                    sh "${KUBECTL_PATH} apply -f k8s/secrets"
+                    sh "${KUBECTL_PATH} apply -f k8s/volumes"
+                    sh "${KUBECTL_PATH} apply -f k8s/deployments"
+                    sh "${KUBECTL_PATH} apply -f k8s/services"
                 }
             }
+        }
+    }
+
+    post {
+        always {
+            echo 'Cleaning up workspace'
+            deleteDir()
+        }
+        success {
+            echo 'Deployment completed successfully!'
+        }
+        failure {
+            echo 'Deployment failed!'
         }
     }
 }
