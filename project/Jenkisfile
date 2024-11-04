@@ -1,18 +1,34 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REGISTRY = "docker.io/your-repo"
+        // Zmień na lokalny adres IP lub hostname twojego rejestru
+        DOCKER_REGISTRY = "localhost:5000" // Przykład lokalnego rejestru
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         HELM_PATH = "/usr/local/bin/helm"  
         KUBECONFIG = credentials('K8S_CONFIG')
     }
     stages {
-        stage('Build') {
+        stage('Build Applications') {
+            steps {
+                script {
+                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
+                    services.each { service ->
+                        dir("../${service}") {
+                            // Kompilacja aplikacji przy użyciu Makefile
+                            sh "make build"
+                        }
+                    }
+                }
+            }
+        }
+        
+        stage('Build Docker Images') {
             steps {
                 script {
                     def services = ['auth-service', 'user-service', 'logger-service', 'admin-service', 'mailer-service']
                     services.each { service ->
                         dir("../${service}") {
+                            // Budowanie obrazów Docker
                             sh "docker build -t ${DOCKER_REGISTRY}/${service}:latest -f ${service}.dockerfile ."
                         }
                     }
@@ -20,11 +36,12 @@ pipeline {
             }
         }
         
-        stage('Push') {
+        stage('Push Docker Images') {
             steps {
                 script {
                     def services = ['auth-service', 'user-service', 'logger-service', 'admin-service', 'mailer-service']
                     services.each { service ->
+                        // Wypychanie obrazów do lokalnego rejestru
                         sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
                     }
                 }
@@ -34,7 +51,8 @@ pipeline {
         stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "${HELM_PATH} upgrade --install my-app ./my-app-chart --namespace your-namespace"
+                    // Wdrożenie aplikacji za pomocą Helm
+                    sh "${HELM_PATH} upgrade --install my-app ./my-app-chart --namespace your-namespace --set image.tag=latest"
                 }
             }
         }
