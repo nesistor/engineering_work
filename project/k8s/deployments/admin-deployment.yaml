@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: user-service
+  name: admin-service
   labels:
-    app: user-service
+    app: admin-service
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: user-service
+      app: admin-service
   template:
     metadata:
       labels:
-        app: user-service
+        app: admin-service
     spec:
       containers:
-        - name: user-service
-          image: your-registry/user-service:latest
+        - name: admin-service
+          image: your-registry/admin-service:latest
           ports:
             - containerPort: 80
           env:
             - name: DSN
-              value: "host=postgres-users port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+              value: "host=postgres-admins port=5432 user=postgres password=password dbname=admins sslmode=disable timezone=UTC connect_timeout=5"
             - name: VAULT_ADDR
               value: "http://vault:8200"
             - name: VAULT_TOKEN

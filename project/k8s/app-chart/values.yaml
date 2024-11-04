@@ -1,0 +1,20 @@
+replicaCount: 1
+
+image:
+  repository: "docker.io/your-repo/auth-service"
+  tag: "latest"
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 80
+
+env:
+  VAULT_ADDR: "http://vault:8200"
+  VAULT_TOKEN: "root_token"
+  REDIS_URL: "redis:6379"
+
+persistence:
+  enabled: true
+  size: 1Gi
+  storageClass: "manual"  # lub inny jeśli twój klaster ma StorageClass, np. `gp2` dla AWS
