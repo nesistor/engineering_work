@@ -1,20 +1,53 @@
 replicaCount: 1
 
+# Common environment variables
+vault:
+  address: "http://vault:8200"
+  token: "root_token"
+
+# Image tags for each service
 image:
-  repository: "docker.io/your-repo/auth-service"
-  tag: "latest"
-  pullPolicy: Always
+  authService: "your-registry/auth-service:latest"
+  userService: "your-registry/user-service:latest"
+  loggerService: "your-registry/logger-service:latest"
+  adminService: "your-registry/admin-service:latest"
+  mailerService: "your-registry/mailer-service:latest"
+  vault: "vault:1.13.2"
+  redis: "redis:7.0"
+  flyway: "your-registry/flyway:latest"
+  mailhog: "mailhog/mailhog:latest"
+  postgres: "postgres:14.0"
+  mongo: "mongo:4.2.16-bionic"
 
-service:
-  type: ClusterIP
-  port: 80
+# Environment variables
+environment:
+  mail:
+    domain: "localhost"
+    host: "mailhog"
+    port: 1025
+    fromName: "Karol"
+    fromAddress: "goappdm@gmail.com"
 
-env:
-  VAULT_ADDR: "http://vault:8200"
-  VAULT_TOKEN: "root_token"
-  REDIS_URL: "redis:6379"
+# Database connection settings
+database:
+  postgres:
+    username: "postgres"
+    password: "password"
+    usersDb: "users"
+    adminsDb: "admins"
+  mongo:
+    username: "admin"
+    password: "password"
+    database: "logs"
 
+# Persistent Volumes for PostgreSQL, MongoDB, and Vault
 persistence:
-  enabled: true
-  size: 1Gi
-  storageClass: "manual"  # lub inny jeśli twój klaster ma StorageClass, np. `gp2` dla AWS
+  postgres:
+    storage: 1Gi
+    path: /data/postgres
+  mongo:
+    storage: 1Gi
+    path: /data/mongo
+  vault:
+    storage: 1Gi
+    path: /data/vault

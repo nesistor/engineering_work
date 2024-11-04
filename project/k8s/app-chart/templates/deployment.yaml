@@ -1,29 +1,43 @@
+{{- $vault := .Values.vault -}}
+{{- range $service, $image := .Values.image }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ $service | lower }}
+  labels:
+    app: {{ $service | lower }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: {{ $.Values.replicaCount }}
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ $service | lower }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ $service | lower }}
     spec:
       containers:
-        - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        - name: {{ $service | lower }}
+          image: {{ $image }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: 80
           env:
-            - name: REDIS_URL
-              value: {{ .Values.env.REDIS_URL }}
             - name: VAULT_ADDR
-              value: {{ .Values.env.VAULT_ADDR }}
+              value: {{ $vault.address }}
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
                   name: vault-secret
                   key: VAULT_DEV_ROOT_TOKEN_ID
+            {{- if eq $service "authService" }}
+            - name: REDIS_URL
+              value: "redis:6379"
+            {{- end }}
+            {{- if eq $service "userService" }}
+            - name: DSN
+              value: "host=postgres-users port=5432 user={{ $.Values.database.postgres.username }} password={{ $.Values.database.postgres.password }} dbname={{ $.Values.database.postgres.usersDb }} sslmode=disable"
+            {{- end }}
+          volumeMounts:
+            - mountPath: "/vault/file"
+              name: vault-data
+{{- end }}
