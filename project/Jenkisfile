@@ -52,7 +52,7 @@ pipeline {
             steps {
                 script {
                     // Wdrożenie aplikacji za pomocą Helm
-                    sh "${HELM_PATH} upgrade --install my-app ./my-app-chart --namespace your-namespace --set image.tag=latest"
+                    sh "${HELM_PATH} upgrade --install my-app ./microservices-chart --namespace your-namespace --set image.tag=latest"
                 }
             }
         }
