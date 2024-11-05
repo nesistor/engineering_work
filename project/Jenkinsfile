@@ -4,7 +4,7 @@ pipeline {
         DOCKER_REGISTRY = "localhost:5000"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         HELM_PATH = "/usr/local/bin/helm"  
-        KUBECONFIG = credentials('K8S_CONFIG')
+        KUBECONFIG = credentials('home/karol/.kube/config')
     }
     stages {
         stage('Build Applications') {
