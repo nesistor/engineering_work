@@ -19,7 +19,7 @@ pipeline {
                     ]
                     
                     binaries.each { service, binaryName ->
-                        dir("../${service}") {
+                        dir("./../${service}") {
                             sh """
                                 echo "Building ${service} binary..."
                                 env GOOS=linux CGO_ENABLED=0 go build -o ${binaryName} ./cmd/api
