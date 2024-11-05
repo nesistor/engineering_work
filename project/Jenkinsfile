@@ -7,6 +7,19 @@ pipeline {
         KUBECONFIG = credentials('K8S_CONFIG')
     }
     stages {
+        stage('Debug Auth Service') {
+            steps {
+                script {
+                    // Debug: Sprawdzenie, jakie pliki są w katalogu auth-service
+                    def service = 'auth-service'
+                    dir("../${service}") {
+                        sh 'echo "Listing files in ${service}:"'
+                        sh 'ls -l'  // Wyświetlenie szczegółów plików
+                    }
+                }
+            }
+        }
+        
         stage('Build Applications') {
             steps {
                 script {
