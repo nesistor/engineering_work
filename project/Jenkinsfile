@@ -1,35 +1,12 @@
 pipeline {
     agent any
+    environment {
+        DOCKER_REGISTRY = "localhost:5000"
+        KUBECTL_PATH = "/usr/local/bin/kubectl"
+        HELM_PATH = "/usr/local/bin/helm"  
+        KUBECONFIG = credentials('K8S_CONFIG')
+    }
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-                sh "echo 'Current directory: '; pwd"
-                sh "echo 'Files in workspace:'; ls -la"
-            }
-        }
-        
-        stage('Debug Auth Service') {
-            steps {
-                dir("./auth-service") {
-                    sh "echo 'Current directory for auth-service: '; pwd"
-                    sh "echo 'Files in auth-service:'; ls -la"
-                }
-            }
-        }
-        
-        stage('Build auth-service') {
-            steps {
-                dir("./auth-service") {
-                    sh """
-                        echo "Building auth-service binary..."
-                        env GOOS=linux CGO_ENABLED=0 go build -o authApp ./cmd/api
-                        echo "Built auth-service binary!"
-                    """
-                }
-            }
-        }
-
         stage('Build Applications') {
             steps {
                 script {
