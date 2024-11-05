@@ -60,7 +60,7 @@ pipeline {
         stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "${HELM_PATH} upgrade --install microservices ./microservices-chart --namespace microservices-app --set image.tag=latest"
+                    sh "${HELM_PATH} upgrade --install microservices ./microservices-chart --namespace microservices-app --set image.tag=latest --debug"
                 }
             }
         }
