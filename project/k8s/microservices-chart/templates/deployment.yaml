@@ -39,5 +39,9 @@ spec:
             {{- end }}
           volumeMounts:
             - mountPath: "/vault/file"
-              name: vault-data
+              name: vault-data  
+      volumes:  
+        - name: vault-data
+          persistentVolumeClaim:
+            claimName: vault-pvc 
 {{- end }}

@@ -43,6 +43,8 @@ database:
 
 # Persistent Volumes for PostgreSQL, MongoDB, and Vault
 persistence:
+  accessMode: ReadWriteOnce  # Dodaj dostępność
+  size: 1Gi                   # Rozmiar pamięci dla PVC
   postgres:
     storage: 1Gi
     path: /data/postgres
