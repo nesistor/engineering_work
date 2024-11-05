@@ -7,17 +7,18 @@ vault:
 
 # Image tags for each service
 image:
-  authService: "your-registry/auth-service:latest"
-  userService: "your-registry/user-service:latest"
-  loggerService: "your-registry/logger-service:latest"
-  adminService: "your-registry/admin-service:latest"
-  mailerService: "your-registry/mailer-service:latest"
+  authService: "localhost:5000/auth-service:latest"
+  userService: "localhost:5000/user-service:latest"
+  loggerService: "localhost:5000/logger-service:latest"
+  adminService: "localhost:5000/admin-service:latest"
+  mailerService: "localhost:5000/mailer-service:latest"
   vault: "vault:1.13.2"
   redis: "redis:7.0"
-  flyway: "your-registry/flyway:latest"
+  flyway: "localhost:5000/flyway:latest"
   mailhog: "mailhog/mailhog:latest"
   postgres: "postgres:14.0"
   mongo: "mongo:4.2.16-bionic"
+
 
 # Environment variables
 environment:
