@@ -1,0 +1,3 @@
+Createe first admin in vault and push him to the code. 
+Create endopoint where admins can add email for new admin
+Change Registry for only new admins in table
