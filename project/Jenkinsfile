@@ -4,7 +4,7 @@ pipeline {
         DOCKER_REGISTRY = "localhost:5000"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         HELM_PATH = "/usr/local/bin/helm"  
-        KUBECONFIG = '/home/karol/.minikube/profiles/minikube/config'
+        KUBECONFIG = '/tmp/minikube/profiles/minikube/config'
     }
     stages {
         stage('Build Applications') {
