@@ -1,4 +1,3 @@
-{{- $vault := .Values.vault -}}
 {{- range $service, $image := .Values.image }}
 apiVersion: apps/v1
 kind: Deployment
@@ -22,9 +21,8 @@ spec:
           ports:
             - containerPort: 80
           env:
-            # Using api_addr for VAULT_ADDR
             - name: VAULT_ADDR
-              value: {{ $vault.api_addr }}
+              value: {{ $.Values.vault.api_addr }}
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -40,8 +38,8 @@ spec:
             {{- end }}
           volumeMounts:
             - mountPath: "/vault/file"
-              name: vault-data  
-      volumes:  
+              name: vault-data
+      volumes:
         - name: vault-data
           persistentVolumeClaim:
             claimName: vault-pvc

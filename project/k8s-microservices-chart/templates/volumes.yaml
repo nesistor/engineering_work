@@ -1,38 +1,40 @@
-{{- $persistence := .Values.persistence -}}
+# Persistent Volume dla PostgreSQL
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: postgres-pv
 spec:
   capacity:
-    storage: {{ $persistence.postgres.storage }}
+    storage: {{ .Values.persistence.postgres.storage }}
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: {{ $persistence.postgres.path }}
+    path: {{ .Values.persistence.postgres.path }}
 
 ---
+# Persistent Volume dla MongoDB
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: mongo-pv
 spec:
   capacity:
-    storage: {{ $persistence.mongo.storage }}
+    storage: {{ .Values.persistence.mongo.storage }}
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: {{ $persistence.mongo.path }}
+    path: {{ .Values.persistence.mongo.path }}
 
 ---
+# Persistent Volume dla Vault
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: vault-pv
 spec:
   capacity:
-    storage: {{ $persistence.vault.storage }}
+    storage: {{ .Values.persistence.vault.storage }}
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: {{ $persistence.vault.path }}
+    path: {{ .Values.persistence.vault.path }}

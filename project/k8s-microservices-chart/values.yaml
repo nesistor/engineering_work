@@ -56,3 +56,11 @@ persistence:
   vault:
     storage: 1Gi
     path: /data/vault           # Ścieżka pamięci dla Vault
+
+ingress:
+  enabled: true
+  controller:
+    ingressClass: nginx
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"

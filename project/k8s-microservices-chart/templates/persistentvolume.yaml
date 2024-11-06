@@ -1,35 +1,40 @@
+# PersistentVolumeClaim dla PostgreSQL
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
 spec:
   accessModes:
-    - {{ .Values.persistence.accessMode | default "ReadWriteOnce" }}
+    - {{ .Values.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.persistence.postgres.storage | default "1Gi" }}
-  storageClassName: {{ .Values.persistence.storageClass | default "standard" }}
+      storage: {{ .Values.persistence.postgres.storage }}
+  storageClassName: {{ .Values.persistence.storageClass }}
+
 ---
+# PersistentVolumeClaim dla MongoDB
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: mongo-pvc
 spec:
   accessModes:
-    - {{ .Values.persistence.accessMode | default "ReadWriteOnce" }}
+    - {{ .Values.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.persistence.mongo.storage | default "1Gi" }}
-  storageClassName: {{ .Values.persistence.storageClass | default "standard" }}
+      storage: {{ .Values.persistence.mongo.storage }}
+  storageClassName: {{ .Values.persistence.storageClass }}
+
 ---
+# PersistentVolumeClaim dla Vault
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: vault-pvc
 spec:
   accessModes:
-    - {{ .Values.persistence.accessMode | default "ReadWriteOnce" }}
+    - {{ .Values.persistence.accessMode }}
   resources:
     requests:
-      storage: {{ .Values.persistence.vault.storage | default "1Gi" }}
-  storageClassName: {{ .Values.persistence.storageClass | default "standard" }}
+      storage: {{ .Values.persistence.vault.storage }}
+  storageClassName: {{ .Values.persistence.storageClass }}
