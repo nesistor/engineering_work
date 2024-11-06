@@ -4,7 +4,7 @@ pipeline {
         DOCKER_REGISTRY = "localhost:5000"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         HELM_PATH = "/usr/local/bin/helm"  
-        KUBECONFIG = credentials('K8S_CONFIG')
+        KUBECONFIG = '/var/lib/jenkins/minikube/kubeconfig'
     }
     stages {
         stage('Build Applications') {
@@ -60,7 +60,7 @@ pipeline {
             stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "whoami"  // Sprawdzanie użytkownika wykonującego skrypt
+                    sh "whoami" 
                     sh "${HELM_PATH} upgrade --install microservices ./microservices-chart --namespace microservices-app --set image.tag=latest --debug"
                 }
             }
