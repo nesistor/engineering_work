@@ -22,8 +22,9 @@ spec:
           ports:
             - containerPort: 80
           env:
+            # Using api_addr for VAULT_ADDR
             - name: VAULT_ADDR
-              value: {{ $vault.address }}
+              value: {{ $vault.api_addr }}
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
@@ -43,5 +44,5 @@ spec:
       volumes:  
         - name: vault-data
           persistentVolumeClaim:
-            claimName: vault-pvc 
+            claimName: vault-pvc
 {{- end }}

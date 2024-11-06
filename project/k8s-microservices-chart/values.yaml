@@ -1,11 +1,14 @@
-replicaCount: 1
-
-# Common environment variables
+# Konfiguracja główna z adresem Vault
 vault:
-  address: "http://vault:8200"
-  token: "root_token"
+  address: "http://vault:8200"         # Główny adres Vault
+  api_addr: "http://localhost:8200"    # Adres API dla lokalnej instancji Vault
+  token: "root_token" 
+  securityContext:
+    capabilities:
+      add: ["IPC_LOCK"]
+    
 
-# Image tags for each service
+# Tagowanie obrazów Docker dla poszczególnych usług
 image:
   authService: "localhost:5000/auth-service:latest"
   userService: "localhost:5000/user-service:latest"
@@ -19,8 +22,7 @@ image:
   postgres: "postgres:14.0"
   mongo: "mongo:4.2.16-bionic"
 
-
-# Environment variables
+# Zmienne środowiskowe
 environment:
   mail:
     domain: "localhost"
@@ -29,7 +31,7 @@ environment:
     fromName: "Karol"
     fromAddress: "goappdm@gmail.com"
 
-# Database connection settings
+# Konfiguracja bazy danych
 database:
   postgres:
     username: "postgres"
@@ -41,10 +43,10 @@ database:
     password: "password"
     database: "logs"
 
-# Persistent Volumes for PostgreSQL, MongoDB, and Vault
+# Persistent Volumes dla PostgreSQL, MongoDB i Vault
 persistence:
-  accessMode: ReadWriteOnce  # Dodaj dostępność
-  size: 1Gi                   # Rozmiar pamięci dla PVC
+  accessMode: ReadWriteOnce       # Tryb dostępu dla pamięci trwałej
+  size: 1Gi                       # Domyślny rozmiar pamięci
   postgres:
     storage: 1Gi
     path: /data/postgres
@@ -53,4 +55,4 @@ persistence:
     path: /data/mongo
   vault:
     storage: 1Gi
-    path: /data/vault
+    path: /data/vault           # Ścieżka pamięci dla Vault
