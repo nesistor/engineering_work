@@ -1,7 +1,7 @@
 # Konfiguracja główna z adresem Vault
 vault:
-  address: "http://vault:8200"         # Główny adres Vault
-  api_addr: "http://localhost:8200"    # Adres API dla lokalnej instancji Vault
+  address: "http://vault:8200"        
+  api_addr: "http://localhost:8200"    
   token: "root_token" 
   securityContext:
     capabilities:
@@ -45,8 +45,8 @@ database:
 
 # Persistent Volumes dla PostgreSQL, MongoDB i Vault
 persistence:
-  accessMode: ReadWriteOnce       # Tryb dostępu dla pamięci trwałej
-  size: 1Gi                       # Domyślny rozmiar pamięci
+  accessMode: ReadWriteOnce       
+  size: 1Gi                       
   postgres:
     storage: 1Gi
     path: /data/postgres
