@@ -1,4 +1,4 @@
-package data
+package keys
 
 import (
 	"crypto/rsa"
