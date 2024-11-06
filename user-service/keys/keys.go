@@ -1,4 +1,4 @@
-package keys
+package data
 
 import (
 	"crypto/rsa"
@@ -24,6 +24,7 @@ type KeyManager struct {
 	publicKeys   map[string]*rsa.PublicKey
 	mu           sync.RWMutex
 	refreshCycle time.Duration
+	stopCh       chan struct{}
 }
 
 // NewKeyManager initializes a KeyManager and starts the key rotation mechanism.
@@ -32,6 +33,7 @@ func NewKeyManager(vaultConfig VaultConfig, refreshCycle time.Duration) (*KeyMan
 		vaultConfig:  vaultConfig,
 		publicKeys:   make(map[string]*rsa.PublicKey),
 		refreshCycle: refreshCycle,
+		stopCh:       make(chan struct{}),
 	}
 
 	err := km.loadKeys()
@@ -74,7 +76,7 @@ func (km *KeyManager) loadKeys() error {
 		return fmt.Errorf("failed to parse private key: %w", err)
 	}
 
-	// Load public keys
+	// Load public keys (can be optimized with versioning, so we don't load all every time)
 	secretPublic, err := client.Logical().Read("jwt_keys/public_keys")
 	if err != nil {
 		return fmt.Errorf("failed to read public keys from Vault: %w", err)
@@ -83,7 +85,6 @@ func (km *KeyManager) loadKeys() error {
 		return fmt.Errorf("public keys not found in Vault")
 	}
 
-	// Extract the public key
 	publicKeyData, ok := secretPublic.Data["public_key"].(string)
 	if !ok {
 		return fmt.Errorf("unexpected format for public key data")
@@ -110,14 +111,25 @@ func (km *KeyManager) startKeyRotation() {
 	ticker := time.NewTicker(km.refreshCycle)
 	defer ticker.Stop()
 
-	for range ticker.C {
-		err := km.loadKeys()
-		if err != nil {
-			log.Printf("Failed to refresh keys: %v. Retrying in 1 minute.", err)
-			time.Sleep(time.Minute) // Try to reload after one minute
-			continue
+	for {
+		select {
+		case <-ticker.C:
+			err := km.loadKeys()
+			if err != nil {
+				log.Printf("Failed to refresh keys: %v. Retrying in 1 minute.", err)
+				time.Sleep(time.Minute)
+				continue
+			}
+		case <-km.stopCh:
+			log.Println("Key rotation stopped")
+			return
 		}
 	}
+}
+
+// Stop gracefully stops the key rotation process
+func (km *KeyManager) Stop() {
+	close(km.stopCh)
 }
 
 // GetPrivateKey safely retrieves the private key.
