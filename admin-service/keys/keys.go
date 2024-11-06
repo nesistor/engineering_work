@@ -1,4 +1,4 @@
-package data
+package keys
 
 import (
 	"crypto/rsa"
@@ -99,7 +99,7 @@ func (km *KeyManager) loadKeys() error {
 
 	km.privateKey = privateKey
 	km.publicKeys = map[string]*rsa.PublicKey{
-		"default": publicKey, // Use a default kid for now
+		"default": publicKey, 
 	}
 
 	log.Println("Keys successfully loaded and updated from Vault")
@@ -117,7 +117,7 @@ func (km *KeyManager) startKeyRotation() {
 			err := km.loadKeys()
 			if err != nil {
 				log.Printf("Failed to refresh keys: %v. Retrying in 1 minute.", err)
-				time.Sleep(time.Minute) // Retry after 1 minute
+				time.Sleep(time.Minute) 
 				continue
 			}
 		case <-km.stopCh:
