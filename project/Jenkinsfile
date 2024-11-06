@@ -57,12 +57,14 @@ pipeline {
             }
         }
         
-        stage('Deploy with Helm') {
+            stage('Deploy with Helm') {
             steps {
                 script {
+                    sh "whoami"  // Sprawdzanie użytkownika wykonującego skrypt
                     sh "${HELM_PATH} upgrade --install microservices ./microservices-chart --namespace microservices-app --set image.tag=latest --debug"
                 }
             }
         }
+
     }
 }
