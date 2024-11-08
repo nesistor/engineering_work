@@ -1,12 +1,23 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REGISTRY = "localhost:5000"
+        DOCKER_REGISTRY = "975050173579.dkr.ecr.eu-central-1.amazonaws.com"
+        AWS_REGION = "eu-central-1"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         HELM_PATH = "/usr/local/bin/helm"  
         KUBECONFIG = '/var/lib/jenkins/minikube/kubeconfig'
     }
     stages {
+        stage('Login to ECR') {
+            steps {
+                script {
+                    sh """
+                        aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
+                    """
+                }
+            }
+        }
+
         stage('Build Applications') {
             steps {
                 script {
@@ -30,7 +41,7 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Build Docker Images') {
             steps {
                 script {
@@ -44,27 +55,26 @@ pipeline {
                 }
             }
         }
-        
-        stage('Push Docker Images') {
+
+        stage('Tag and Push Docker Images') {
             steps {
                 script {
                     def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
                     
                     services.each { service ->
+                        sh "docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest"
                         sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
                     }
                 }
             }
         }
         
-            stage('Deploy with Helm') {
+        stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "whoami" 
-                    sh "${HELM_PATH} upgrade --install microservices ./microservices-chart --namespace microservices-app --set image.tag=latest --debug"
+                    sh "${HELM_PATH} upgrade --install microservices ./my-helm-chart --namespace microservices-app --set image.tag=latest --debug"
                 }
             }
         }
-
     }
 }
