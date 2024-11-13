@@ -72,7 +72,6 @@ func main() {
 	// Start gRPC server
 	go app.gRPCListen()
 
-	// Block main thread to keep the servers running
 	select {}
 }
 
