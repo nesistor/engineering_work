@@ -9,18 +9,13 @@ pipeline {
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"  
     }
-    stages {
+    stages { 
         stage('Login to Google Cloud') {
             steps {
                 script {
-                    // Użycie poświadczeń z Google Cloud (GoogleServiceAccountCredentialsBinding)
-                    withCredentials([[
-                        $class: 'GoogleServiceAccountCredentialsBinding', 
-                        credentialsId: 'gcloud-credentials', 
-                        keyFileVariable: 'GOOGLE_APPLICATION_CREDENTIALS'
-                    ]]) {
+                    // Manually authenticate with Google Cloud
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
-                            # Aktywacja konta usługi Google Cloud
                             gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
                             gcloud config set project \${GCP_PROJECT}
                         """
@@ -88,5 +83,5 @@ pipeline {
                 }
             }
         }
-    }
+    } 
 }
