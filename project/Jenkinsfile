@@ -1,22 +1,25 @@
 pipeline {
     agent any
     environment {
-        DOCKER_REGISTRY = "975050173579.dkr.ecr.eu-central-1.amazonaws.com"
-        AWS_REGION = "eu-central-1"
+        GCP_PROJECT = "my-microservices-app" 
+        GKE_CLUSTER = "my-gke-cluster"
+        GKE_ZONE = "us-central1-a"  
+        DOCKER_REGISTRY = "gcr.io/${GCP_PROJECT}"  
+        HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
-        HELM_PATH = "/usr/local/bin/helm"  
-        KUBECONFIG = '/var/lib/jenkins/minikube/kubeconfig'
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"  
     }
     stages {
-        stage('Login to ECR') {
+        stage('Login to Google Cloud') {
             steps {
                 script {
                     withCredentials([[
-                        $class: 'AmazonWebServicesCredentialsBinding',
-                        credentialsId: 'aws-credentials'
+                        $class: 'GoogleServiceAccountCredentialsBinding',
+                        credentialsId: 'gcloud-credentials'
                     ]]) {
                         sh """
-                            aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${DOCKER_REGISTRY}
+                            gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
+                            gcloud config set project \${GCP_PROJECT}
                         """
                     }
                 }
@@ -73,10 +76,11 @@ pipeline {
                 }
             }
         }
-        
+
         stage('Deploy with Helm') {
             steps {
                 script {
+                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
                     sh "${HELM_PATH} upgrade --install microservices ./my-helm-chart --namespace microservices-app --set image.tag=latest --debug"
                 }
             }
