@@ -13,11 +13,8 @@ pipeline {
         stage('Login to Google Cloud') {
             steps {
                 script {
-                    withCredentials([[
-                        $class: 'GoogleServiceAccountCredentialsBinding',
-                        credentialsId: 'gcloud-credentials'
-                        keyFileVariable: 'GOOGLE_APPLICATION_CREDENTIALS'
-                    ]]) {
+            // Użycie poświadczeń z Google Cloud
+                    withCredentials([[$class: 'GoogleServiceAccountCredentialsBinding', credentialsId: 'gcloud-credentials']]) {
                         sh """
                             export GOOGLE_APPLICATION_CREDENTIALS=\${GOOGLE_APPLICATION_CREDENTIALS}
                             gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
