@@ -9,16 +9,15 @@ pipeline {
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
-        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
+        GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
+        PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"  // Adding gcloud to PATH
     }
 
     stages {
         // Nowy stage uruchamiający gcloud
         stage('Run gcloud') {
             steps {
-                withEnv(['GCLOUD_PATH=/var/lib/jenkins/google-cloud-sdk/bin']) {
-                    sh '$GCLOUD_PATH/gcloud --version'
-                }
+                sh 'gcloud --version'  // Simply use 'gcloud' since it's now in the PATH
             }
         }
 
