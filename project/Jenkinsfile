@@ -61,6 +61,18 @@ pipeline {
             }
         }
 
+        stage('Test Connection to GCR') {
+            steps {
+                script {
+                    echo "Testing connection to Google Container Registry..."
+                    sh """
+                        gcloud auth configure-docker us-central1-docker.pkg.dev
+                        docker pull ${DOCKER_REGISTRY}/auth-service:latest || echo 'Error pulling image from GCR'
+                    """
+                }
+            }
+        }
+
         stage('Build Applications') {
             steps {
                 script {
