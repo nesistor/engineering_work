@@ -128,6 +128,11 @@ pipeline {
         stage('Deploy with Helm') {
             steps {
                 script {
+                    // Debugging - Print the current directory
+                    sh 'pwd'
+                    // List the files in the current directory to see if the my-helm-chart folder exists
+                    sh 'ls -la'
+
                     sh """
                         echo "Setting up kubeconfig to use gke-gcloud-auth-plugin..."
                         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
