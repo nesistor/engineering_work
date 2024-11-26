@@ -106,6 +106,8 @@ pipeline {
         stage('Tag and Push Docker Images') {
             steps {
                 script {
+                    sh "gcloud auth configure-docker gcr.io"
+                    
                     def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
                     
                     services.each { service ->
