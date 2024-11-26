@@ -16,7 +16,7 @@ pipeline {
         // Nowy stage uruchamiający gcloud
         stage('Run gcloud') {
             steps {
-                withEnv(['GCLOUD_PATH=/var/lib/jenkins_home/google-cloud-sdk/bin']) {
+                withEnv(['GCLOUD_PATH=/var/lib/jenkins/google-cloud-sdk/bin']) {
                     sh '$GCLOUD_PATH/gcloud --version'
                 }
             }
