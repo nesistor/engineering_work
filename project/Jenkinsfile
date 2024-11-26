@@ -14,12 +14,12 @@ pipeline {
             steps {
                 script {
             // Użycie poświadczeń z Google Cloud
-                    withCredentials([[$class: 'GoogleServiceAccountCredentialsBinding', credentialsId: 'gcloud-credentials']]) {
-                        sh """
-                            export GOOGLE_APPLICATION_CREDENTIALS=\${GOOGLE_APPLICATION_CREDENTIALS}
-                            gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
-                            gcloud config set project \${GCP_PROJECT}
-                """
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                    sh """
+                        export GOOGLE_APPLICATION_CREDENTIALS=\${GOOGLE_APPLICATION_CREDENTIALS}
+                        gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
+                        gcloud config set project \${GCP_PROJECT}
+                    """
                     }
                 }
             }
