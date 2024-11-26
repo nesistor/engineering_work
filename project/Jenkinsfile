@@ -137,6 +137,10 @@ pipeline {
                         echo "Setting up kubeconfig to use gke-gcloud-auth-plugin..."
                         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
                         gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}
+                        
+                        echo "Checking if microservices-app namespace exists..."
+                        kubectl get namespaces | grep microservices-app || kubectl create namespace microservices-app
+                        
                         echo "Deploying with Helm..."
                         ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
                     """
