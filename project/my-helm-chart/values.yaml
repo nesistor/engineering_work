@@ -1,5 +1,3 @@
-# values.yaml
-
 vault:
   image:
     repository: "vault"
