@@ -1,0 +1,121 @@
+# values.yaml
+
+vault:
+  image:
+    repository: vault
+    tag: "1.13.2"
+  ports:
+    - "8200:8200"
+  environment:
+    VAULT_ADDR: http://0.0.0.0:8200
+    VAULT_API_ADDR: http://localhost:8200
+    VAULT_DEV_ROOT_TOKEN_ID: root_token
+  volumes:
+    - name: vault-data
+      mountPath: /vault/file
+  command: "server -dev -dev-root-token-id=root_token"
+  cap_add:
+    - IPC_LOCK
+
+authenticationService:
+  image:
+    buildContext: ./../auth-service
+    dockerfile: auth-service.dockerfile
+  ports:
+    - "8083:80"
+  environment:
+    REDIS_URL: "redis:6379"
+    VAULT_ADDR: "http://vault:8200"
+    VAULT_TOKEN: root_token
+  dependsOn:
+    - redis
+    - vault
+
+loggerService:
+  image:
+    buildContext: ./../logger-service
+    dockerfile: logger-service.dockerfile
+
+mailerService:
+  image:
+    buildContext: ./../mail-service
+    dockerfile: mail-service.dockerfile
+  environment:
+    MAIL_DOMAIN: localhost
+    MAIL_HOST: mailhog
+    MAIL_PORT: 1025
+    MAIL_ENCRYPTION: none
+    MAIL_USERNAME: ""
+    MAIL_PASSWORD: ""
+    FROM_NAME: "Karol"
+    FROM_ADDRESS: goappdm@gmail.com
+
+userService:
+  image:
+    buildContext: ./../user-service
+    dockerfile: user-service.dockerfile
+  ports:
+    - "8081:80"
+    - "50001:50001"
+  environment:
+    DSN: "host=postgres-users port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+    VAULT_ADDR: "http://vault:8200"
+    VAULT_TOKEN: root_token
+  dependsOn:
+    - postgres-users
+    - vault
+
+adminService:
+  image:
+    buildContext: ./../admin-service
+    dockerfile: admin-service.dockerfile
+  ports:
+    - "8082:80"
+    - "50002:50001"
+  environment:
+    DSN: "host=postgres-admins port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
+    VAULT_ADDR: "http://vault:8200"
+    VAULT_TOKEN: root_token
+  dependsOn:
+    - postgres-admins
+    - vault
+
+redis:
+  image:
+    repository: redis
+    tag: "7.0"
+  ports:
+    - "6379:6379"
+
+postgresUsers:
+  image:
+    repository: postgres
+    tag: "14.0"
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+    POSTGRES_DB: users
+  volumes:
+    - ./db-data/postgres-users:/var/lib/postgresql/data
+
+postgresAdmins:
+  image:
+    repository: postgres
+    tag: "14.0"
+  environment:
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: password
+    POSTGRES_DB: admins
+  volumes:
+    - ./db-data/postgres-admins:/var/lib/postgresql/data
+
+mongo:
+  image:
+    repository: mongo
+    tag: "4.2.16-bionic"
+  environment:
+    MONGO_INITDB_DATABASE: logs
+    MONGO_INITDB_ROOT_USERNAME: admin
+    MONGO_INITDB_ROOT_PASSWORD: password
+  volumes:
+    - ./db-data/mongo:/data/db
