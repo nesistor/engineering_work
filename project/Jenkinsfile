@@ -100,7 +100,7 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 script {
-                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
+                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service', "flyway"]
                     
                     services.each { service ->
                         dir("./${service}") {
