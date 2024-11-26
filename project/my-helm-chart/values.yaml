@@ -1,6 +1,6 @@
 vault:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/vault"
+    repository: "vault"
     tag: "latest"
   ports:
     - "8200:8200"
@@ -17,7 +17,7 @@ vault:
 
 authenticationService:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/auth-service"
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
     tag: "latest"
   ports:
     - "8083:80"
@@ -31,12 +31,12 @@ authenticationService:
 
 loggerService:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/logger-service"
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/logger-service"
     tag: "latest"
 
 mailerService:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/mail-service"
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/mail-service"
     tag: "latest"
   environment:
     MAIL_DOMAIN: localhost
@@ -50,7 +50,7 @@ mailerService:
 
 userService:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/user-service"
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/user-service"
     tag: "latest"
   ports:
     - "8081:80"
@@ -65,7 +65,7 @@ userService:
 
 adminService:
   image:
-    repository: "us-central1-docker.pkg.dev/my-microservices-repo/admin-service"
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/admin-service"
     tag: "latest"
   ports:
     - "8082:80"
