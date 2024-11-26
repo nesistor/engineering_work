@@ -12,15 +12,6 @@ pipeline {
         GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
     }
 
-    stages {
-        // Nowy stage uruchamiający gcloud jako pierwszy
-        stage('Run gcloud') {
-            steps {
-                withEnv(['GCLOUD_PATH=/var/jenkins_home/google-cloud-sdk/bin']) {
-                    sh '$GCLOUD_PATH/gcloud --version'
-                }
-            }
-        }
 
         // Sprawdzanie, czy gcloud jest zainstalowane
         stage('Check if gcloud is installed') {
