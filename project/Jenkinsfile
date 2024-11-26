@@ -138,7 +138,7 @@ pipeline {
                         export USE_GKE_GCLOUD_AUTH_PLUGIN=True
                         gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}
                         echo "Deploying with Helm..."
-                        ${HELM_PATH} upgrade --install microservices ./my-helm-chart --namespace microservices-app --set image.tag=latest --debug
+                        ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
                     """
                 }
             }
