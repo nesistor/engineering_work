@@ -16,8 +16,8 @@ pipeline {
         stage('Test Google Credentials') {
             steps {
                 script {
-                    // Użycie poświadczeń Google Cloud Service Account
-                    withCredentials([[$class: 'GoogleServiceAccountCredentialsBinding', credentialsId: 'gcloud-credentials']]) {
+                    // Użycie poświadczeń Google Cloud Service Account z pliku JSON
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
                             echo "Testing Google Cloud credentials..."
                             gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
@@ -33,9 +33,10 @@ pipeline {
         stage('Login to Google Cloud') {
             steps {
                 script {
-                    // Użycie poświadczeń Google Cloud Service Account
-                    withCredentials([[$class: 'GoogleServiceAccountCredentialsBinding', credentialsId: 'gcloud-credentials']]) {
+                    // Użycie poświadczeń Google Cloud Service Account z pliku JSON
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
+                            echo "Authenticating with Google Cloud..."
                             gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
                             gcloud config set project \${GCP_PROJECT}
                         """
