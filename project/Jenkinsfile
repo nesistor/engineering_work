@@ -5,7 +5,7 @@ pipeline {
         GCP_PROJECT = "my-microservices-app" 
         GKE_CLUSTER = "my-gke-cluster"
         GKE_ZONE = "us-central1-a"  
-        DOCKER_REGISTRY = "gcr.io/${GCP_PROJECT}"  
+        DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"  
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
@@ -14,14 +14,12 @@ pipeline {
     }
 
     stages {
-        // Nowy stage uruchamiający gcloud
         stage('Run gcloud') {
             steps {
                 sh 'gcloud --version'  // Simply use 'gcloud' since it's now in the PATH
             }
         }
 
-        // Sprawdzanie, czy gcloud jest zainstalowane
         stage('Check if gcloud is installed') {
             steps {
                 script {
@@ -35,7 +33,6 @@ pipeline {
             }
         }
 
-        // Testowanie poświadczeń Google Cloud
         stage('Test Google Credentials') {
             steps {
                 script {
@@ -50,7 +47,6 @@ pipeline {
             }
         }
 
-        // Krok logowania do Google Cloud
         stage('Login to Google Cloud') {
             steps {
                 script {
@@ -106,10 +102,13 @@ pipeline {
         stage('Tag and Push Docker Images') {
             steps {
                 script {
-                    sh "gcloud auth configure-docker gcr.io"
+                    // Configure Docker to use Artifact Registry
+                    sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
                     
+                    // List of microservices
                     def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
                     
+                    // Tag and push Docker images
                     services.each { service ->
                         sh "docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest"
                         sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
