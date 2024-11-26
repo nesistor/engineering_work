@@ -137,6 +137,24 @@ pipeline {
             }
         }
 
+        stage('Create Kubernetes Secret for GCR') {
+            steps {
+                script {
+                    // Create Kubernetes secret for pulling images from GCR
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh """
+                            echo "Creating Kubernetes secret for GCR..."
+                            kubectl create secret docker-registry gcr-json-key \
+                            --docker-server=us-central1-docker.pkg.dev \
+                            --docker-username=_json_key \
+                            --docker-password=\$(cat \${GOOGLE_APPLICATION_CREDENTIALS}) \
+                            --docker-email=youremail@example.com --dry-run=client -o yaml | kubectl apply -f -
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Deploy with Helm') {
             steps {
                 script {
