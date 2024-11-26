@@ -1,5 +1,6 @@
 pipeline {
     agent any
+
     environment {
         GCP_PROJECT = "my-microservices-app" 
         GKE_CLUSTER = "my-gke-cluster"
@@ -9,7 +10,26 @@ pipeline {
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"  
     }
+
     stages {
+        // Testowanie poświadczeń Google Cloud
+        stage('Test Google Credentials') {
+            steps {
+                script {
+                    // Użycie poświadczeń Google Cloud Service Account
+                    withCredentials([[$class: 'GoogleServiceAccountCredentialsBinding', credentialsId: 'gcloud-credentials']]) {
+                        sh """
+                            echo "Testing Google Cloud credentials..."
+                            gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
+                            gcloud config set project \${GCP_PROJECT}
+                            gcloud config list project  // Sprawdzanie aktualnego projektu
+                        """
+                    }
+                }
+            }
+        }
+
+        // Krok logowania do Google Cloud
         stage('Login to Google Cloud') {
             steps {
                 script {
