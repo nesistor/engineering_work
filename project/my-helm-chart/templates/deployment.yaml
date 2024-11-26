@@ -1,4 +1,145 @@
+# deployment.yaml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-vault
+  labels:
+    app: vault
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vault
+  template:
+    metadata:
+      labels:
+        app: vault
+    spec:
+      containers:
+        - name: vault
+          image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
+          ports:
+            - containerPort: 8200
+          env:
+            - name: VAULT_ADDR
+              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+            - name: VAULT_API_ADDR
+              value: "{{ .Values.vault.environment.VAULT_API_ADDR }}"
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
+          volumeMounts:
+            - name: vault-data
+              mountPath: /vault/file
+          command: ["server", "-dev", "-dev-root-token-id=root_token"]
+          securityContext:
+            capabilities:
+              add: ["IPC_LOCK"]
+      volumes:
+        - name: vault-data
+          emptyDir: {}
+
 ---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-authentication-service
+  labels:
+    app: authentication-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: authentication-service
+  template:
+    metadata:
+      labels:
+        app: authentication-service
+    spec:
+      containers:
+        - name: authentication-service
+          image: "{{ .Values.authenticationService.image.buildContext }}/{{ .Values.authenticationService.image.dockerfile }}"
+          ports:
+            - containerPort: 8083
+          env:
+            - name: REDIS_URL
+              value: "{{ .Values.authenticationService.environment.REDIS_URL }}"
+            - name: VAULT_ADDR
+              value: "{{ .Values.authenticationService.environment.VAULT_ADDR }}"
+            - name: VAULT_TOKEN
+              value: "{{ .Values.authenticationService.environment.VAULT_TOKEN }}"
+          dependsOn:
+            - vault
+            - redis
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-logger-service
+  labels:
+    app: logger-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logger-service
+  template:
+    metadata:
+      labels:
+        app: logger-service
+    spec:
+      containers:
+        - name: logger-service
+          image: "{{ .Values.loggerService.image.buildContext }}/{{ .Values.loggerService.image.dockerfile }}"
+          ports:
+            - containerPort: 8084
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-mailer-service
+  labels:
+    app: mailer-service
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailer-service
+  template:
+    metadata:
+      labels:
+        app: mailer-service
+    spec:
+      containers:
+        - name: mailer-service
+          image: "{{ .Values.mailerService.image.buildContext }}/{{ .Values.mailerService.image.dockerfile }}"
+          ports:
+            - containerPort: 8085
+          env:
+            - name: MAIL_DOMAIN
+              value: "{{ .Values.mailerService.environment.MAIL_DOMAIN }}"
+            - name: MAIL_HOST
+              value: "{{ .Values.mailerService.environment.MAIL_HOST }}"
+            - name: MAIL_PORT
+              value: "{{ .Values.mailerService.environment.MAIL_PORT }}"
+            - name: MAIL_ENCRYPTION
+              value: "{{ .Values.mailerService.environment.MAIL_ENCRYPTION }}"
+            - name: MAIL_USERNAME
+              value: "{{ .Values.mailerService.environment.MAIL_USERNAME }}"
+            - name: MAIL_PASSWORD
+              value: "{{ .Values.mailerService.environment.MAIL_PASSWORD }}"
+            - name: FROM_NAME
+              value: "{{ .Values.mailerService.environment.FROM_NAME }}"
+            - name: FROM_ADDRESS
+              value: "{{ .Values.mailerService.environment.FROM_ADDRESS }}"
+
+---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -17,7 +158,7 @@ spec:
     spec:
       containers:
         - name: user-service
-          image: "{{ .Values.userService.image.repository }}:{{ .Values.userService.image.tag }}"
+          image: "{{ .Values.userService.image.buildContext }}/{{ .Values.userService.image.dockerfile }}"
           ports:
             - containerPort: 8081
             - containerPort: 50001
@@ -33,6 +174,7 @@ spec:
             - vault
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -51,7 +193,7 @@ spec:
     spec:
       containers:
         - name: admin-service
-          image: "{{ .Values.adminService.image.repository }}:{{ .Values.adminService.image.tag }}"
+          image: "{{ .Values.adminService.image.buildContext }}/{{ .Values.adminService.image.dockerfile }}"
           ports:
             - containerPort: 8082
             - containerPort: 50002
@@ -67,6 +209,7 @@ spec:
             - vault
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -90,6 +233,7 @@ spec:
             - containerPort: 6379
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -127,6 +271,7 @@ spec:
             path: ./db-data/postgres-users
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -164,6 +309,7 @@ spec:
             path: ./db-data/postgres-admins
 
 ---
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
