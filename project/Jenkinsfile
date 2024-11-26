@@ -12,6 +12,21 @@ pipeline {
     }
 
     stages {
+        // Sprawdzanie, czy gcloud jest zainstalowane
+        stage('Check if gcloud is installed') {
+            steps {
+                script {
+                    // Sprawdzenie, czy `gcloud` jest zainstalowane
+                    def gcloudCheck = sh(script: 'which gcloud', returnStatus: true)
+                    if (gcloudCheck != 0) {
+                        error 'gcloud is not installed or not found in PATH'
+                    } else {
+                        echo 'gcloud is installed and available in PATH'
+                    }
+                }
+            }
+        }
+
         // Testowanie poświadczeń Google Cloud
         stage('Test Google Credentials') {
             steps {
