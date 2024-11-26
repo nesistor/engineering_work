@@ -1,7 +1,7 @@
 vault:
   image:
-    repository: "vault"
-    tag: "1.13.2"
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/vault"
+    tag: "latest"
   ports:
     - "8200:8200"
   environment:
@@ -17,8 +17,8 @@ vault:
 
 authenticationService:
   image:
-    buildContext: ./../auth-service
-    dockerfile: auth-service.dockerfile
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/auth-service"
+    tag: "latest"
   ports:
     - "8083:80"
   environment:
@@ -31,13 +31,13 @@ authenticationService:
 
 loggerService:
   image:
-    buildContext: ./../logger-service
-    dockerfile: logger-service.dockerfile
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/logger-service"
+    tag: "latest"
 
 mailerService:
   image:
-    buildContext: ./../mail-service
-    dockerfile: mail-service.dockerfile
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/mail-service"
+    tag: "latest"
   environment:
     MAIL_DOMAIN: localhost
     MAIL_HOST: mailhog
@@ -50,8 +50,8 @@ mailerService:
 
 userService:
   image:
-    buildContext: ./../user-service
-    dockerfile: user-service.dockerfile
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/user-service"
+    tag: "latest"
   ports:
     - "8081:80"
     - "50001:50001"
@@ -65,8 +65,8 @@ userService:
 
 adminService:
   image:
-    buildContext: ./../admin-service
-    dockerfile: admin-service.dockerfile
+    repository: "us-central1-docker.pkg.dev/my-microservices-repo/admin-service"
+    tag: "latest"
   ports:
     - "8082:80"
     - "50002:50001"
@@ -80,14 +80,14 @@ adminService:
 
 redis:
   image:
-    repository: redis
+    repository: "redis"
     tag: "7.0"
   ports:
     - "6379:6379"
 
 postgresUsers:
   image:
-    repository: postgres
+    repository: "postgres"
     tag: "14.0"
   environment:
     POSTGRES_USER: postgres
@@ -98,7 +98,7 @@ postgresUsers:
 
 postgresAdmins:
   image:
-    repository: postgres
+    repository: "postgres"
     tag: "14.0"
   environment:
     POSTGRES_USER: postgres
@@ -109,7 +109,7 @@ postgresAdmins:
 
 mongo:
   image:
-    repository: mongo
+    repository: "mongo"
     tag: "4.2.16-bionic"
   environment:
     MONGO_INITDB_DATABASE: logs
