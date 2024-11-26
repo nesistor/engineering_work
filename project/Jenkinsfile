@@ -8,15 +8,24 @@ pipeline {
         DOCKER_REGISTRY = "gcr.io/${GCP_PROJECT}"  
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
-        KUBECONFIG = "/var/lib/jenkins/.kube/config"  
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
+        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
     }
 
     stages {
+        // Nowy stage uruchamiający gcloud jako pierwszy
+        stage('Run gcloud') {
+            steps {
+                withEnv(['GCLOUD_PATH=/var/jenkins_home/google-cloud-sdk/bin']) {
+                    sh '$GCLOUD_PATH/gcloud --version'
+                }
+            }
+        }
+
         // Sprawdzanie, czy gcloud jest zainstalowane
         stage('Check if gcloud is installed') {
             steps {
                 script {
-                    // Sprawdzenie, czy `gcloud` jest zainstalowane
                     def gcloudCheck = sh(script: 'which gcloud', returnStatus: true)
                     if (gcloudCheck != 0) {
                         error 'gcloud is not installed or not found in PATH'
@@ -31,7 +40,6 @@ pipeline {
         stage('Test Google Credentials') {
             steps {
                 script {
-                    // Użycie poświadczeń Google Cloud Service Account z pliku JSON
                     withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
                             echo "Testing Google Cloud credentials..."
@@ -48,7 +56,6 @@ pipeline {
         stage('Login to Google Cloud') {
             steps {
                 script {
-                    // Użycie poświadczeń Google Cloud Service Account z pliku JSON
                     withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
                             echo "Authenticating with Google Cloud..."
