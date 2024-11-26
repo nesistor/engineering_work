@@ -141,6 +141,9 @@ pipeline {
                         echo "Checking if microservices-app namespace exists..."
                         kubectl get namespaces | grep microservices-app || kubectl create namespace microservices-app
                         
+                        echo "Deleting old Helm release if it exists..."
+                        helm uninstall microservices --namespace microservices-app || echo "No existing Helm release found"
+
                         echo "Deploying with Helm..."
                         ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
                     """
