@@ -102,13 +102,10 @@ pipeline {
         stage('Tag and Push Docker Images') {
             steps {
                 script {
-                    // Configure Docker to use Artifact Registry
                     sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
                     
-                    // List of microservices
                     def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
                     
-                    // Tag and push Docker images
                     services.each { service ->
                         sh "docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest"
                         sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
@@ -117,11 +114,27 @@ pipeline {
             }
         }
 
+        stage('Install gke-gcloud-auth-plugin') {
+            steps {
+                script {
+                    sh """
+                        echo "Installing gke-gcloud-auth-plugin..."
+                        gcloud components install gke-gcloud-auth-plugin -q
+                    """
+                }
+            }
+        }
+
         stage('Deploy with Helm') {
             steps {
                 script {
-                    sh "gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}"
-                    sh "${HELM_PATH} upgrade --install microservices ./my-helm-chart --namespace microservices-app --set image.tag=latest --debug"
+                    sh """
+                        echo "Setting up kubeconfig to use gke-gcloud-auth-plugin..."
+                        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+                        gcloud container clusters get-credentials ${GKE_CLUSTER} --zone ${GKE_ZONE} --project ${GCP_PROJECT}
+                        echo "Deploying with Helm..."
+                        ${HELM_PATH} upgrade --install microservices ./my-helm-chart --namespace microservices-app --set image.tag=latest --debug
+                    """
                 }
             }
         }
