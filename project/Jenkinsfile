@@ -9,7 +9,7 @@ pipeline {
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
-        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
+        GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
     }
 
     stages {
