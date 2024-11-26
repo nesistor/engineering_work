@@ -9,15 +9,16 @@ pipeline {
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
-        GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
-        PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"  // Adding gcloud to PATH
+        GCLOUD_PATH = "/var/jenkins_home/google-cloud-sdk/bin"
     }
 
     stages {
         // Nowy stage uruchamiający gcloud
         stage('Run gcloud') {
             steps {
-                sh 'gcloud --version'  // Simply use 'gcloud' since it's now in the PATH
+                withEnv(['GCLOUD_PATH=/var/lib/jenkins/google-cloud-sdk/bin']) {
+                    sh '$GCLOUD_PATH/gcloud --version'
+                }
             }
         }
 
@@ -44,7 +45,7 @@ pipeline {
                             echo "Testing Google Cloud credentials..."
                             gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
                             gcloud config set project \${GCP_PROJECT}
-                            gcloud config list project  // Sprawdzanie aktualnego projektu
+                            gcloud config list project  # Sprawdzanie aktualnego projektu
                         """
                     }
                 }
