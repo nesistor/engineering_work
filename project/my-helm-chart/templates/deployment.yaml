@@ -1,5 +1,3 @@
-# deployment.yaml
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -16,6 +14,8 @@ spec:
       labels:
         app: vault
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -57,6 +57,8 @@ spec:
       labels:
         app: authentication-service
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: authentication-service
           image: "{{ .Values.authenticationService.image.buildContext }}/{{ .Values.authenticationService.image.dockerfile }}"
@@ -91,6 +93,8 @@ spec:
       labels:
         app: logger-service
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: logger-service
           image: "{{ .Values.loggerService.image.buildContext }}/{{ .Values.loggerService.image.dockerfile }}"
@@ -115,6 +119,8 @@ spec:
       labels:
         app: mailer-service
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: mailer-service
           image: "{{ .Values.mailerService.image.buildContext }}/{{ .Values.mailerService.image.dockerfile }}"
@@ -156,6 +162,8 @@ spec:
       labels:
         app: user-service
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: user-service
           image: "{{ .Values.userService.image.buildContext }}/{{ .Values.userService.image.dockerfile }}"
@@ -191,6 +199,8 @@ spec:
       labels:
         app: admin-service
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: admin-service
           image: "{{ .Values.adminService.image.buildContext }}/{{ .Values.adminService.image.dockerfile }}"
@@ -226,6 +236,8 @@ spec:
       labels:
         app: redis
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: redis
           image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
@@ -250,6 +262,8 @@ spec:
       labels:
         app: postgres-users
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: postgres-users
           image: "{{ .Values.postgresUsers.image.repository }}:{{ .Values.postgresUsers.image.tag }}"
@@ -288,6 +302,8 @@ spec:
       labels:
         app: postgres-admins
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: postgres-admins
           image: "{{ .Values.postgresAdmins.image.repository }}:{{ .Values.postgresAdmins.image.tag }}"
@@ -326,6 +342,8 @@ spec:
       labels:
         app: mongo
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: mongo
           image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
