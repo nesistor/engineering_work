@@ -2,7 +2,7 @@
 
 vault:
   image:
-    repository: vault
+    repository: "vault"
     tag: "1.13.2"
   ports:
     - "8200:8200"
