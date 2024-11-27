@@ -4,18 +4,21 @@ metadata:
   name: {{ .Release.Name }}-vault
   labels:
     app: vault
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: vault
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: vault
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -28,9 +31,6 @@ spec:
               value: "{{ .Values.vault.environment.VAULT_API_ADDR }}"
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
-          volumeMounts:
-            - name: vault-data
-              mountPath: /vault/file
           command: ["server", "-dev", "-dev-root-token-id=root_token"]
           securityContext:
             capabilities:
@@ -47,21 +47,24 @@ metadata:
   name: {{ .Release.Name }}-authentication-service
   labels:
     app: authentication-service
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: authentication-service
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: authentication-service
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: authentication-service
-          image: "{{ .Values.authenticationService.image.buildContext }}:{{ .Values.authenticationService.image.dockerfile }}"
+          image: "{{ .Values.authenticationService.image.repository }}:{{ .Values.authenticationService.image.tag }}"
           ports:
             - containerPort: 8083
           env:
@@ -71,9 +74,6 @@ spec:
               value: "{{ .Values.authenticationService.environment.VAULT_ADDR }}"
             - name: VAULT_TOKEN
               value: "{{ .Values.authenticationService.environment.VAULT_TOKEN }}"
-          dependsOn:
-            - vault
-            - redis
 
 ---
 
@@ -83,23 +83,24 @@ metadata:
   name: {{ .Release.Name }}-logger-service
   labels:
     app: logger-service
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: logger-service
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: logger-service
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: logger-service
-          image: "{{ .Values.loggerService.image.buildContext }}:{{ .Values.loggerService.image.dockerfile }}"
-          ports:
-            - containerPort: 8084
+          image: "{{ .Values.loggerService.image.repository }}:{{ .Values.loggerService.image.tag }}"
 
 ---
 
@@ -109,21 +110,24 @@ metadata:
   name: {{ .Release.Name }}-mailer-service
   labels:
     app: mailer-service
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: mailer-service
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: mailer-service
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: mailer-service
-          image: "{{ .Values.mailerService.image.buildContext }}:{{ .Values.mailerService.image.dockerfile }}"
+          image: "{{ .Values.mailerService.image.repository }}:{{ .Values.mailerService.image.tag }}"
           ports:
             - containerPort: 8085
           env:
@@ -152,21 +156,24 @@ metadata:
   name: {{ .Release.Name }}-user-service
   labels:
     app: user-service
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: user-service
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: user-service
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: user-service
-          image: "{{ .Values.userService.image.buildContext }}:{{ .Values.userService.image.dockerfile }}"
+          image: "{{ .Values.userService.image.repository }}:{{ .Values.userService.image.tag }}"
           ports:
             - containerPort: 8081
             - containerPort: 50001
@@ -177,9 +184,6 @@ spec:
               value: "{{ .Values.userService.environment.VAULT_ADDR }}"
             - name: VAULT_TOKEN
               value: "{{ .Values.userService.environment.VAULT_TOKEN }}"
-          dependsOn:
-            - postgres-users
-            - vault
 
 ---
 
@@ -189,21 +193,24 @@ metadata:
   name: {{ .Release.Name }}-admin-service
   labels:
     app: admin-service
+    release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: admin-service
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: admin-service
+        release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
+        - name: gcr-json-key
       containers:
         - name: admin-service
-          image: "{{ .Values.adminService.image.buildContext }}:{{ .Values.adminService.image.dockerfile }}"
+          image: "{{ .Values.adminService.image.repository }}:{{ .Values.adminService.image.tag }}"
           ports:
             - containerPort: 8082
             - containerPort: 50002
@@ -214,30 +221,27 @@ spec:
               value: "{{ .Values.adminService.environment.VAULT_ADDR }}"
             - name: VAULT_TOKEN
               value: "{{ .Values.adminService.environment.VAULT_TOKEN }}"
-          dependsOn:
-            - postgres-admins
-            - vault
 
 ---
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-redis
   labels:
     app: redis
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: redis
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: redis
+        release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: redis
           image: "{{ .Values.redis.image.repository }}:{{ .Values.redis.image.tag }}"
@@ -252,18 +256,19 @@ metadata:
   name: {{ .Release.Name }}-postgres-users
   labels:
     app: postgres-users
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: postgres-users
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: postgres-users
+        release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: postgres-users
           image: "{{ .Values.postgresUsers.image.repository }}:{{ .Values.postgresUsers.image.tag }}"
@@ -281,8 +286,7 @@ spec:
               mountPath: /var/lib/postgresql/data
       volumes:
         - name: postgres-users-data
-          hostPath:
-            path: ./db-data/postgres-users
+          emptyDir: {}
 
 ---
 
@@ -292,18 +296,19 @@ metadata:
   name: {{ .Release.Name }}-postgres-admins
   labels:
     app: postgres-admins
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: postgres-admins
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: postgres-admins
+        release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: postgres-admins
           image: "{{ .Values.postgresAdmins.image.repository }}:{{ .Values.postgresAdmins.image.tag }}"
@@ -321,8 +326,7 @@ spec:
               mountPath: /var/lib/postgresql/data
       volumes:
         - name: postgres-admins-data
-          hostPath:
-            path: ./db-data/postgres-admins
+          emptyDir: {}
 
 ---
 
@@ -332,18 +336,19 @@ metadata:
   name: {{ .Release.Name }}-mongo
   labels:
     app: mongo
+    release: {{ .Release.Name }}
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: mongo
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: mongo
+        release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: mongo
           image: "{{ .Values.mongo.image.repository }}:{{ .Values.mongo.image.tag }}"
@@ -361,5 +366,4 @@ spec:
               mountPath: /data/db
       volumes:
         - name: mongo-data
-          hostPath:
-            path: ./db-data/mongo
+          emptyDir: {}

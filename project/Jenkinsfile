@@ -6,6 +6,7 @@ pipeline {
         GKE_CLUSTER = "my-gke-cluster"
         GKE_ZONE = "us-central1-a"
         DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
+        HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
         GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
@@ -121,8 +122,8 @@ pipeline {
                 }
             }
         }
-
-        stage('Deploy with kubectl') {
+        
+        stage('Deploy with Helm') {
             steps {
                 script {
                     sh """
@@ -133,11 +134,11 @@ pipeline {
                         echo "Checking if microservices-app namespace exists..."
                         kubectl get namespaces | grep microservices-app || kubectl create namespace microservices-app
                         
-                        echo "Deleting old Kubernetes resources if they exist..."
-                        kubectl delete -f ./project/k8s-config || echo "No old resources found"
+                        echo "Deleting old Helm release if it exists..."
+                        helm uninstall microservices --namespace microservices-app || echo "No existing Helm release found"
 
-                        echo "Deploying Kubernetes resources..."
-                        kubectl apply -f ./project/k8s-config
+                        echo "Deploying with Helm..."
+                        ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
                     """
                 }
             }

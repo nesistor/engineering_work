@@ -1,33 +1,36 @@
+global:
+  imagePullSecrets:
+    - name: gcr-json-key
+  vault:
+    address: "http://vault:8200"
+    token: root_token
+  redis:
+    url: "redis:6379"
+
 vault:
   image:
     repository: "vault"
     tag: "latest"
-  ports:
-    - "8200:8200"
   environment:
-    VAULT_ADDR: http://0.0.0.0:8200
-    VAULT_API_ADDR: http://localhost:8200
     VAULT_DEV_ROOT_TOKEN_ID: root_token
   volumes:
-    - name: vault-data
-      mountPath: /vault/file
-  command: "server -dev -dev-root-token-id=root_token"
-  cap_add:
-    - IPC_LOCK
+    data:
+      size: 1Gi  # Przy użyciu PVC
+  ports:
+    - name: http
+      containerPort: 8200
 
 authenticationService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
     tag: "latest"
-  ports:
-    - "8083:80"
   environment:
-    REDIS_URL: "redis:6379"
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: root_token
-  dependsOn:
-    - redis
-    - vault
+    VAULT_ADDR: "{{ .Values.global.vault.address }}"
+    VAULT_TOKEN: "{{ .Values.global.vault.token }}"
+    REDIS_URL: "{{ .Values.global.redis.url }}"
+  ports:
+    - name: http
+      containerPort: 8083
 
 loggerService:
   image:
@@ -39,51 +42,46 @@ mailerService:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/mail-service"
     tag: "latest"
   environment:
-    MAIL_DOMAIN: localhost
     MAIL_HOST: mailhog
     MAIL_PORT: 1025
-    MAIL_ENCRYPTION: none
-    MAIL_USERNAME: ""
-    MAIL_PASSWORD: ""
     FROM_NAME: "Karol"
-    FROM_ADDRESS: goappdm@gmail.com
+    FROM_ADDRESS: "goappdm@gmail.com"
+  ports:
+    - name: http
+      containerPort: 8085
 
 userService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/user-service"
     tag: "latest"
-  ports:
-    - "8081:80"
-    - "50001:50001"
   environment:
-    DSN: "host=postgres-users port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: root_token
-  dependsOn:
-    - postgres-users
-    - vault
+    DSN: "host=postgres-users-service port=5432 user=postgres password=password dbname=users sslmode=disable"
+    VAULT_ADDR: "{{ .Values.global.vault.address }}"
+    VAULT_TOKEN: "{{ .Values.global.vault.token }}"
+  ports:
+    - name: http
+      containerPort: 8081
+    - name: grpc
+      containerPort: 50001
 
 adminService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/admin-service"
     tag: "latest"
-  ports:
-    - "8082:80"
-    - "50002:50001"
   environment:
-    DSN: "host=postgres-admins port=5432 user=postgres password=password dbname=users sslmode=disable timezone=UTC connect_timeout=5"
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: root_token
-  dependsOn:
-    - postgres-admins
-    - vault
+    DSN: "host=postgres-admins-service port=5432 user=postgres password=password dbname=admins sslmode=disable"
+    VAULT_ADDR: "{{ .Values.global.vault.address }}"
+    VAULT_TOKEN: "{{ .Values.global.vault.token }}"
+  ports:
+    - name: http
+      containerPort: 8082
+    - name: grpc
+      containerPort: 50002
 
 redis:
   image:
     repository: "redis"
     tag: "7.0"
-  ports:
-    - "6379:6379"
 
 postgresUsers:
   image:
@@ -94,7 +92,8 @@ postgresUsers:
     POSTGRES_PASSWORD: password
     POSTGRES_DB: users
   volumes:
-    - ./db-data/postgres-users:/var/lib/postgresql/data
+    data:
+      size: 1Gi
 
 postgresAdmins:
   image:
@@ -105,7 +104,8 @@ postgresAdmins:
     POSTGRES_PASSWORD: password
     POSTGRES_DB: admins
   volumes:
-    - ./db-data/postgres-admins:/var/lib/postgresql/data
+    data:
+      size: 1Gi
 
 mongo:
   image:
@@ -116,4 +116,5 @@ mongo:
     MONGO_INITDB_ROOT_USERNAME: admin
     MONGO_INITDB_ROOT_PASSWORD: password
   volumes:
-    - ./db-data/mongo:/data/db
+    data:
+      size: 1Gi
