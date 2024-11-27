@@ -2,7 +2,7 @@ global:
   imagePullSecrets:
     - name: gcr-json-key
   vault:
-    address: "http://vault:8200"
+    address: "https://vault.example.com:8200"
     token: root_token
   redis:
     url: "redis:6379"
