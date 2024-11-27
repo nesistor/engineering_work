@@ -2,14 +2,13 @@ global:
   imagePullSecrets:
     - name: gcr-json-key
 
-  # Wspólne zmienne środowiskowe
   vaultAddr: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
   vaultToken: "root_token"
 
 vault:
   image:
     repository: "hashicorp/vault"
-    tag: "1.10.0"  # Konkretna wersja zamiast 'latest'
+    tag: "latest"  # Konkretna wersja zamiast 'latest'
   environment:
     VAULT_DEV_ROOT_TOKEN_ID: "{{ .Values.global.vaultToken }}"
     VAULT_ADDR: "{{ .Values.global.vaultAddr }}"
