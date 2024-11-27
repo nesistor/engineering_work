@@ -73,38 +73,24 @@ pipeline {
             }
         }
 
-        stage('Build Applications') {
-            steps {
-                script {
-                    def binaries = [
-                        'auth-service': 'authApp',
-                        'user-service': 'userApp',
-                        'admin-service': 'adminApp',
-                        'mail-service': 'mailApp',
-                        'logger-service': 'loggerApp'
-                    ]
-                    
-                    binaries.each { service, binaryName ->
-                        dir("./${service}") {
-                            sh """
-                                echo "Building ${service} binary..."
-                                env GOOS=linux CGO_ENABLED=0 go build -o ${binaryName} ./cmd/api
-                                echo "Built ${service} binary!"
-                            """
-                        }
-                    }
-                }
-            }
-        }
-
         stage('Build Docker Images') {
             steps {
                 script {
-                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service', "flyway"]
+                    def services = [
+                        'auth-service': 'auth-service.dockerfile',
+                        'user-service': 'user-service.dockerfile',
+                        'admin-service': 'admin-service.dockerfile',
+                        'mail-service': 'mail-service.dockerfile',
+                        'logger-service': 'logger-service.dockerfile',
+                        'flyway': 'flyway.dockerfile' // Add Flyway
+                    ]
                     
-                    services.each { service ->
+                    services.each { service, dockerfile ->
                         dir("./${service}") {
-                            sh "docker build -t ${DOCKER_REGISTRY}/${service}:latest -f ${service}.dockerfile ."
+                            sh """
+                                echo "Building Docker image for ${service}..."
+                                docker build -t ${DOCKER_REGISTRY}/${service}:latest -f ${dockerfile} .
+                            """
                         }
                     }
                 }
@@ -116,11 +102,14 @@ pipeline {
                 script {
                     sh "gcloud auth configure-docker us-central1-docker.pkg.dev"
                     
-                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service']
+                    def services = ['auth-service', 'user-service', 'admin-service', 'mail-service', 'logger-service', 'flyway']
                     
                     services.each { service ->
-                        sh "docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest"
-                        sh "docker push ${DOCKER_REGISTRY}/${service}:latest"
+                        sh """
+                            echo "Tagging and pushing Docker image for ${service}..."
+                            docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest
+                            docker push ${DOCKER_REGISTRY}/${service}:latest
+                        """
                     }
                 }
             }
@@ -140,7 +129,6 @@ pipeline {
         stage('Create Kubernetes Secret for GCR') {
             steps {
                 script {
-                    // Create Kubernetes secret for pulling images from GCR
                     withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
                         sh """
                             echo "Creating Kubernetes secret for GCR..."
@@ -158,11 +146,6 @@ pipeline {
         stage('Deploy with Helm') {
             steps {
                 script {
-                    // Debugging - Print the current directory
-                    sh 'pwd'
-                    // List the files in the current directory to see if the my-helm-chart folder exists
-                    sh 'ls -la'
-
                     sh """
                         echo "Setting up kubeconfig to use gke-gcloud-auth-plugin..."
                         export USE_GKE_GCLOUD_AUTH_PLUGIN=True

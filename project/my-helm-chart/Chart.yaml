@@ -1,8 +1,17 @@
-name: docker-compose
-description: A generated Helm Chart for docker-compose from Skippbox Kompose
-version: 0.0.1
 apiVersion: v2
+name: docker-compose
+description: Helm Chart generated from Skippbox Kompose for Docker Compose applications.
+type: application
+version: 0.1.0
+appVersion: "1.0.0" 
 keywords:
   - docker-compose
+  - helm
+  - skippbox
 sources:
-home:
+  - https://github.com/skippbox/kompose  
+home: https://github.com/skippbox/kompose 
+maintainers:
+  - name: Your Name
+    email: your.email@example.com
+    url: https://yourwebsite.example.com
