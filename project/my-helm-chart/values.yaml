@@ -2,13 +2,17 @@ global:
   imagePullSecrets:
     - name: gcr-json-key
 
+  # Wspólne zmienne środowiskowe
+  vaultAddr: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
+  vaultToken: "root_token"
+
 vault:
   image:
     repository: "hashicorp/vault"
-    tag: "latest"
+    tag: "1.10.0"  # Konkretna wersja zamiast 'latest'
   environment:
-    VAULT_DEV_ROOT_TOKEN_ID: "root_token"
-    VAULT_ADDR: "http://vault:8200"
+    VAULT_DEV_ROOT_TOKEN_ID: "{{ .Values.global.vaultToken }}"
+    VAULT_ADDR: "{{ .Values.global.vaultAddr }}"
   volumes:
     data:
       size: 1Gi
@@ -19,11 +23,11 @@ vault:
 authenticationService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
-    tag: "latest"
+    tag: "1.0.0"
   environment:
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: "root_token"
-    REDIS_URL: "redis:6379"
+    VAULT_ADDR: "{{ .Values.global.vaultAddr }}"
+    VAULT_TOKEN: "{{ .Values.global.vaultToken }}"
+    REDIS_URL: "microservices-redis-service.microservices-app.svc.cluster.local:6379"
   ports:
     - name: http
       containerPort: 8083
@@ -31,12 +35,12 @@ authenticationService:
 loggerService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/logger-service"
-    tag: "latest"
+    tag: "1.0.0"
 
 mailerService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/mail-service"
-    tag: "latest"
+    tag: "1.0.0"
   environment:
     MAIL_HOST: "mailhog"
     MAIL_PORT: "1025"
@@ -49,11 +53,11 @@ mailerService:
 userService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/user-service"
-    tag: "latest"
+    tag: "1.0.0"
   environment:
-    DSN: "host=postgres-users-service port=5432 user=postgres password=password dbname=users sslmode=disable"
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: "root_token"
+    DSN: "host=postgres-users-service.microservices-app port=5432 user=postgres password=password dbname=users sslmode=disable"
+    VAULT_ADDR: "{{ .Values.global.vaultAddr }}"
+    VAULT_TOKEN: "{{ .Values.global.vaultToken }}"
   ports:
     - name: http
       containerPort: 8081
@@ -63,11 +67,11 @@ userService:
 adminService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/admin-service"
-    tag: "latest"
+    tag: "1.0.0"
   environment:
-    DSN: "host=postgres-users-service port=5432 user=postgres password=password dbname=users sslmode=disable"
-    VAULT_ADDR: "http://vault:8200"
-    VAULT_TOKEN: "root_token"
+    DSN: "host=postgres-users-service.microservices-app port=5432 user=postgres password=password dbname=users sslmode=disable"
+    VAULT_ADDR: "{{ .Values.global.vaultAddr }}"
+    VAULT_TOKEN: "{{ .Values.global.vaultToken }}"
   ports:
     - name: http
       containerPort: 8082
@@ -77,7 +81,9 @@ adminService:
 redis:
   image:
     repository: "redis"
-    tag: "7.0"
+    tag: "7.0"  # Określenie konkretnej wersji obrazu
+  ports:
+    - containerPort: 6379
 
 postgresUsers:
   image:
