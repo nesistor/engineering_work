@@ -76,10 +76,12 @@ spec:
   selector:
     app: user-service
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 8081
-    - protocol: TCP
+    - name: api
+      protocol: TCP
       port: 50001
       targetPort: 50001
   type: ClusterIP
@@ -96,12 +98,14 @@ spec:
   selector:
     app: admin-service
   ports:
-    - protocol: TCP
+    - name: http
+      protocol: TCP
       port: 80
       targetPort: 8082
-    - protocol: TCP
+    - name: api
+      protocol: TCP
       port: 50002
-      targetPort: 50002
+      targetPort: 50001
   type: ClusterIP
 
 ---
