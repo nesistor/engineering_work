@@ -2,10 +2,10 @@ pipeline {
     agent any
 
     environment {
-        GCP_PROJECT = "my-microservices-app" 
+        GCP_PROJECT = "my-microservices-app"
         GKE_CLUSTER = "my-gke-cluster"
-        GKE_ZONE = "us-central1-a"  
-        DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"  
+        GKE_ZONE = "us-central1-a"
+        DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
@@ -14,12 +14,6 @@ pipeline {
     }
 
     stages {
-        stage('Run gcloud') {
-            steps {
-                sh 'gcloud --version'  // Simply use 'gcloud' since it's now in the PATH
-            }
-        }
-
         stage('Check if gcloud is installed') {
             steps {
                 script {
@@ -33,21 +27,7 @@ pipeline {
             }
         }
 
-        stage('Test Google Credentials') {
-            steps {
-                script {
-                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
-                        sh """
-                            echo "Testing Google Cloud credentials..."
-                            gcloud auth activate-service-account --key-file=\${GOOGLE_APPLICATION_CREDENTIALS}
-                            gcloud config set project \${GCP_PROJECT}
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('Login to Google Cloud') {
+        stage('Authenticate to Google Cloud') {
             steps {
                 script {
                     withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
@@ -82,7 +62,7 @@ pipeline {
                         'admin-service': 'admin-service.dockerfile',
                         'mail-service': 'mail-service.dockerfile',
                         'logger-service': 'logger-service.dockerfile',
-                        'flyway': 'flyway.dockerfile' // Add Flyway
+                        'flyway': 'flyway.dockerfile'
                     ]
                     
                     services.each { service, dockerfile ->
@@ -109,6 +89,23 @@ pipeline {
                             echo "Tagging and pushing Docker image for ${service}..."
                             docker tag ${DOCKER_REGISTRY}/${service}:latest ${DOCKER_REGISTRY}/${service}:latest
                             docker push ${DOCKER_REGISTRY}/${service}:latest
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Create Kubernetes Secret for GCR') {
+            steps {
+                script {
+                    withCredentials([file(credentialsId: 'gcloud-credentials', variable: 'GOOGLE_APPLICATION_CREDENTIALS')]) {
+                        sh """
+                            echo "Creating Kubernetes secret for GCR..."
+                            kubectl create secret docker-registry gcr-json-key \
+                            --docker-server=us-central1-docker.pkg.dev \
+                            --docker-username=_json_key \
+                            --docker-password="\$(cat \${GOOGLE_APPLICATION_CREDENTIALS} | tr -d '\\n')" \
+                            --docker-email=youremail@example.com --dry-run=client -o yaml | kubectl apply -f -
                         """
                     }
                 }
