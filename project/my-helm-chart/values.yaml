@@ -10,7 +10,7 @@ global:
 vault:
   image:
     repository: "vault"
-    tag: "latest"
+    tag: "1.18.2"
   environment:
     VAULT_DEV_ROOT_TOKEN_ID: root_token
   volumes:
