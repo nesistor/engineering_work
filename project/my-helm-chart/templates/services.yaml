@@ -171,13 +171,16 @@ spec:
     app: user-service
     release: {{ .Release.Name }}
   ports:
-    - protocol: TCP
+    - name: http  # Dodano nazwę
+      protocol: TCP
       port: 8081
       targetPort: 8081
-    - protocol: TCP
+    - name: grpc  # Dodano nazwę
+      protocol: TCP
       port: 50001
       targetPort: 50001
   type: ClusterIP
+
 
 ---
 
