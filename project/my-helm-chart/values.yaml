@@ -23,7 +23,7 @@ authenticationService:
   environment:
     VAULT_ADDR: "http://vault:8200"
     VAULT_TOKEN: "root_token"
-    REDIS_URL: "redis:6379"
+    REDIS_URL: "redis.microservices-app.svc.cluster.local:6379"
   ports:
     - name: http
       containerPort: 8083
