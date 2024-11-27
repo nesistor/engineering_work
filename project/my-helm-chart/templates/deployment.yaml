@@ -61,7 +61,7 @@ spec:
         - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: authentication-service
-          image: "{{ .Values.authenticationService.image.buildContext }}/{{ .Values.authenticationService.image.dockerfile }}"
+          image: "{{ .Values.authenticationService.image.buildContext }}:{{ .Values.authenticationService.image.dockerfile }}"
           ports:
             - containerPort: 8083
           env:
@@ -97,7 +97,7 @@ spec:
         - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: logger-service
-          image: "{{ .Values.loggerService.image.buildContext }}/{{ .Values.loggerService.image.dockerfile }}"
+          image: "{{ .Values.loggerService.image.buildContext }}:{{ .Values.loggerService.image.dockerfile }}"
           ports:
             - containerPort: 8084
 
@@ -123,7 +123,7 @@ spec:
         - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: mailer-service
-          image: "{{ .Values.mailerService.image.buildContext }}/{{ .Values.mailerService.image.dockerfile }}"
+          image: "{{ .Values.mailerService.image.buildContext }}:{{ .Values.mailerService.image.dockerfile }}"
           ports:
             - containerPort: 8085
           env:
@@ -166,7 +166,7 @@ spec:
         - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: user-service
-          image: "{{ .Values.userService.image.buildContext }}/{{ .Values.userService.image.dockerfile }}"
+          image: "{{ .Values.userService.image.buildContext }}:{{ .Values.userService.image.dockerfile }}"
           ports:
             - containerPort: 8081
             - containerPort: 50001
@@ -203,7 +203,7 @@ spec:
         - name: gcr-json-key  # Dodajemy secret do pobierania obrazów z Artifact Registry
       containers:
         - name: admin-service
-          image: "{{ .Values.adminService.image.buildContext }}/{{ .Values.adminService.image.dockerfile }}"
+          image: "{{ .Values.adminService.image.buildContext }}:{{ .Values.adminService.image.dockerfile }}"
           ports:
             - containerPort: 8082
             - containerPort: 50002
