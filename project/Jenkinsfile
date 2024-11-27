@@ -134,10 +134,10 @@ pipeline {
                         kubectl get namespaces | grep microservices-app || kubectl create namespace microservices-app
                         
                         echo "Deleting old Kubernetes resources if they exist..."
-                        kubectl delete -f ./k8s-config || echo "No old resources found"
+                        kubectl delete -f ./project/k8s-config || echo "No old resources found"
 
                         echo "Deploying Kubernetes resources..."
-                        kubectl apply -f ./k8s-config
+                        kubectl apply -f ./project/k8s-config
                     """
                 }
             }
