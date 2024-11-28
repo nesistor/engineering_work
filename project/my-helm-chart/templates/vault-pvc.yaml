@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: vault-pvc
+  labels:
+    app: vault
+spec:
+  accessModes:
+    - ReadWriteOnce  # Wolumen będzie montowany tylko w jednym podzie jednocześnie
+  resources:
+    requests:
+      storage: 10Gi  # Możesz dostosować wielkość według swoich potrzeb

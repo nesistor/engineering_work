@@ -26,28 +26,32 @@ spec:
             - containerPort: 8200  # Port serwisu Vaulta
           env:
             - name: VAULT_ADDR
-              value: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"  # Vault server URL
-            - name: VAULT_DEV_ROOT_TOKEN_ID
-              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"  # Token root do Vault
+              value: "http://{{ .Release.Name }}-vault-service:8200"  # Vault server URL, może być w usłudze Kubernetes
+            - name: VAULT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: vault-root-token-secret  # Zamiast tokenu root, użyj bezpiecznego podejścia z tajnymi danymi
+                  key: token
           command:
             - "vault"
             - "server"
-            - "-dev"
-            - "-dev-root-token-id={{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"  # Ustawienie tokenu root w trybie deweloperskim
+            - "-config=/vault/config/vault.hcl"  # Plik konfiguracyjny Vault w trybie produkcyjnym
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]  # Pozwala na blokowanie pamięci, aby Vault mógł działać
           volumeMounts:
             - name: vault-data
               mountPath: /vault/data  # Miejsce przechowywania danych Vault
-            - name: vault-files-volume
-              mountPath: /vault/secrets  # Miejsce przechowywania sekretnych plików
+            - name: vault-config-volume
+              mountPath: /vault/config  # Miejsce, gdzie jest plik konfiguracji vault.hcl
       volumes:
         - name: vault-data
-          emptyDir: {}  # Przechowywanie danych w pamięci tymczasowej
-        - name: vault-files-volume
-          secret:
-            secretName: vault-files-secret  # Wolumen z sekretem Vaulta, którego używamy do przechowywania kluczy i polityk
+          persistentVolumeClaim:
+            claimName: vault-pvc  # Użyj PVC w trybie produkcyjnym
+        - name: vault-config-volume
+          configMap:
+            name: vault-config  # Plik konfiguracyjny w Kubernetes
+
 
 ---
 
