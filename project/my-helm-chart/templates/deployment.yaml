@@ -27,7 +27,7 @@ spec:
             - "-c"
             - |
               echo "Initializing Vault with keys and policies..."
-              sleep 30  # Wstrzymaj na 30 sekund, aby Vault zdążył się uruchomić
+              sleep 60 
               vault secrets enable -path=jwt_keys kv
               vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
               vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
@@ -40,7 +40,7 @@ spec:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
-            - containerPort: 8200
+            - containerPort: 8200v
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
