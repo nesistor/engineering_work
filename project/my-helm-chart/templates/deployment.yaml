@@ -18,7 +18,7 @@ spec:
         release: {{ .Release.Name }}
     spec:
       imagePullSecrets:
-        - name: gcr-json-key
+        - name: gcr-json-key  # Jeśli używasz prywatnego repozytorium
       initContainers:
         - name: vault-init
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -37,34 +37,39 @@ spec:
               vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
           volumeMounts:
             - name: vault-files-volume
-              mountPath: /vault/secrets
+              mountPath: /vault/secrets  # Ścieżka do sekretnych plików, z których Vault będzie korzystał
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
-            - containerPort: 8200  # Upewnij się, że wartość 'containerPort' jest liczbą, a nie ciągiem znaków
+            - containerPort: 8200  # Port serwisu Vaulta
           env:
             - name: VAULT_ADDR
-              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+              value: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"  # Vault server URL
             - name: VAULT_API_ADDR
-              value: "microservices-vault-service.microservices-app.svc.cluster.local:8200"
+              value: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"  # Vault API URL
             - name: VAULT_DEV_ROOT_TOKEN_ID
-              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
-          command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
+              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"  # Token root do Vault
+          command:
+            - "vault"
+            - "server"
+            - "-dev"
+            - "-dev-root-token-id={{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"  # Ustawienie tokenu root w trybie deweloperskim
           securityContext:
             capabilities:
-              add: ["IPC_LOCK"]
+              add: ["IPC_LOCK"]  # Pozwala na blokowanie pamięci, aby Vault mógł działać
           volumeMounts:
             - name: vault-data
-              mountPath: /vault/data
+              mountPath: /vault/data  # Miejsce przechowywania danych Vault
             - name: vault-files-volume
-              mountPath: /vault/secrets
+              mountPath: /vault/secrets  # Miejsce przechowywania sekretnych plików
       volumes:
         - name: vault-data
-          emptyDir: {}
+          emptyDir: {}  # Przechowywanie danych w pamięci tymczasowej
         - name: vault-files-volume
           secret:
-            secretName: vault-files-secret
+            secretName: vault-files-secret  # Wolumen z sekretem Vaulta, którego używamy do przechowywania kluczy i polityk
+
 
 ---
 
