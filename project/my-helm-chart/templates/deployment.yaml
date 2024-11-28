@@ -19,22 +19,6 @@ spec:
     spec:
       imagePullSecrets:
         - name: gcr-json-key
-      initContainers:
-        - name: vault-init
-          image: hashicorp/vault:latest
-          command:
-            - "sh"
-            - "-c"
-            - |
-              # Skrypt inicjujący dla Vaulta, ustawiający polityki i sekrety
-              vault login {{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}
-              vault policy write my-policy /path/to/policy.hcl
-              vault kv put secret/myapp apiKey={{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}
-          env:
-            - name: VAULT_ADDR
-              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
-            - name: VAULT_TOKEN
-              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -51,9 +35,13 @@ spec:
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
-      volumes:
-        - name: vault-data
-          emptyDir: {}
+      initContainers:
+        - name: vault-init
+          image: "hashicorp/vault:latest"
+          command: ["vault", "operator", "init"]
+          env:
+            - name: VAULT_ADDR
+              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
 
 ---
 
