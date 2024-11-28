@@ -26,8 +26,11 @@ spec:
             - "sh"
             - "-c"
             - |
-              echo "Initializing Vault with keys and policies..."
-              sleep 60
+              echo "Waiting for Vault to be ready..."
+              until vault status; do
+                sleep 5
+              done
+              echo "Vault is ready, initializing..."
               vault secrets enable -path=jwt_keys kv
               vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
               vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
