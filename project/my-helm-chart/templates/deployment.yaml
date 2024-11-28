@@ -27,20 +27,19 @@ spec:
             - "-c"
             - |
               echo "Initializing Vault with keys and policies..."
-              sleep 60 
+              sleep 60
               vault secrets enable -path=jwt_keys kv
               vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
               vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
               vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
-
           volumeMounts:
             - name: vault-files-volume
-              mountPath: /vault/secrets  # Miejsce montowania plików w kontenerze
+              mountPath: /vault/secrets
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
-            - containerPort: 8200
+            - containerPort: 8200  # Upewnij się, że wartość 'containerPort' jest liczbą, a nie ciągiem znaków
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
@@ -56,13 +55,13 @@ spec:
             - name: vault-data
               mountPath: /vault/data
             - name: vault-files-volume
-              mountPath: /vault/secrets  # Miejsce montowania plików w kontenerze
+              mountPath: /vault/secrets
       volumes:
         - name: vault-data
           emptyDir: {}
         - name: vault-files-volume
           secret:
-            secretName: vault-files-secret  # Referencja do sekretu zawierającego pliki
+            secretName: vault-files-secret
 
 ---
 
