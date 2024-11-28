@@ -26,11 +26,13 @@ spec:
             - "sh"
             - "-c"
             - |
-              echo "Initializing Vault with keys and policies..."
-              vault secrets enable -path=jwt_keys kv
-              vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
-              vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
-              vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
+            echo "Initializing Vault with keys and policies..."
+            sleep 30  # Wstrzymaj na 30 sekund, aby Vault zdążył się uruchomić
+            vault secrets enable -path=jwt_keys kv
+            vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
+            vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
+            vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
+
           volumeMounts:
             - name: vault-files-volume
               mountPath: /vault/secrets  # Miejsce montowania plików w kontenerze
