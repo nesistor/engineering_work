@@ -26,12 +26,12 @@ spec:
             - "sh"
             - "-c"
             - |
-            echo "Initializing Vault with keys and policies..."
-            sleep 30  # Wstrzymaj na 30 sekund, aby Vault zdążył się uruchomić
-            vault secrets enable -path=jwt_keys kv
-            vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
-            vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
-            vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
+              echo "Initializing Vault with keys and policies..."
+              sleep 30  # Wstrzymaj na 30 sekund, aby Vault zdążył się uruchomić
+              vault secrets enable -path=jwt_keys kv
+              vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
+              vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
+              vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
 
           volumeMounts:
             - name: vault-files-volume
@@ -44,8 +44,6 @@ spec:
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
-            - name: VAULT_API_ADDR
-              value: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
           command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
@@ -63,7 +61,6 @@ spec:
         - name: vault-files-volume
           secret:
             secretName: vault-files-secret  # Referencja do sekretu zawierającego pliki
-
 
 ---
 
