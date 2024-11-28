@@ -6,14 +6,14 @@ vault:
     repository: "hashicorp/vault"
     tag: "latest"
   environment:
-    VAULT_DEV_ROOT_TOKEN_ID: "root_token"  # Token dla środowiska deweloperskiego (w produkcji nie powinno się tego trzymać w pliku)
+    VAULT_DEV_ROOT_TOKEN_ID: "root_token" 
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
-  volumes:
-    data:
-      size: 1Gi
   ports:
     - name: http
       containerPort: 8200
+  serviceAccount:
+    create: true  
+    name: vault
 
 authenticationService:
   image:
