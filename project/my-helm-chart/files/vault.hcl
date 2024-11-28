@@ -1,4 +1,3 @@
-# vault.hcl
 storage "file" {
   path = "/vault/data"  # Lokalizacja przechowywania danych w kontenerze
 }
@@ -15,3 +14,13 @@ listener "tcp" {
 
 # Autentykacja
 disable_mlock = true  # To jest opcjonalne, zależy od Twojego środowiska
+
+# Konfiguracja Kubernetes Auth Method
+auth "kubernetes" {
+  # Adres do API Kubernetes
+  kubernetes_host = "https://kubernetes.default.svc"
+
+  # Tokeny autentykacji z Kubernetes (domyślnie Vault użyje service account token w podach)
+  kubernetes_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"  # Certyfikat CA Kubernetes
+  kubernetes_token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"  # Token serwisu
+}

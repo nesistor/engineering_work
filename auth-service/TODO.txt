@@ -1,2 +1,2 @@
-Create endpoint register and add  procedure call grpc or API Request to register user in auth-service.
-Create keyrotation with PKI Engine in Vualt
+1. Implement gRPC or REST API endpoint in auth-service for user registration, including input validation and database integration.
+2 .Configure Vault's PKI Engine for key rotation and implement an automated rotation policy.
