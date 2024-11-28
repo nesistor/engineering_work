@@ -40,7 +40,7 @@ spec:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
-            - containerPort: 8200v
+            - containerPort: 8200
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
