@@ -10,7 +10,7 @@ pipeline {
         KUBECTL_PATH = "/usr/local/bin/kubectl"
         KUBECONFIG = "/var/lib/jenkins/.kube/config"
         GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
-        PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"  
+        PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"
     }
 
     stages {
@@ -127,6 +127,22 @@ pipeline {
 
                         echo "Deploying with Helm..."
                         ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
+                    """
+                }
+            }
+        }
+
+        stage('Initialize Vault with Keys and Policies') {
+            steps {
+                script {
+                    sh """
+                        echo "Initializing Vault with keys and policies..."
+                        kubectl exec -it $(kubectl get pod -l app=vault -o jsonpath='{.items[0].metadata.name}') -- /bin/sh -c "
+                          vault secrets enable -path=jwt_keys kv
+                          vault policy write jwt_policy /vault/secrets/jwt_policy.hcl
+                          vault kv put jwt_keys/public_keys public_key=/vault/secrets/public_key.pem
+                          vault kv put jwt_keys/private_key private_key=/vault/secrets/private_key.pem
+                        "
                     """
                 }
             }

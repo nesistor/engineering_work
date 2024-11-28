@@ -17,7 +17,8 @@ spec:
         app: vault
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: vault  # Powiązanie z Vault ServiceAccount
+      imagePullSecrets:
+        - name: gcr-json-key
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -27,17 +28,25 @@ spec:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
             - name: VAULT_API_ADDR
-              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+              value: "{{ .Values.vault.environment.VAULT_API_ADDR }}"
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
           command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
-
+          volumeMounts:
+            - name: vault-data
+              mountPath: /vault/data
+            - name: vault-files-volume
+              mountPath: /vault/files
       volumes:
         - name: vault-data
           emptyDir: {}
+        - name: vault-files-volume
+          secret:
+            secretName: vault-files-secret  # Referencja do wcześniej utworzonego Secret
+
 
 ---
 
