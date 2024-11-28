@@ -2,8 +2,6 @@ pipeline {
     agent any
 
     environment {
-        VAULT_ADDR = 'http://microservices-vault-service.microservices-app.svc.cluster.local:8200'
-        VAULT_TOKEN = 'root_token'  
         GCP_PROJECT = "my-microservices-app"
         GKE_CLUSTER = "my-gke-cluster"
         GKE_ZONE = "us-central1-a"
@@ -129,47 +127,6 @@ pipeline {
 
                         echo "Deploying with Helm..."
                         ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
-                    """
-                }
-            }
-        }
-
-        stage('Configure Vault Secrets') {
-            steps {
-                script {
-                    echo "Configuring JWT secrets in Vault..."
-
-                    // Zalogowanie się do Vault
-                    sh """
-                        vault login root_token
-                    """
-
-                    // Włączenie secret engine JWT
-                    sh """
-                        vault secrets enable -path=jwt_keys kv
-                    """
-
-                    // Zapisanie polityki JWT
-                    sh """
-                        vault policy write jwt_policy ~/vault/jwt_policy.hcl
-                    """
-
-                    // Wczytanie plików kluczy do Vault
-                    sh """
-                        vault kv put jwt_keys/public_keys public_key=@~/path/to/public_key.pem
-                        vault kv put jwt_keys/private_key private_key=@~/path/to/private_key.pem
-                    """
-                }
-            }
-        }
-
-        stage('Inject Vault Secrets into Kubernetes') {
-            steps {
-                script {
-                    echo "Injecting Vault secrets into Kubernetes..."
-                    // Tutaj możesz użyć Vaulta w Kubernetes, np. za pomocą Kubernetes Secrets
-                    sh """
-                        kubectl apply -f ./vault-kubernetes-config.yaml
                     """
                 }
             }

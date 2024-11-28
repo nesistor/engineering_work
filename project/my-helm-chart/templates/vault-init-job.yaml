@@ -1,0 +1,29 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-vault-init
+  labels:
+    app: vault-init
+    release: {{ .Release.Name }}
+  annotations:
+    "helm.sh/hook": pre-install,pre-upgrade  # Hook, aby uruchomił się przed instalacją i aktualizacją
+spec:
+  template:
+    spec:
+      containers:
+        - name: vault-init
+          image: hashicorp/vault:latest
+          command:
+            - "sh"
+            - "-c"
+            - |
+              # Inicjalizacja Vaulta - dodawanie polityk i sekretów
+              vault login {{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}
+              vault policy write my-policy /path/to/policy.hcl
+              vault kv put secret/myapp apiKey={{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}
+          env:
+            - name: VAULT_ADDR
+              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+            - name: VAULT_TOKEN
+              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
+      restartPolicy: Never
