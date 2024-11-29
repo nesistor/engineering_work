@@ -6,7 +6,7 @@ metadata:
     app: vault
 spec:
   accessModes:
-    - ReadWriteOnce  # Wolumen będzie montowany tylko w jednym podzie jednocześnie
+    - ReadWriteOnce  
   resources:
     requests:
-      storage: 10Gi  # Możesz dostosować wielkość według swoich potrzeb
+      storage: 10Gi  

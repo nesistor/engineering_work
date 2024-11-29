@@ -13,44 +13,34 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/agent-inject-secret-mysecret: "secret/data/myapp/config"
+        vault.hashicorp.com/role: "my-role"
       labels:
         app: vault
         release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key  # Jeśli używasz prywatnego repozytorium
+      serviceAccountName: vault
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
-            - containerPort: 8200  # Port serwisu Vaulta
+            - containerPort: 8200
           env:
             - name: VAULT_ADDR
-              value: "http://{{ .Release.Name }}-vault-service:8200"  # Vault server URL, może być w usłudze Kubernetes
-            - name: VAULT_TOKEN
-              valueFrom:
-                secretKeyRef:
-                  name: vault-root-token-secret  # Zamiast tokenu root, użyj bezpiecznego podejścia z tajnymi danymi
-                  key: token
-          command:
-            - "vault"
-            - "server"
-            - "-config=/vault/config/vault.hcl"  # Plik konfiguracyjny Vault w trybie produkcyjnym
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]  # Pozwala na blokowanie pamięci, aby Vault mógł działać
+              value: "http://{{ .Release.Name }}-vault-service:8200"
           volumeMounts:
-            - name: vault-data
-              mountPath: /vault/data  # Miejsce przechowywania danych Vault
-            - name: vault-config-volume
-              mountPath: /vault/config  # Miejsce, gdzie jest plik konfiguracji vault.hcl
+            - name: jwt-keys
+              mountPath: /vault/jwt-keys
+              readOnly: true
       volumes:
-        - name: vault-data
-          persistentVolumeClaim:
-            claimName: vault-pvc  # Użyj PVC w trybie produkcyjnym
         - name: vault-config-volume
           configMap:
-            name: vault-config  # Plik konfiguracyjny w Kubernetes
+            name: vault-config
+        - name: jwt-keys
+          secret:
+            secretName: vault-jwt-keys
 
 
 ---
