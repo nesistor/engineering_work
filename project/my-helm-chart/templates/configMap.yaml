@@ -2,8 +2,14 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: vault-config
+  namespace: microservices-app
   labels:
     app: vault
+    app.kubernetes.io/managed-by: "Helm"  # Dodanie etykiety zarządzania przez Helm
+    release: microservices  # Nazwa wydania Helm
+  annotations:
+    meta.helm.sh/release-name: "microservices"  # Dodanie adnotacji dla nazwy wydania
+    meta.helm.sh/release-namespace: "microservices-app"  # Dodanie adnotacji dla namespace
 data:
   vault.hcl: |
     storage "file" {
