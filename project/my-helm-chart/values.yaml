@@ -8,21 +8,17 @@ vault:
   environment:
     VAULT_DEV_ROOT_TOKEN_ID: "root_token"
     VAULT_ADDR: "http://{{ .Release.Name }}-vault-service:8200"
-  ports:
-    - name: http
-      containerPort: 8200
   serviceAccount:
     create: true
     name: vault
-  secrets:
-    - name: vault-jwt-keys  # Sekret zawierający publiczny i prywatny klucz JWT
   volumes:
     - name: vault-config-volume
       configMap:
-        name: vault-config  # ConfigMap z konfiguracją Vaulta
-    - name: jwt-keys
-      secret:
-        secretName: vault-jwt-keys  # Sekret przechowujący klucze JWT
+        name: vault-config
+  volumeMounts:
+    - name: vault-secrets
+      mountPath: /vault/secrets
+      readOnly: true
 
 
 authenticationService:

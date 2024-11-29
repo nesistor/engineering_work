@@ -5,11 +5,11 @@ metadata:
   namespace: microservices-app
   labels:
     app: vault
-    app.kubernetes.io/managed-by: "Helm"  # Dodanie etykiety zarządzania przez Helm
-    release: microservices  # Nazwa wydania Helm
+    app.kubernetes.io/managed-by: "Helm"
+    release: microservices
   annotations:
-    meta.helm.sh/release-name: "microservices"  # Dodanie adnotacji dla nazwy wydania
-    meta.helm.sh/release-namespace: "microservices-app"  # Dodanie adnotacji dla namespace
+    meta.helm.sh/release-name: "microservices"
+    meta.helm.sh/release-namespace: "microservices-app"
 data:
   vault.hcl: |
     storage "file" {

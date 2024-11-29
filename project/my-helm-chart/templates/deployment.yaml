@@ -16,15 +16,14 @@ spec:
       annotations:
         vault.hashicorp.com/agent-inject: "true"
         vault.hashicorp.com/role: "my-role"  # Rola Vault w Kubernetes
-        vault.hashicorp.com/agent-inject-secret-mysecret: "secret/data/myapp/config"  # Wstrzyknięcie sekretu
-        vault.hashicorp.com/agent-inject-secret-private-key: "jwt_keys/private"  # Wstrzyknięcie prywatnego klucza JWT
-        vault.hashicorp.com/agent-inject-secret-public-key: "jwt_keys/public"  # Wstrzyknięcie publicznego klucza JWT
-        vault.hashicorp.com/agent-inject-secret-policy: "sys/policies/acl/jwt_policy"  # Polityka JWT
+        # Wstrzykujemy pliki bezpośrednio
+        vault.hashicorp.com/agent-inject-secret-private-key: "jwt_keys/private_key.pem"  # Ścieżka do lokalnego pliku
+        vault.hashicorp.com/agent-inject-secret-public-key: "jwt_keys/public_key.pem"  # Ścieżka do lokalnego pliku
       labels:
         app: vault
         release: {{ .Release.Name }}
     spec:
-      serviceAccountName: vault  # Użycie konta serwisowego Vault
+      serviceAccountName: vault
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -34,21 +33,18 @@ spec:
             - name: VAULT_ADDR
               value: "http://{{ .Release.Name }}-vault-service:8200"
           volumeMounts:
-            - name: jwt-keys
-              mountPath: /vault/jwt-keys
-              readOnly: true
             - name: vault-config-volume
               mountPath: /vault/config
+              readOnly: true
+            - name: vault-secrets
+              mountPath: /vault/secrets
               readOnly: true
       volumes:
         - name: vault-config-volume
           configMap:
-            name: vault-config  # ConfigMap przechowujący konfigurację Vaulta
-        - name: jwt-keys
-          secret:
-            secretName: vault-jwt-keys  # Sekret z kluczami JWT
-
-
+            name: vault-config
+        - name: vault-secrets
+          emptyDir: {}
 
 ---
 
