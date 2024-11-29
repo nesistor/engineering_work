@@ -6,16 +6,23 @@ vault:
     repository: "hashicorp/vault"
     tag: "1.18.2"
   environment:
-    VAULT_DEV_ROOT_TOKEN_ID: "root_token" 
-    VAULT_ADDR: "microservices-vault-service.microservices-app.svc.cluster.local:8200"
+    VAULT_DEV_ROOT_TOKEN_ID: "root_token"
+    VAULT_ADDR: "http://{{ .Release.Name }}-vault-service:8200"
   ports:
     - name: http
       containerPort: 8200
   serviceAccount:
-    create: true  
+    create: true
     name: vault
   secrets:
-    - name: vault-files-secret 
+    - name: vault-jwt-keys  # Sekret zawierający publiczny i prywatny klucz JWT
+  volumes:
+    - name: vault-config-volume
+      configMap:
+        name: vault-config  # ConfigMap z konfiguracją Vaulta
+    - name: jwt-keys
+      secret:
+        secretName: vault-jwt-keys  # Sekret przechowujący klucze JWT
 
 
 authenticationService:
