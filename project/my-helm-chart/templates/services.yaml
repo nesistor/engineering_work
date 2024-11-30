@@ -23,7 +23,6 @@ spec:
       port: 80
       targetPort: 8084
   type: ClusterIP
-
     release: {{ .Release.Name }}
   ports:
     - protocol: TCP
