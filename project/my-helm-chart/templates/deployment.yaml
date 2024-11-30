@@ -35,16 +35,10 @@ spec:
               value: "/vault/tls/vault.crt"
             - name: VAULT_KEY
               value: "/vault/tls/vault.key"
-     volumeMounts:
-      - name: vault-tls
-      mountPath: /vault/tls
-      readOnly: true
-
-    volumes:
-      - name: vault-tls
-      secret:
-        secretName: vault-tls-secret
-
+      volumes:
+        - name: vault-tls
+          secret:
+            secretName: vault-tls-secret
 
 ---
 
