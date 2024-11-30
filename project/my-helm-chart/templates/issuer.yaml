@@ -1,0 +1,8 @@
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: injector-ca-issuer
+  namespace: vault
+spec:
+  ca:
+    secretName: injector-ca-secret

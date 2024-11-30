@@ -4,21 +4,18 @@ imagePullSecrets:
 vault:
   image:
     repository: "hashicorp/vault"
-    tag: "1.18.2"
-  environment:
-    VAULT_DEV_ROOT_TOKEN_ID: "root_token"
-    VAULT_ADDR: "http://{{ .Release.Name }}-vault-service:8200"
-  serviceAccount:
-    create: true
-    name: vault
-  volumes:
-    - name: vault-config-volume
-      configMap:
-        name: vault-config
-  volumeMounts:
-    - name: vault-secrets
-      mountPath: /vault/secrets
-      readOnly: true
+    tag: "latest"
+  tls:
+    enabled: true
+    certSecretName: vault-tls-secret
+  service:
+    type: ClusterIP
+    port: 8200
+    targetPort: 8200
+    annotations:
+      cert-manager.io/issuer: "injector-ca-issuer"
+    dnsNames:
+      - vault.my-namespace.svc.cluster.local
 
 
 authenticationService:
