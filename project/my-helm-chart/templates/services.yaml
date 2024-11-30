@@ -8,8 +8,22 @@ metadata:
     app: logger-service
     release: {{ .Release.Name }}
 spec:
+  selector:kind: Service
+metadata:
+  name: {{ .Release.Name }}-logger-service
+  labels:
+    app: logger-service
+    release: {{ .Release.Name }}
+spec:
   selector:
     app: logger-service
+    release: {{ .Release.Name }}
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8084
+  type: ClusterIP
+
     release: {{ .Release.Name }}
   ports:
     - protocol: TCP

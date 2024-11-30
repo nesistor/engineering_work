@@ -2,20 +2,26 @@ imagePullSecrets:
   - name: gcr-json-key
 
 vault:
-  image:
-    repository: "hashicorp/vault"
-    tag: "latest"
+  image: "hashicorp/vault:latest"
+  replicaCount: 1
+  serviceAccount:
+    create: true
+    name: vault-service-account
   tls:
     enabled: true
-    certSecretName: vault-tls-secret
-  service:
-    type: ClusterIP
-    port: 8200
-    targetPort: 8200
-    annotations:
-      cert-manager.io/issuer: "injector-ca-issuer"
-    dnsNames:
-      - vault.my-namespace.svc.cluster.local
+    secretName: injector-tls
+  agent:
+    enabled: true
+    secretKeys:
+      - name: secret/jwt/key1
+        path: "/vault/secrets/jwt-key1"
+      - name: secret/jwt/key2
+        path: "/vault/secrets/jwt-key2"
+  role: "vault-role"
+  storage:
+    backend: raft
+    path: /vault/data
+    replicas: 3
 
 
 authenticationService:
