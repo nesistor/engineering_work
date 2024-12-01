@@ -17,14 +17,11 @@ spec:
         app: vault
         release: {{ .Release.Name }}
       annotations:
+        # Usuwamy TLS-related annotations
         vault.hashicorp.com/agent-inject: 'true'
         vault.hashicorp.com/agent-inject-secret-jwt-key1: 'secret/jwt/key1'
         vault.hashicorp.com/agent-inject-secret-jwt-key2: 'secret/jwt/key2'
         vault.hashicorp.com/role: 'vault-role'
-        vault.hashicorp.com/ca-cert: '/vault/tls/ca.crt'
-        vault.hashicorp.com/client-cert: '/vault/tls/vault.crt'
-        vault.hashicorp.com/client-key: '/vault/tls/vault.key'
-        vault.hashicorp.com/tls-secret: 'vault-tls-secret'
     spec:
       containers:
         - name: vault
@@ -37,16 +34,11 @@ spec:
           volumeMounts:
             - name: vault-data
               mountPath: /vault/data
-            - name: vault-tls
-              mountPath: /vault/tls
-              readOnly: true
       volumes:
         - name: vault-data
           emptyDir: {}
-        - name: vault-tls
-          secret:
-            secretName: vault-tls-secret
       serviceAccountName: vault-service-account
+
 
 
 apiVersion: apps/v1

@@ -1,8 +1,0 @@
-apiVersion: cert-manager.io/v1
-kind: Issuer
-metadata:
-  name: injector-ca-issuer
-  namespace: microservices-app
-spec:
-  ca:
-    secretName: injector-ca-secret
