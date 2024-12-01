@@ -39,7 +39,7 @@ spec:
         - name: vault-data
           emptyDir: {}
 
-
+---
 
 apiVersion: apps/v1
 kind: Deployment

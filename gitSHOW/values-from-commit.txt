@@ -1,6 +1,6 @@
-imagePullSecrets:
-  - name: gcr-json-key
-
+global:
+  imagePullSecrets:
+    - name: gcr-json-key
 
 vault:
   image:
@@ -22,8 +22,10 @@ authenticationService:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
     tag: "latest"
   environment:
+    # Zmienione: pełna nazwa DNS usługi Vault
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
-    VAULT_TOKEN: "root_token"  # Zastanów się nad przechowywaniem tego tokena w Kubernetes Secrets
+    VAULT_TOKEN: "root_token"
+    # Zmienione: pełna nazwa DNS usługi Redis
     REDIS_URL: "microservices-redis-service.microservices-app.svc.cluster.local:6379"
   ports:
     - name: http
@@ -33,9 +35,6 @@ loggerService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/logger-service"
     tag: "latest"
-  ports:
-    - name: http
-      containerPort: 80
 
 mailerService:
   image:
@@ -55,7 +54,7 @@ userService:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/user-service"
     tag: "latest"
   environment:
-    DSN: "host=microservices-postgres-users-service.microservices-app.svc.cluster.local port=5432 user=postgres password=password dbname=users sslmode=disable"
+    DSN: "host=postgres-users-service microservices-app port=5432 user=postgres password=password dbname=users sslmode=disable"
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
     VAULT_TOKEN: "root_token"
   ports:
@@ -69,7 +68,7 @@ adminService:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/admin-service"
     tag: "latest"
   environment:
-    DSN: "host=microservices-postgres-admins-service.microservices-app.svc.cluster.local port=5432 user=postgres password=password dbname=admins sslmode=disable"
+    DSN: "host=postgres-users-service.microservices-app port=5432 user=postgres password=password dbname=users sslmode=disable"
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
     VAULT_TOKEN: "root_token"
   ports:
@@ -82,9 +81,6 @@ redis:
   image:
     repository: "redis"
     tag: "7.0"
-  ports:
-    - name: redis
-      containerPort: 6379
 
 postgresUsers:
   image:
@@ -97,9 +93,6 @@ postgresUsers:
   volumes:
     data:
       size: 1Gi
-  ports:
-    - name: postgres
-      containerPort: 5432
 
 postgresAdmins:
   image:
@@ -112,9 +105,6 @@ postgresAdmins:
   volumes:
     data:
       size: 1Gi
-  ports:
-    - name: postgres
-      containerPort: 5432
 
 mongo:
   image:
@@ -127,6 +117,3 @@ mongo:
   volumes:
     data:
       size: 1Gi
-  ports:
-    - name: mongo
-      containerPort: 27017
