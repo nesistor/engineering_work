@@ -41,6 +41,8 @@ vault:
   # Ustawienie tokena Vaulta (w przypadku produkcji najlepiej trzymać go w Secrets)
   vault_token: "root_token"  # Root token dla testów
 
+
+
 authenticationService:
   image:
     repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
