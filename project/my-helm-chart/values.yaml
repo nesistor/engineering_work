@@ -7,7 +7,7 @@ vault:
   serviceAccount:
     create: true
     name: vault-service-account
-  # Wyłączamy TLS
+  # Wyłączamy TLS (tylko w środowisku testowym)
   tls:
     enabled: false
   agent:
@@ -18,14 +18,13 @@ vault:
       - name: "vault-policies"
         path: "/vault/secrets/jwt-policy"
   storage:
-    backend: inmem  
+    backend: inmem  # Backend inmem do testów
     path: /vault/data
   vaultConfig: |
     # Vault Configuration
     disable_mlock: true
-    storage "raft" {
-      path    = "/vault/data"
-      node_id = "node1"
+    storage "inmem" {
+      path = "/vault/data"
     }
     listener "tcp" {
       address     = "0.0.0.0:8200"
@@ -34,9 +33,6 @@ vault:
     api_addr = "http://0.0.0.0:8200"
     cluster_addr = "https://0.0.0.0:8201"
     ui = true
-    # Zmienna środowiskowa dla Vaulta
-    vault_api_addr = "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
-  # Ustawienie tokena Vaulta (w przypadku produkcji najlepiej trzymać go w Secrets)
   vault_token: "root_token"  # Root token dla testów
 
 
