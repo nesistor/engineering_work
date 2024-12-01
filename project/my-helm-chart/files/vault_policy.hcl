@@ -3,7 +3,7 @@ path "sys/mounts" {
 }
 
 path "secret/*" {
-  capabilities = ["create", "read", "update", "delete"]
+  capabilities = ["read"]
 }
 
 path "jwt_keys/*" {
