@@ -127,7 +127,7 @@ pipeline {
 
                         echo "Deploying with Helm..."
                         ${HELM_PATH} upgrade --install microservices ./project/my-helm-chart --namespace microservices-app --set image.tag=latest --debug
-                        ./init-vault.sh
+                        ./project/init-vault.sh
                     """
                 }
             }
