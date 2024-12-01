@@ -33,12 +33,17 @@ spec:
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
+          volumeMounts:
+            - name: vault-secrets
+              mountPath: /vault/secrets
+              readOnly: true
       volumes:
+        - name: vault-secrets
+          secret:
+            secretName: vault-policies
         - name: vault-data
           emptyDir: {}
-
-
-
+          
 ---
 
 apiVersion: apps/v1

@@ -36,7 +36,7 @@ spec:
       port: 8200
       targetPort: 8200
   type: ClusterIP
-
+  
 ---
 
 apiVersion: v1
