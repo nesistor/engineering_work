@@ -5,7 +5,7 @@ imagePullSecrets:
 vault:
   image:
     repository: "hashicorp/vault"
-    tag: "latest"
+    tag: "1.18.2"
   environment:
     VAULT_DEV_ROOT_TOKEN_ID: "root_token"
     # Zmienione: pełna nazwa DNS usługi Vault
