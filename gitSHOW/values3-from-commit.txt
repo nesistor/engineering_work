@@ -1,0 +1,136 @@
+imagePullSecrets:
+  - name: gcr-json-key
+
+vault:
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.18.2"
+  environment:
+    VAULT_DEV_ROOT_TOKEN_ID: "root_token"
+    VAULT_ADDR: "http://{{ .Release.Name }}-vault-service:8200"
+  serviceAccount:
+    create: true
+    name: vault
+  volumes:
+    - name: vault-config-volume
+      configMap:
+        name: vault-config
+  volumeMounts:
+    - name: vault-secrets
+      mountPath: /vault/secrets
+      readOnly: true
+
+
+authenticationService:
+  image:
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/auth-service"
+    tag: "latest"
+  environment:
+    VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
+    VAULT_TOKEN: "root_token"  # Zastanów się nad przechowywaniem tego tokena w Kubernetes Secrets
+    REDIS_URL: "microservices-redis-service.microservices-app.svc.cluster.local:6379"
+  ports:
+    - name: http
+      containerPort: 8083
+
+loggerService:
+  image:
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/logger-service"
+    tag: "latest"
+  ports:
+    - name: http
+      containerPort: 80
+
+mailerService:
+  image:
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/mail-service"
+    tag: "latest"
+  environment:
+    MAIL_HOST: "mailhog"
+    MAIL_PORT: "1025"
+    FROM_NAME: "Karol"
+    FROM_ADDRESS: "goappdm@gmail.com"
+  ports:
+    - name: http
+      containerPort: 8085
+
+userService:
+  image:
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/user-service"
+    tag: "latest"
+  environment:
+    DSN: "host=microservices-postgres-users-service.microservices-app.svc.cluster.local port=5432 user=postgres password=password dbname=users sslmode=disable"
+    VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
+    VAULT_TOKEN: "root_token"
+  ports:
+    - name: http
+      containerPort: 8081
+    - name: grpc
+      containerPort: 50001
+
+adminService:
+  image:
+    repository: "us-central1-docker.pkg.dev/my-microservices-app/my-microservices-repo/admin-service"
+    tag: "latest"
+  environment:
+    DSN: "host=microservices-postgres-admins-service.microservices-app.svc.cluster.local port=5432 user=postgres password=password dbname=admins sslmode=disable"
+    VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
+    VAULT_TOKEN: "root_token"
+  ports:
+    - name: http
+      containerPort: 8082
+    - name: grpc
+      containerPort: 50002
+
+redis:
+  image:
+    repository: "redis"
+    tag: "7.0"
+  ports:
+    - name: redis
+      containerPort: 6379
+
+postgresUsers:
+  image:
+    repository: "postgres"
+    tag: "14.0"
+  environment:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "password"
+    POSTGRES_DB: "users"
+  volumes:
+    data:
+      size: 1Gi
+  ports:
+    - name: postgres
+      containerPort: 5432
+
+postgresAdmins:
+  image:
+    repository: "postgres"
+    tag: "14.0"
+  environment:
+    POSTGRES_USER: "postgres"
+    POSTGRES_PASSWORD: "password"
+    POSTGRES_DB: "admins"
+  volumes:
+    data:
+      size: 1Gi
+  ports:
+    - name: postgres
+      containerPort: 5432
+
+mongo:
+  image:
+    repository: "mongo"
+    tag: "4.2.16-bionic"
+  environment:
+    MONGO_INITDB_DATABASE: "logs"
+    MONGO_INITDB_ROOT_USERNAME: "admin"
+    MONGO_INITDB_ROOT_PASSWORD: "password"
+  volumes:
+    data:
+      size: 1Gi
+  ports:
+    - name: mongo
+      containerPort: 27017

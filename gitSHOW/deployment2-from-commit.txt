@@ -27,17 +27,17 @@ spec:
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+            - name: VAULT_API_ADDR
+              value: "{{ .Values.vault.environment.VAULT_API_ADDR }}"
             - name: VAULT_DEV_ROOT_TOKEN_ID
               value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
-          command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
+          command: ["server", "-dev", "-dev-root-token-id=root_token"]
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
       volumes:
         - name: vault-data
           emptyDir: {}
-
-
 
 ---
 

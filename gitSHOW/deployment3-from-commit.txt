@@ -13,12 +13,17 @@ spec:
       release: {{ .Release.Name }}
   template:
     metadata:
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "my-role"  # Rola Vault w Kubernetes
+        # Wstrzykujemy pliki bezpośrednio
+        vault.hashicorp.com/agent-inject-secret-private-key: "jwt_keys/private_key.pem"  # Ścieżka do lokalnego pliku
+        vault.hashicorp.com/agent-inject-secret-public-key: "jwt_keys/public_key.pem"  # Ścieżka do lokalnego pliku
       labels:
         app: vault
         release: {{ .Release.Name }}
     spec:
-      imagePullSecrets:
-        - name: gcr-json-key
+      serviceAccountName: vault
       containers:
         - name: vault
           image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
@@ -26,18 +31,20 @@ spec:
             - containerPort: 8200
           env:
             - name: VAULT_ADDR
-              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
-            - name: VAULT_DEV_ROOT_TOKEN_ID
-              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
-          command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]
+              value: "http://{{ .Release.Name }}-vault-service:8200"
+          volumeMounts:
+            - name: vault-config-volume
+              mountPath: /vault/config
+              readOnly: true
+            - name: vault-secrets
+              mountPath: /vault/secrets
+              readOnly: true
       volumes:
-        - name: vault-data
+        - name: vault-config-volume
+          configMap:
+            name: vault-config
+        - name: vault-secrets
           emptyDir: {}
-
-
 
 ---
 
