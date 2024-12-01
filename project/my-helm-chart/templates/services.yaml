@@ -22,15 +22,18 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ .Release.Name }}-vault
+  name: {{ .Release.Name }}-vault-service
+  labels:
+    app: vault
+    release: {{ .Release.Name }}
 spec:
-  ports:
-    - port: 8200
-      targetPort: 8200
-      name: http
   selector:
     app: vault
     release: {{ .Release.Name }}
+  ports:
+    - protocol: TCP
+      port: 8200
+      targetPort: 8200
 
 ---
 

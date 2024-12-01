@@ -15,13 +15,31 @@ vault:
     secretKeys:
       - name: "vault-jwt-keys"
         path: "/vault/secrets/jwt-keys"
-      - name: "vault-policies" 
+      - name: "vault-policies"
         path: "/vault/secrets/jwt-policy"
-  role: "vault-role"
   storage:
     backend: raft
     path: /vault/data
     replicas: 3
+  # Ustawienia Vaulta (np. root token dla testów)
+  vaultConfig: |
+    # Vault Configuration
+    disable_mlock: true
+    storage "raft" {
+      path    = "/vault/data"
+      node_id = "node1"
+    }
+    listener "tcp" {
+      address     = "0.0.0.0:8200"
+      tls_disable = 1
+    }
+    api_addr = "http://0.0.0.0:8200"
+    cluster_addr = "https://0.0.0.0:8201"
+    ui = true
+    # Zmienna środowiskowa dla Vaulta
+    vault_api_addr = "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
+  # Ustawienie tokena Vaulta (w przypadku produkcji najlepiej trzymać go w Secrets)
+  vault_token: "root_token"  # Root token dla testów
 
 
 

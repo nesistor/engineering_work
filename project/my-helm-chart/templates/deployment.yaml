@@ -16,30 +16,29 @@ spec:
       labels:
         app: vault
         release: {{ .Release.Name }}
-      annotations:
-        # Usuwamy TLS-related annotations
-        vault.hashicorp.com/agent-inject: 'true'
-        vault.hashicorp.com/agent-inject-secret-jwt-key1: 'secret/jwt/key1'
-        vault.hashicorp.com/agent-inject-secret-jwt-key2: 'secret/jwt/key2'
-        vault.hashicorp.com/role: 'vault-role'
     spec:
       containers:
         - name: vault
-          image: "hashicorp/vault:latest"
+          image: "hashicorp/vault:1.18.2"
           ports:
             - containerPort: 8200
-          securityContext:
-            capabilities:
-              add: ["IPC_LOCK"]
+          env:
+            - name: VAULT_ADDR
+              value: "http://0.0.0.0:8200"
           volumeMounts:
             - name: vault-data
               mountPath: /vault/data
+            - name: vault-secrets
+              mountPath: /vault/secrets
       volumes:
         - name: vault-data
           emptyDir: {}
+        - name: vault-secrets
+          secret:
+            secretName: vault-jwt-keys  
       serviceAccountName: vault-service-account
 
-
+      
 
 apiVersion: apps/v1
 kind: Deployment
