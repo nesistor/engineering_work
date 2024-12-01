@@ -14,6 +14,14 @@ vault:
   ports:
     - name: http
       containerPort: 8200
+  agent:
+    enabled: true
+    secretKeys:
+      - name: "vault-jwt-keys"
+        path: "/vault/secrets/jwt-keys"
+      - name: "vault-policies"
+        path: "/vault/secrets/jwt-policy"
+
 
 authenticationService:
   image:

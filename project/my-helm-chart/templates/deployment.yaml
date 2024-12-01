@@ -34,16 +34,23 @@ spec:
             capabilities:
               add: ["IPC_LOCK"]
           volumeMounts:
-            - name: vault-secrets
-              mountPath: /vault/secrets
+            - name: vault-jwt-keys
+              mountPath: /vault/secrets/jwt-keys
+              readOnly: true
+            - name: vault-policies
+              mountPath: /vault/secrets/jwt-policy
               readOnly: true
       volumes:
-        - name: vault-secrets
+        - name: vault-jwt-keys
+          secret:
+            secretName: vault-jwt-keys
+        - name: vault-policies
           secret:
             secretName: vault-policies
         - name: vault-data
           emptyDir: {}
-          
+
+
 ---
 
 apiVersion: apps/v1
