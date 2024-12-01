@@ -2,7 +2,9 @@ imagePullSecrets:
   - name: gcr-json-key
 
 vault:
-  image: "hashicorp/vault:1.18.2"
+  image:
+    repository: "hashicorp/vault"
+    tag: "1.18.2"
   replicaCount: 1
   serviceAccount:
     create: true
