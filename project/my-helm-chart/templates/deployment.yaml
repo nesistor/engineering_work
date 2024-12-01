@@ -38,8 +38,6 @@ spec:
             secretName: vault-jwt-keys  
       serviceAccountName: vault-service-account
 
-
-
 ---
 
 apiVersion: apps/v1
