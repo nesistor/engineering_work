@@ -1,18 +1,16 @@
 imagePullSecrets:
   - name: gcr-json-key
-
-
+  
 vault:
   image:
     repository: "hashicorp/vault"
     tag: "1.18.2"
   environment:
     VAULT_DEV_ROOT_TOKEN_ID: "root_token"
-    # Zmienione: pełna nazwa DNS usługi Vault
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
   volumes:
     data:
-      size: 1Gi
+      size: 1Gi 
   ports:
     - name: http
       containerPort: 8200
