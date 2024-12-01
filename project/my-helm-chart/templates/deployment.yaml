@@ -17,26 +17,27 @@ spec:
         app: vault
         release: {{ .Release.Name }}
     spec:
+      imagePullSecrets:
+        - name: gcr-json-key
       containers:
         - name: vault
-          image: "hashicorp/vault:1.18.2"
+          image: "{{ .Values.vault.image.repository }}:{{ .Values.vault.image.tag }}"
           ports:
             - containerPort: 8200
           env:
             - name: VAULT_ADDR
-              value: "http://0.0.0.0:8200"
-          volumeMounts:
-            - name: vault-data
-              mountPath: /vault/data
-            - name: vault-secrets
-              mountPath: /vault/secrets
+              value: "{{ .Values.vault.environment.VAULT_ADDR }}"
+            - name: VAULT_DEV_ROOT_TOKEN_ID
+              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
+          command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
+          securityContext:
+            capabilities:
+              add: ["IPC_LOCK"]
       volumes:
         - name: vault-data
           emptyDir: {}
-        - name: vault-secrets
-          secret:
-            secretName: vault-jwt-keys  
-      serviceAccountName: vault-service-account
+
+
 
 ---
 
