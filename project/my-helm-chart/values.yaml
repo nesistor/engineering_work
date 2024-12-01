@@ -18,10 +18,8 @@ vault:
       - name: "vault-policies"
         path: "/vault/secrets/jwt-policy"
   storage:
-    backend: raft
+    backend: inmem  
     path: /vault/data
-    replicas: 3
-  # Ustawienia Vaulta (np. root token dla testów)
   vaultConfig: |
     # Vault Configuration
     disable_mlock: true
