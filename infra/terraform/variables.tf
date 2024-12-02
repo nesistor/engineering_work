@@ -1,0 +1,28 @@
+variable "gcp_project" {
+  description = "The Google Cloud project ID"
+  type        = string
+}
+
+variable "gcp_region" {
+  description = "The Google Cloud region"
+  type        = string
+  default     = "us-central1"
+}
+
+variable "gcp_zone" {
+  description = "The Google Cloud zone"
+  type        = string
+  default     = "us-central1-a"
+}
+
+variable "kms_keyring" {
+  description = "The name of the KMS KeyRing"
+  type        = string
+  default     = "vault-keyring"
+}
+
+variable "kms_key" {
+  description = "The name of the KMS Key"
+  type        = string
+  default     = "vault-init-key"
+}

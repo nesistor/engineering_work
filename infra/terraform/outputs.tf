@@ -1,7 +1,14 @@
-output "gke_endpoint" {
-  value = google_container_cluster.gke.endpoint
+output "gke_cluster_name" {
+  description = "Name of the GKE cluster"
+  value       = google_container_cluster.gke_cluster.name
 }
 
-output "cluster_name" {
-  value = google_container_cluster.gke.name
+output "gke_cluster_endpoint" {
+  description = "The endpoint of the GKE cluster"
+  value       = google_container_cluster.gke_cluster.endpoint
+}
+
+output "gke_cluster_ca_certificate" {
+  description = "The CA certificate of the GKE cluster"
+  value       = google_container_cluster.gke_cluster.master_auth[0].cluster_ca_certificate
 }
