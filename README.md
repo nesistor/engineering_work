@@ -2,24 +2,29 @@
 
 ## Overview
 
-This project implements a secure infrastructure for managing secrets in a microservices architecture using **Vault**, **Google Cloud KMS**, and **Terraform**. It ensures that sensitive data like unseal keys, policies, and cryptographic keys are stored securely and dynamically delivered to microservices in a Kubernetes (GKE) cluster.
+This project implements a secure infrastructure for managing secrets in a microservices architecture, utilizing **Vault**, **Google Cloud KMS**, and **Terraform**. The system is designed to securely handle sensitive data such as unseal keys, policies, and cryptographic keys, which are dynamically delivered to microservices within a Kubernetes (GKE) cluster. Please note that this setup is intended for development purposes and is not production-ready, as it lacks production-grade SSL certificates.
 
 ## Architecture & Workflow
 
-1. **Key Management:**
-   - **Unseal Keys** are stored in **Google Cloud KMS** and delivered to Vault in the GKE cluster via **CSI Driver**.
-   - Additional secrets (e.g., policies, private/public keys) are also stored in Vault.
+### Key Management:
+- **Unseal Keys** are securely stored in **Google Cloud KMS** and are delivered to Vault running in the GKE cluster via a **CSI Driver**.
+- Other sensitive secrets, such as policies and cryptographic keys (private/public keys), are also stored within Vault.
 
-2. **Vault Configuration:**
-   - Vault dynamically supplies secrets to the microservices as needed, ensuring secure and on-demand access.
+### Vault Configuration:
+- Vault is configured to dynamically supply secrets to microservices on demand, ensuring that only the necessary data is provided securely at runtime.
+- The configuration includes integration with **Google Cloud KMS** for key management and encryption.
 
-3. **CI/CD Pipeline:**
-   - Deployment is automated through a **Jenkins pipeline** with encrypted credentials stored in **Jenkins Credentials**.
-   - **Terraform** is used for infrastructure provisioning, including Vault setup and integration with Google Cloud KMS.
+### Infrastructure Setup:
+- **Terraform** is used for provisioning the infrastructure, which includes the setup of Vault and its integration with **Google Cloud KMS**.
+- The infrastructure is deployed within a GKE cluster, which is running on **two nodes** to ensure basic availability.
 
-## Microservices
+### CI/CD Pipeline:
+- The deployment pipeline is managed via **Jenkins**, with encrypted credentials securely stored in **Jenkins Credentials**.
+- The pipeline automates the deployment process, ensuring consistency and security through Terraform-managed infrastructure provisioning.
 
-The application consists of the following microservices, each with a specific responsibility:
+## Microservices Overview
+
+The application is composed of the following microservices, each with a specific responsibility:
 
 | Service Name      | Description                              |
 |-------------------|------------------------------------------|
@@ -34,40 +39,35 @@ The application consists of the following microservices, each with a specific re
 | **mongodb**       | NoSQL database for unstructured data.    |
 | **mailhog**       | Email capturing and testing tool.        |
 
-Each service uses **JWT tokens** for secure communication and authentication.
+Each microservice leverages **JWT tokens** for secure communication and authentication.
 
 ## Security Design
 
-- **Vault** serves as a centralized secret management system, ensuring dynamic secret delivery, auditing, and policy enforcement.
-- **Google Cloud KMS** ensures unseal keys are encrypted and securely delivered to Vault.
-- **Jenkins** and **Terraform** provide secure, automated deployment and infrastructure setup.
+The security model in place uses best practices for managing secrets and ensuring secure communication:
+
+- **Vault** acts as the central secret management system, enforcing policies, delivering secrets dynamically, and enabling full audit capabilities.
+- **Google Cloud KMS** is used to encrypt and securely deliver the unseal keys to Vault, ensuring a high level of security for sensitive data.
+- **Jenkins** automates the CI/CD pipeline, ensuring encrypted credentials are used throughout the deployment process.
+- **Terraform** ensures infrastructure provisioning is automated and consistent, removing human error in the setup process.
 
 ## Advantages
 
-- **Centralized Secret Management:** Secure storage, dynamic delivery, and auditing of secrets.
-- **High Security:** Google Cloud KMS and Vault’s robust features ensure the highest security standards.
-- **Scalability:** Easily scalable with Kubernetes and Vault for large, distributed systems.
+- **Centralized Secret Management**: Securely store and dynamically deliver secrets as needed.
+- **High Security**: With Vault and Google Cloud KMS, this setup provides the highest level of security for key management.
+- **Scalability**: Built on Kubernetes and Vault, the infrastructure is easily scalable to meet the needs of large, distributed systems.
+
+## Deployment Environment
+
+- The application is deployed within a **Google Kubernetes Engine (GKE)** cluster, spanning **two nodes**. This configuration provides basic availability but is not suitable for production environments.
+- The system is not production-ready as it lacks SSL certificates for secure communications, which is a crucial element for deployment in production.
 
 ## Local Setup
 
-Clone the repository:
+To run the project locally:
+
+1. Clone the repository:
 
 ```bash
 git clone https://github.com/nesistor/enigneering_work
-
-Go to the project directory
-
-```bash
-  cd enigneering_work/project
-```
-
-Start the server
-
-```bash
-  make up_build
-```
-
-## 🚀 About Me
-I'm a full stack developer focusing on Golang and Flutter.
-
-https://www.linkedin.com/in/karol-malicki/
+cd engineering_work
+make_up
