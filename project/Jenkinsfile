@@ -40,6 +40,17 @@ pipeline {
                 }
             }
         }
+        /*stage('Terraform Init and Apply') {
+            steps {
+                script {
+                    echo "Initializing and applying Terraform"
+                    sh """
+                        terraform init
+                        terraform apply -auto-approve
+                    """
+                }
+            }
+        }*/
 
         stage('Build Docker Images') {
             steps {
