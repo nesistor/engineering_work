@@ -1,4 +1,4 @@
-project/infra/terraform/.terraform/*
+infra/terraform/.terraform/*
 project/db-data/*
 project/vault/*
 /frontend/.DS_Store
