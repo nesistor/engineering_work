@@ -10,9 +10,6 @@ resource "google_container_cluster" "gke_cluster" {
       "https://www.googleapis.com/auth/cloud-platform",
     ]
   }
-
-  # Optional: Enabling GKE node pool auto-scaling
-  # enable_autoscaling = true
 }
 
 resource "google_container_node_pool" "primary_node_pool" {
@@ -27,4 +24,8 @@ resource "google_container_node_pool" "primary_node_pool" {
       "https://www.googleapis.com/auth/cloud-platform",
     ]
   }
+}
+
+module "kms" {
+  source = "./kms" # Assuming you modularize your KMS setup
 }

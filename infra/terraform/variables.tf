@@ -7,7 +7,7 @@ variable "gcp_credentials_file" {
 variable "gcp_project" {
   description = "The Google Cloud project ID"
   type        = string
-  default     = "my-microservices-app" # Replace with your project ID
+  default     = "my-microservices-app"
 }
 
 variable "gcp_region" {

@@ -1,16 +1,16 @@
 output "gke_cluster_name" {
   description = "The name of the GKE cluster"
-  value       = google_container_cluster.primary.name
+  value       = google_container_cluster.gke_cluster.name
 }
 
 output "gke_cluster_endpoint" {
   description = "The endpoint of the GKE cluster"
-  value       = google_container_cluster.primary.endpoint
+  value       = google_container_cluster.gke_cluster.endpoint
 }
 
 output "gke_cluster_zone" {
   description = "The zone of the GKE cluster"
-  value       = google_container_cluster.primary.zone
+  value       = google_container_cluster.gke_cluster.location
 }
 
 output "gcr_docker_registry" {
