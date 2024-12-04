@@ -1,6 +1,13 @@
+variable "gcp_credentials_file" {
+  description = "Path to the JSON service account credentials file for GCP"
+  type        = string
+  default     = "/home/karol/terraform/cred/jenkins-deployer-key.json"
+}
+
 variable "gcp_project" {
   description = "The Google Cloud project ID"
   type        = string
+  default     = "my-microservices-app" # Replace with your project ID
 }
 
 variable "gcp_region" {
