@@ -8,7 +8,7 @@ provider "google" {
 variable "gcp_credentials_file" {
   description = "Path to the JSON service account credentials file for GCP"
   type        = string
-  default     = "<path_to_your_service_account_key_file>" # Replace with the actual path
+  default     = "/home/karol/terraform/cred/jenkins-deployer-key.json"
 }
 
 variable "gcp_project" {
