@@ -26,6 +26,15 @@ resource "google_container_node_pool" "primary_node_pool" {
   }
 }
 
+resource "google_service_account" "sa" {
+  account_id   = "my-service-account"
+  display_name = "My Service Account"
+  project      = var.gcp_project
+}
+
+# KMS Module
 module "kms" {
-  source = "./kms" # Assuming you modularize your KMS setup
+  source      = "./kms"        # Ścieżka do modułu KMS
+  kms_keyring = var.kms_keyring
+  kms_key     = var.kms_key
 }
