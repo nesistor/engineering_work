@@ -1,26 +1,25 @@
-storage "file" {
-  path = "/vault/data"  # Lokalizacja przechowywania danych w kontenerze
-}
-
-# HTTP API
-api_addr = "http://0.0.0.0:8200"
-cluster_addr = "https://0.0.0.0:8201"  # Wewnętrzny adres klastra Vault (dla HA)
-
-# Adresy i certyfikaty TLS
+# Listener Configuration
 listener "tcp" {
-  address = "0.0.0.0:8200"
-  tls_disable = 1  # Zablokowanie TLS, należy włączyć TLS w produkcji
+  address       = "0.0.0.0:8200"
+  cluster_address = "0.0.0.0:8201"
+  tls_disable   = true
 }
 
-# Autentykacja
-disable_mlock = true  # To jest opcjonalne, zależy od Twojego środowiska
-
-# Konfiguracja Kubernetes Auth Method
-auth "kubernetes" {
-  # Adres do API Kubernetes
-  kubernetes_host = "https://kubernetes.default.svc"
-
-  # Tokeny autentykacji z Kubernetes (domyślnie Vault użyje service account token w podach)
-  kubernetes_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"  # Certyfikat CA Kubernetes
-  kubernetes_token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"  # Token serwisu
+# Storage Backend Configuration: Consul
+storage "consul" {
+  address = "localhost:8500" # Zmień na właściwy adres Consul, np. consul.service.consul:8500
+  path    = "vault/"         # Ścieżka przechowywania w Consul
 }
+
+# High Availability Configuration
+ha_storage "consul" {
+  address = "localhost:8500" # Zmień na właściwy adres Consul
+  path    = "vault-ha/"      # Ścieżka dla konfiguracji HA
+}
+
+# API Configuration
+api_addr = "http://0.0.0.0:8200"       # Adres API Vault
+cluster_addr = "http://0.0.0.0:8201"   # Adres klastra Vault
+
+# UI Configuration
+ui = true
