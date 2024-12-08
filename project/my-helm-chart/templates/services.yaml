@@ -35,8 +35,10 @@ spec:
     - protocol: TCP
       port: 8200
       targetPort: 8200
+    - protocol: TCP
+      port: 8201
+      targetPort: 8201
   type: ClusterIP
-
 
 ---
 

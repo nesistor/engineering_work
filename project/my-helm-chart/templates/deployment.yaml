@@ -6,7 +6,7 @@ metadata:
     app: vault
     release: {{ .Release.Name }}
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: vault
@@ -27,20 +27,32 @@ spec:
           env:
             - name: VAULT_ADDR
               value: "{{ .Values.vault.environment.VAULT_ADDR }}"
-            - name: VAULT_DEV_ROOT_TOKEN_ID
-              value: "{{ .Values.vault.environment.VAULT_DEV_ROOT_TOKEN_ID }}"
-          command: ["vault", "server", "-dev", "-dev-root-token-id=root_token"]
+            - name: VAULT_API_ADDR
+              value: "http://{{ .Release.Name }}-vault-service:8200"
+            - name: VAULT_CLUSTER_ADDR
+              value: "http://{{ .Release.Name }}-vault:8201"
+          command:
+            - "vault"
+            - "server"
+            - "-config=/vault/config/vault.hcl"
           securityContext:
             capabilities:
               add: ["IPC_LOCK"]
           volumeMounts:
+            - name: vault-config
+              mountPath: /vault/config
             - name: vault-jwt-keys
               mountPath: /vault/secrets/jwt-keys
               readOnly: true
             - name: vault-policies
               mountPath: /vault/secrets/jwt-policy
               readOnly: true
+            - name: vault-data
+              mountPath: /vault/data
       volumes:
+        - name: vault-config
+          configMap:
+            name: vault-config
         - name: vault-jwt-keys
           secret:
             secretName: vault-jwt-keys

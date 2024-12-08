@@ -1,16 +1,16 @@
 imagePullSecrets:
   - name: gcr-json-key
   
+
 vault:
   image:
     repository: "hashicorp/vault"
     tag: "1.18.2"
   environment:
-    VAULT_DEV_ROOT_TOKEN_ID: "root_token"
     VAULT_ADDR: "http://0.0.0.0:8200"
   volumes:
     data:
-      size: 1Gi 
+      size: 1Gi
   ports:
     - name: http
       containerPort: 8200
@@ -21,7 +21,33 @@ vault:
         path: "/vault/secrets/jwt-keys"
       - name: "vault-policies"
         path: "/vault/secrets/jwt-policy"
+  ha:
+    enabled: true
+    backend:
+      consul:
+        address: "microservices-consul-service.microservices-app.svc.cluster.local:8500"
+        path: "vault/"
+        scheme: "http"
 
+consul:
+  image:
+    repository: "hashicorp/consul"
+    tag: "1.15.1"
+  replicas: 3
+  environment:
+    CONSUL_BIND_INTERFACE: "eth0"
+  ports:
+    - name: http
+      containerPort: 8500
+    - name: serf-lan
+      containerPort: 8301
+    - name: serf-wan
+      containerPort: 8302
+    - name: rpc
+      containerPort: 8300
+  volumes:
+    data:
+      size: 1Gi
 
 authenticationService:
   image:
