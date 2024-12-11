@@ -1,5 +1,3 @@
-Here’s a structured documentation draft for setting up and deploying your project. This includes both local setup and cloud deployment instructions. 
-
 ### Documentation: Project Setup and Deployment
 
 ---
@@ -139,5 +137,3 @@ The project utilizes a CI/CD pipeline via Jenkins.
 - **Vault Integration**: Ensure Vault's root token is stored securely (e.g., in Kubernetes secrets).
 - **Database Initialization**: Use Flyway for database migrations during deployment.
 - **Testing**: Verify service endpoints are reachable post-deployment.
-
-This documentation ensures clear separation between local and cloud environments, providing commands and configuration details tailored for each context. Let me know if you want refinements or additional details!
