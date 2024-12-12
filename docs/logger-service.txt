@@ -1,0 +1,151 @@
+### Log-Service System Documentation
+
+The **Log-Service System** is a microservice designed to handle logging operations for other microservices within a distributed application. It provides mechanisms for writing logs, retrieving log data, and interacting with a MongoDB database. The service supports HTTP, gRPC, and RPC communication protocols.
+
+---
+
+### System Architecture
+
+#### Components:
+1. **HTTP REST API**  
+   - Handles logging requests via POST requests to the `/log` endpoint.
+
+2. **gRPC API**  
+   - Supports logging through gRPC requests for efficient inter-service communication.
+
+3. **RPC Server**  
+   - Processes logging requests using a lightweight RPC protocol.
+
+4. **MongoDB**  
+   - Stores all log entries, supporting operations such as insertion, retrieval, and updates.
+
+5. **Configuration**  
+   - The service configuration includes MongoDB connection settings, server ports, and middleware setup.
+
+---
+
+### Functionalities
+
+#### HTTP REST API
+- **Write Log**  
+  - **Endpoint**: `/log`  
+  - **Method**: POST  
+  - **Description**: Accepts a JSON payload to create a new log entry in the MongoDB database.  
+
+  **Payload**:
+  ```json
+  {
+    "name": "string",
+    "data": "string"
+  }
+  ```
+
+  **Response**:
+  ```json
+  {
+    "error": false,
+    "message": "logged"
+  }
+  ```
+
+#### gRPC API
+- **Write Log**  
+  - **Method**: `WriteLog`  
+  - **Description**: Accepts a `LogRequest` message containing log details and writes it to the MongoDB database.  
+
+  **Request Message**:
+  ```proto
+  message LogRequest {
+    LogEntry logEntry = 1;
+  }
+  ```
+
+  **Response Message**:
+  ```proto
+  message LogResponse {
+    string result = 1;
+  }
+  ```
+
+#### RPC API
+- **Write Log**  
+  - Processes log requests via RPC connections on port `5001`.
+
+#### MongoDB Operations
+1. **Insert Log Entry**  
+   - Adds a new log entry with fields for `name`, `data`, `created_at`, and `updated_at`.
+
+2. **Retrieve All Logs**  
+   - Fetches all log entries from the database, sorted by `created_at` in descending order.
+
+3. **Retrieve Single Log Entry**  
+   - Retrieves a specific log entry by its unique ID.
+
+4. **Update Log Entry**  
+   - Updates a log entry's data and timestamps based on its ID.
+
+5. **Drop Logs Collection**  
+   - Deletes all log entries by dropping the collection.
+
+---
+
+### Code Structure
+
+1. **`main.go`**  
+   - Entry point for the application, handling MongoDB connection, service initialization, and server startup.  
+
+2. **`routes.go`**  
+   - Defines HTTP routes and middleware for the REST API.  
+
+3. **`helpers.go`**  
+   - Contains utility functions for reading and writing JSON data, as well as handling errors.  
+
+4. **`grpc.go`**  
+   - Implements the gRPC server and `WriteLog` method for log operations.  
+
+5. **`handlers.go`**  
+   - Implements REST API handlers, including the `WriteLog` function for handling log POST requests.  
+
+6. **`models.go`**  
+   - Contains the MongoDB models and methods for interacting with the database, such as `Insert`, `All`, `GetOne`, `DropCollection`, and `Update`.
+
+7. **Generated Files**:
+   - **`logs_grpc.pb.go`** and **`logs.pb.go`**  
+     Auto-generated files containing gRPC and Protocol Buffers definitions.
+
+---
+
+### Deployment Configuration
+
+#### Environment Variables:
+- `MONGO_URL`: MongoDB connection string (e.g., `mongodb://mongo:27017`).
+- `WEB_PORT`: HTTP REST API port (default: `80`).
+- `GRPC_PORT`: gRPC server port (default: `50003`).
+- `RPC_PORT`: RPC server port (default: `5001`).
+
+#### Requirements:
+1. **MongoDB**  
+   - Ensure MongoDB is running and accessible at the specified `MONGO_URL`.
+2. **Network Configuration**  
+   - Ensure ports `80`, `50003`, and `5001` are open for HTTP, gRPC, and RPC communication, respectively.
+3. **Go Environment**  
+   - Install necessary Go modules such as `mongo-driver`, `chi`, `grpc`, and `protobuf`.
+
+---
+
+### Usage
+
+1. **Start the Service**  
+   - Run the service to initialize HTTP, gRPC, and RPC servers. Logs will be stored in the `logs` collection within the MongoDB database.
+
+2. **Write Logs via REST API**  
+   - Use a POST request to the `/log` endpoint with a JSON payload.
+
+3. **Write Logs via gRPC**  
+   - Use the `WriteLog` gRPC method with a `LogRequest` message.
+
+4. **RPC Logging**  
+   - Connect to the RPC server on port `5001` to log events.
+
+5. **MongoDB Maintenance**  
+   - Use the database methods in `models.go` for advanced operations like retrieving all logs or updating entries.
