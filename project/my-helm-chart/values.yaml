@@ -29,6 +29,7 @@ vault:
         path: "vault/"
         scheme: "http"
 
+
 consul:
   image:
     repository: "hashicorp/consul"

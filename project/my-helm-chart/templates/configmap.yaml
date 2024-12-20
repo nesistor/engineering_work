@@ -25,28 +25,16 @@ data:
     api_addr = "http://{{ .Release.Name }}-vault-service:8200"
     cluster_addr = "http://{{ .Release.Name }}-vault:8201"
 
-    
-
     # Enable Vault UI
     ui = true
-
 
     # Enable transit backend for key management
     secrets "transit" {}
 
     # Kubernetes Auth configuration
     auth "kubernetes" {
-      # Kubernetes service URL
       kubelet_address = "https://kubernetes.default.svc"
-      
-      # CA certificate used to verify the Kubernetes API server
       kubelet_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-      
-      # JWT token used to authenticate the service account to Vault
       token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-      
-      # Kubernetes API server URL
       kubernetes_host = "https://kubernetes.default.svc"
     }
-
-  # Vault agent will be used for initializing and storing secrets if needed.

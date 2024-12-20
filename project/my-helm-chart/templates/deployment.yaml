@@ -49,6 +49,16 @@ spec:
               readOnly: true
             - name: vault-data
               mountPath: /vault/data
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - |
+                    # Tworzenie kluczy RSA przy starcie
+                    vault write -f transit/keys/jwt-private-key
+                    vault write -f transit/keys/jwt-public-key
       volumes:
         - name: vault-config
           configMap:
@@ -61,6 +71,7 @@ spec:
             secretName: vault-policies
         - name: vault-data
           emptyDir: {}
+
 
 ---
 
