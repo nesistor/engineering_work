@@ -42,34 +42,6 @@ spec:
       name: "cluster"
   type: ClusterIP
 
----
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: {{ .Release.Name }}-consul-service
-  labels:
-    app: consul
-    release: {{ .Release.Name }}
-spec:
-  selector:
-    app: consul
-    release: {{ .Release.Name }}
-  ports:
-    - protocol: TCP
-      port: 8500
-      targetPort: 8500
-      name: http  # Dodajemy nazwę portu
-    - protocol: TCP
-      port: 8600
-      targetPort: 8600
-      name: dns  # Dodajemy nazwę portu
-    - protocol: TCP
-      port: 8300
-      targetPort: 8300
-      name: rpc  # Dodajemy nazwę portu
-  type: ClusterIP
-
 
 ---
 
