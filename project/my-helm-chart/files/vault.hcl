@@ -1,25 +1,42 @@
-# Listener Configuration
+# Listener configuration for Vault API and cluster communication
 listener "tcp" {
-  address       = "0.0.0.0:8200"
-  cluster_address = "0.0.0.0:8201"
-  tls_disable   = true
+  address       = "0.0.0.0:8200"  # Vault API listener (accessed externally)
+  cluster_address = "0.0.0.0:8201" # Vault cluster communication listener (for HA)
+  tls_disable   = true  # Disable TLS for simplicity (set to 'false' in production)
 }
 
-# Storage Backend Configuration: Consul
+# Storage backend configuration (Using Consul in this case)
 storage "consul" {
-  address = "localhost:8500" # Zmień na właściwy adres Consul, np. consul.service.consul:8500
-  path    = "vault/"         # Ścieżka przechowywania w Consul
+  address = "{{ .Values.vault.ha.backend.consul.address }}"
+  path    = "{{ .Values.vault.ha.backend.consul.path }}"
+  scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
 }
 
-# High Availability Configuration
-ha_storage "consul" {
-  address = "localhost:8500" # Zmień na właściwy adres Consul
-  path    = "vault-ha/"      # Ścieżka dla konfiguracji HA
-}
+# API and Cluster addresses for Vault
+api_addr = "http://{{ .Release.Name }}-vault-service:8200"
+cluster_addr = "http://{{ .Release.Name }}-vault:8201"
 
-# API Configuration
-api_addr = "http://0.0.0.0:8200"       # Adres API Vault
-cluster_addr = "http://0.0.0.0:8201"   # Adres klastra Vault
-
-# UI Configuration
+# Enable Vault UI
 ui = true
+
+# Kubernetes Auth configuration
+auth "kubernetes" {
+  # Kubernetes service URL
+  kubelet_address = "https://kubernetes.default.svc"
+  
+  # CA certificate used to verify the Kubernetes API server
+  kubelet_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+  
+  # JWT token used to authenticate the service account to Vault
+  token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+  
+  # Kubernetes API server URL
+  kubernetes_host = "https://kubernetes.default.svc"
+}
+
+# Enable any additional secrets engines here (e.g., kv, transit)
+# Example: kv for key-value store
+# secrets "kv" {
+#   path = "secret/"
+# }
+
