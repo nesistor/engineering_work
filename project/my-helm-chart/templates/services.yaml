@@ -42,6 +42,37 @@ spec:
       name: "cluster"
   type: ClusterIP
 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: microservices-consul-service
+  labels:
+    app: consul
+    release: {{ .Release.Name }}
+spec:
+  selector:
+    app: consul
+    release: {{ .Release.Name }}
+  ports:
+    - protocol: TCP
+      port: 8500
+      targetPort: 8500
+      name: "http"
+    - protocol: TCP
+      port: 8301
+      targetPort: 8301
+      name: "serf-lan"
+    - protocol: TCP
+      port: 8302
+      targetPort: 8302
+      name: "serf-wan"
+    - protocol: TCP
+      port: 8300
+      targetPort: 8300
+      name: "rpc"
+  type: ClusterIP
+
 
 ---
 

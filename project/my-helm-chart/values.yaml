@@ -1,6 +1,6 @@
 imagePullSecrets:
   - name: gcr-json-key
-  
+
 
 vault:
   image:
@@ -25,9 +25,11 @@ vault:
     enabled: true
     backend:
       consul:
-        address: "microservices-consul-service.microservices-app.svc.cluster.local:8500"
+        address: "microservices-consul-service.microservices-app.svc.cluster.local:8500" # Consul jako backend
         path: "vault/"
         scheme: "http"
+  transit:
+    enabled: true
 
 consul:
   image:
@@ -48,6 +50,7 @@ consul:
   volumes:
     data:
       size: 1Gi
+
 
 authenticationService:
   image:

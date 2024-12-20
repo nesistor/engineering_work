@@ -34,7 +34,6 @@ data:
     # Kubernetes Auth configuration
     auth "kubernetes" {
       kubelet_address = "https://kubernetes.default.svc"
-      kubelet_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
       token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       kubernetes_host = "https://kubernetes.default.svc"
     }

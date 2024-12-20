@@ -56,7 +56,7 @@ spec:
                   - /bin/sh
                   - -c
                   - |
-                    # Tworzenie kluczy RSA przy starcie
+                    # Tworzenie kluczy RSA przy starcie Vaulta
                     vault write -f transit/keys/jwt-private-key
                     vault write -f transit/keys/jwt-public-key
       volumes:
