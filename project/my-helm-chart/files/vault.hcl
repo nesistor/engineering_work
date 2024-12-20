@@ -7,7 +7,7 @@ listener "tcp" {
 
 # Storage backend configuration (Using Consul in this case)
 storage "consul" {
-  address = "microservices-consul-0.microservices-app.svc.cluster.local:8500"
+  address = "microservices-consul-service.microservices-app.svc.cluster.local:8500"
   path    = "{{ .Values.vault.ha.backend.consul.path }}"
   scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
 }

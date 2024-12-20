@@ -16,7 +16,7 @@ data:
 
     # Storage backend configuration (Using Consul in this case)
     storage "consul" {
-      address = "{{ .Values.vault.ha.backend.consul.address }}"
+      address = "microservices-consul-service.microservices-app.svc.cluster.local:8500"
       path    = "{{ .Values.vault.ha.backend.consul.path }}"
       scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
     }
