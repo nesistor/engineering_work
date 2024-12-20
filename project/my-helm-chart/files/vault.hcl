@@ -1,15 +1,15 @@
 # Listener configuration for Vault API and cluster communication
 listener "tcp" {
-  address       = "0.0.0.0:8200"  # Vault API listener (accessed externally)
+  address = "0.0.0.0:8200"        # Vault API listener (accessed externally)
   cluster_address = "0.0.0.0:8201" # Vault cluster communication listener (for HA)
-  tls_disable   = true  # Disable TLS for simplicity (set to 'false' in production)
+  tls_disable = true                # Disable TLS for simplicity (set to 'false' in production)
 }
 
 # Storage backend configuration (Using Consul in this case)
 storage "consul" {
-  address = "{{ .Values.vault.ha.backend.consul.address }}"
-  path    = "{{ .Values.vault.ha.backend.consul.path }}"
-  scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
+  address = "{{ .Values.vault.ha.backend.consul.address }}"  # Consul server address (replace with actual)
+  path    = "{{ .Values.vault.ha.backend.consul.path }}"     # Path in Consul where Vault data will be stored
+  scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"   # Scheme (http/https) for Consul
 }
 
 # API and Cluster addresses for Vault
@@ -21,17 +21,16 @@ ui = true
 
 # Kubernetes Auth configuration
 auth "kubernetes" {
-  # Kubernetes service URL
-  kubelet_address = "https://kubernetes.default.svc"
-  
-  # CA certificate used to verify the Kubernetes API server
-  kubelet_ca_cert = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-  
-  # JWT token used to authenticate the service account to Vault
+  kubelet_address    = "https://kubernetes.default.svc"
+  kubelet_ca_cert    = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
   token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-  
-  # Kubernetes API server URL
-  kubernetes_host = "https://kubernetes.default.svc"
+  kubernetes_host    = "https://kubernetes.default.svc"
+}
+
+# Enable transit backend for key management
+secrets "transit" {
+  # Here, you can define any additional options if needed
+  # Example: path = "transit/"
 }
 
 # Enable any additional secrets engines here (e.g., kv, transit)
@@ -39,4 +38,3 @@ auth "kubernetes" {
 # secrets "kv" {
 #   path = "secret/"
 # }
-
