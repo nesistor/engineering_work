@@ -73,6 +73,7 @@ spec:
           emptyDir: {}
 
 
+
 ---
 
 apiVersion: apps/v1
@@ -83,7 +84,7 @@ metadata:
     app: consul
     release: {{ .Release.Name }}
 spec:
-  replicas: {{ .Values.consul.replicas }}
+  replicas: 3
   selector:
     matchLabels:
       app: consul
@@ -111,6 +112,7 @@ spec:
       volumes:
         - name: consul-data
           emptyDir: {}
+
 
 ---
 

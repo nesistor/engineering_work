@@ -17,13 +17,9 @@ data:
     # Storage backend configuration (Using Consul in this case)
     storage "consul" {
       address = "microservices-consul-service.microservices-app.svc.cluster.local:8500"
-      path    = "{{ .Values.vault.ha.backend.consul.path }}"
-      scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
+      path    = "vault/"
+      scheme  = "http"
     }
-
-    # API and Cluster addresses for Vault
-    api_addr = "http://{{ .Release.Name }}-vault-service:8200"
-    cluster_addr = "http://{{ .Release.Name }}-vault:8201"
 
     # Enable Vault UI
     ui = true
@@ -36,4 +32,14 @@ data:
       kubelet_address = "https://kubernetes.default.svc"
       token_reviewer_jwt = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       kubernetes_host = "https://kubernetes.default.svc"
+    }
+
+    # Seal configuration using Google Cloud KMS
+    seal "gcpckms" {
+      project     = "your-gcp-project-id"
+      region      = "your-gcp-region"
+      key_ring    = "your-key-ring"
+      crypto_key  = "your-crypto-key"
+      credentials = "/path/to/your/service-account-file.json"
+      auto_unseal = true  # Automatyczne unseal
     }

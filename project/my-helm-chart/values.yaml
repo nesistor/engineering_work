@@ -1,7 +1,6 @@
 imagePullSecrets:
   - name: gcr-json-key
 
-
 vault:
   image:
     repository: "hashicorp/vault"
@@ -31,6 +30,16 @@ vault:
   transit:
     enabled: true
 
+  seal:
+    gcpckms:
+      project: "your-gcp-project-id"
+      region: "your-gcp-region"
+      key_ring: "your-key-ring"
+      crypto_key: "your-crypto-key"
+      credentials: "/path/to/your/service-account-file.json"
+      auto_unseal: true  # Automatyczne unseal przy użyciu GCP KMS
+      enabled: true
+
 consul:
   image:
     repository: "hashicorp/consul"
@@ -50,7 +59,9 @@ consul:
   volumes:
     data:
       size: 1Gi
-
+  ha:
+    enabled: true
+    replication: true  
 
 authenticationService:
   image:
@@ -58,7 +69,7 @@ authenticationService:
     tag: "latest"
   environment:
     VAULT_ADDR: "http://microservices-vault-service.microservices-app.svc.cluster.local:8200"
-    VAULT_TOKEN: "root_token"  # Zastanów się nad przechowywaniem tego tokena w Kubernetes Secrets
+    VAULT_TOKEN: "root_token"  
     REDIS_URL: "microservices-redis-service.microservices-app.svc.cluster.local:6379"
   ports:
     - name: http
