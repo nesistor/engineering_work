@@ -1,7 +1,7 @@
 variable "gcp_credentials_file" {
   description = "Path to the JSON service account credentials file for GCP"
   type        = string
-  default     = "/home/karol/terraform/cred/my-microservices-app-c0b0ae362292.json"
+    default     = "/home/karol/terraform/cred/my-microservices-app-c0b0ae362292.json"
 }
 
 variable "gcp_project" {
