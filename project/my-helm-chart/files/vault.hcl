@@ -7,9 +7,9 @@ listener "tcp" {
 
 # Storage backend configuration (Using Consul in this case)
 storage "consul" {
-  address = "{{ .Values.vault.ha.backend.consul.address }}"  # Consul server address (replace with actual)
-  path    = "{{ .Values.vault.ha.backend.consul.path }}"     # Path in Consul where Vault data will be stored
-  scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"   # Scheme (http/https) for Consul
+  address = "microservices-consul-0.microservices-app.svc.cluster.local:8500"
+  path    = "{{ .Values.vault.ha.backend.consul.path }}"
+  scheme  = "{{ .Values.vault.ha.backend.consul.scheme }}"
 }
 
 # API and Cluster addresses for Vault
