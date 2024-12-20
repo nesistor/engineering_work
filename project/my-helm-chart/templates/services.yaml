@@ -58,14 +58,18 @@ spec:
   ports:
     - protocol: TCP
       port: 8500
-      targetPort: 8500  # Port HTTP dla API Consul
+      targetPort: 8500
+      name: http  # Dodajemy nazwę portu
     - protocol: TCP
       port: 8600
-      targetPort: 8600  # Port DNS dla Consul
+      targetPort: 8600
+      name: dns  # Dodajemy nazwę portu
     - protocol: TCP
       port: 8300
-      targetPort: 8300  # Port RPC dla serwera Consul
+      targetPort: 8300
+      name: rpc  # Dodajemy nazwę portu
   type: ClusterIP
+
 
 ---
 
