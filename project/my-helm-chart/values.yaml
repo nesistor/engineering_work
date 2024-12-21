@@ -24,7 +24,7 @@ vault:
     enabled: true
     backend:
       consul:
-        address: "microservices-consul-service.microservices-app.svc.cluster.local:8500" # Consul jako backend
+        address: "microservices-consul-service.microservices-app.svc.cluster.local:8500" 
         path: "vault/"
         scheme: "http"
   transit:
@@ -32,12 +32,12 @@ vault:
 
   seal:
     gcpckms:
-      project: "your-gcp-project-id"
-      region: "your-gcp-region"
-      key_ring: "your-key-ring"
-      crypto_key: "your-crypto-key"
+      project: "my-microservices-app"
+      region: "us-central1"
+      key_ring: "vault-keyring"
+      crypto_key: "vault-crypto-key"
       credentials: "/path/to/your/service-account-file.json"
-      auto_unseal: true  # Automatyczne unseal przy użyciu GCP KMS
+      auto_unseal: true
       enabled: true
 
 consul:

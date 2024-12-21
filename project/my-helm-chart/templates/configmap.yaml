@@ -36,10 +36,11 @@ data:
 
     # Seal configuration using Google Cloud KMS
     seal "gcpckms" {
-      project     = "your-gcp-project-id"
-      region      = "your-gcp-region"
-      key_ring    = "your-key-ring"
-      crypto_key  = "your-crypto-key"
-      credentials = "/path/to/your/service-account-file.json"
-      auto_unseal = true  # Automatyczne unseal
-    }
+      region      = "{{ .Values.vault.seal.gcpckms.region }}"
+      project     = "{{ .Values.vault.seal.gcpckms.project }}"
+      key_ring    = "{{ .Values.vault.seal.gcpckms.key_ring }}"
+      crypto_key  = "{{ .Values.vault.seal.gcpckms.crypto_key }}"
+      credentials = "/vault/secrets/gcloud-credentials.json" # Path to your service account key file
+      auto_unseal = true  # Enable automatic unseal
+      enabled     = true  # Ensure the seal mechanism is enabled
+    }   

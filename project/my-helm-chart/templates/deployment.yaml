@@ -71,6 +71,9 @@ spec:
             secretName: vault-policies
         - name: vault-data
           emptyDir: {}
+        - name: vault-gcloud-credentials
+          secret:
+            ecretName: gcloud-credentials-secret  # Secret name with GCP credentials
 
 
 

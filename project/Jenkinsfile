@@ -4,7 +4,7 @@ pipeline {
     environment {
         GCP_PROJECT = "my-microservices-app"
         GKE_CLUSTER = "my-gke-cluster"
-        GKE_ZONE = "us-central1-a"
+        GKE_ZONE = "us-central1"
         DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
