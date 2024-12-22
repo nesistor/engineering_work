@@ -73,9 +73,7 @@ spec:
           emptyDir: {}
         - name: vault-gcloud-credentials
           secret:
-            ecretName: gcloud-credentials-secret  # Secret name with GCP credentials
-
-
+            secretName: gcloud-credentials-secret  # Secret name with GCP credentials
 
 ---
 
