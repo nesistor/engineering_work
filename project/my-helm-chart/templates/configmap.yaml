@@ -40,7 +40,7 @@ data:
       project     = "{{ .Values.vault.seal.gcpckms.project }}"
       key_ring    = "{{ .Values.vault.seal.gcpckms.key_ring }}"
       crypto_key  = "{{ .Values.vault.seal.gcpckms.crypto_key }}"
-      credentials = "/vault/secrets/gcloud-credentials.json" # Path to your service account key file
+      credentials = "{{ .Values.vault.seal.gcpckms.credentials }}n" # Path to your service account key file
       auto_unseal = true  # Enable automatic unseal
       enabled     = true  # Ensure the seal mechanism is enabled
     }   

@@ -5,7 +5,3 @@ path "sys/mounts" {
 path "secret/*" {
   capabilities = ["read"]
 }
-
-path "jwt_keys/*" {
-  capabilities = ["read"]
-}
