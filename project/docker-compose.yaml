@@ -126,8 +126,8 @@ services:
 
   flyway:
     build:
-      context: ./../migrations
-      dockerfile: ./../migrations/migrations.dockerfile
+      context: ./../flyway
+      dockerfile: ./../flyway/flyway.dockerfile
     depends_on:
       - postgres-users
     restart: on-failure

@@ -64,31 +64,3 @@ build_logger:
 	@echo "Building logger binary..."
 	cd ../logger-service && env GOOS=linux CGO_ENABLED=0 go build -o ${LOGGER_BINARY} ./cmd/api
 	@echo "Done!"	
-
-
-
-
-# Możesz ustawić tutaj inną komendę, np.:
-# KUBECTL=k3s kubectl  # dla K3s
-# KUBECTL=oc           # dla OpenShift
-KUBECTL=kubectl	
-
-# Deploy all services
-deploy:
-	$(KUBECTL) apply -f k8s/configmaps
-	$(KUBECTL) apply -f k8s/secrets
-	$(KUBECTL) apply -f k8s/volumes
-	$(KUBECTL) apply -f k8s/deployments
-	$(KUBECTL) apply -f k8s/services
-
-# Delete all services
-clean:
-	$(KUBECTL) delete -f k8s/deployments
-	$(KUBECTL) delete -f k8s/services
-	$(KUBECTL) delete -f k8s/configmaps
-	$(KUBECTL) delete -f k8s/secrets
-	$(KUBECTL) delete -f k8s/volumes
-
-# Status
-status:
-	$(KUBECTL) get all -n your-namespace

@@ -4,6 +4,8 @@ resource "google_container_cluster" "gke_cluster" {
 
   initial_node_count = 2
 
+  deletion_protection = false
+
   node_config {
     machine_type = "e2-medium"
     oauth_scopes = [
@@ -20,21 +22,11 @@ resource "google_container_node_pool" "primary_node_pool" {
 
   node_config {
     machine_type = "e2-medium"
+    disk_size_gb = 50  # Reduce disk size per node
+    disk_type    = "pd-standard"  # Use standard disks instead of SSD
     oauth_scopes = [
       "https://www.googleapis.com/auth/cloud-platform",
     ]
   }
 }
 
-resource "google_service_account" "sa" {
-  account_id   = "my-service-account"
-  display_name = "My Service Account"
-  project      = var.gcp_project
-}
-
-# KMS Module
-module "kms" {
-  source      = "./kms"        # Ścieżka do modułu KMS
-  kms_keyring = var.kms_keyring
-  kms_key     = var.kms_key
-}

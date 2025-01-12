@@ -27,8 +27,3 @@ output "helm_release_name" {
   description = "Name of the Helm release"
   value       = "microservices"
 }
-
-output "service_account_email" {
-  description = "Email of the Google service account used"
-  value       = google_service_account.sa.email
-}
