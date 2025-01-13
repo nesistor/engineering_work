@@ -8,7 +8,7 @@ pipeline {
         DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
-        KUBECONFIG = "~/.kube/config"
+        KUBECONFIG = "var/lib/jenkins/.kube/config"
         GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
         PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"  
     }
