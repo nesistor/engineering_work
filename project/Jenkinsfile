@@ -4,7 +4,7 @@ pipeline {
     environment {
         GCP_PROJECT = "my-microservices-app"
         GKE_CLUSTER = "my-gke-cluster"
-        GKE_ZONE = "us-central1"
+        GKE_ZONE = "us-central1-a"
         DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
@@ -40,7 +40,7 @@ pipeline {
                 }
             }
         }
-        stage('Terraform Init and Apply') {
+        /*stage('Terraform Init and Apply') {
             steps {
                 script {
                     echo "Initializing and applying Terraform"
@@ -50,7 +50,7 @@ pipeline {
                     """
                 }
             }
-        }
+        }*/
 
         stage('Build Docker Images') {
             steps {
