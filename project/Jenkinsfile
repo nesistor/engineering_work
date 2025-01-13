@@ -8,7 +8,7 @@ pipeline {
         DOCKER_REGISTRY = "us-central1-docker.pkg.dev/${GCP_PROJECT}/my-microservices-repo"
         HELM_PATH = "/usr/local/bin/helm"
         KUBECTL_PATH = "/usr/local/bin/kubectl"
-        KUBECONFIG = "var/lib/jenkins/.kube/config"
+        KUBECONFIG = "/var/lib/jenkins/.kube/config"
         GCLOUD_PATH = "/var/lib/jenkins/google-cloud-sdk/bin"
         PATH = "/var/lib/jenkins/google-cloud-sdk/bin:$PATH"  
     }
@@ -93,16 +93,6 @@ pipeline {
                 }
             }
         }
-        stage('Install gke-gcloud-auth-plugin') {
-            steps {
-                script {
-                    sh """
-                        echo "Installing gke-gcloud-auth-plugin..."
-                        gcloud components install gke-gcloud-auth-plugin -q
-                    """
-                }
-            }
-        }
 
         stage('Create Kubernetes Secret for GCR') {
             steps {
@@ -114,9 +104,20 @@ pipeline {
                             --docker-server=us-central1-docker.pkg.dev \
                             --docker-username=_json_key \
                             --docker-password="\$(cat \${GOOGLE_APPLICATION_CREDENTIALS} | tr -d '\\n')" \
-                            --docker-email=goappdm@gmail.com --validate=false -o yaml | kubectl apply -f -
+                            --docker-email=youremail@example.com --dry-run=client -o yaml | kubectl apply -f -
                         """
                     }
+                }
+            }
+        }
+
+        stage('Install gke-gcloud-auth-plugin') {
+            steps {
+                script {
+                    sh """
+                        echo "Installing gke-gcloud-auth-plugin..."
+                        gcloud components install gke-gcloud-auth-plugin -q
+                    """
                 }
             }
         }
