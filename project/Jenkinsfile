@@ -93,6 +93,16 @@ pipeline {
                 }
             }
         }
+        stage('Install gke-gcloud-auth-plugin') {
+            steps {
+                script {
+                    sh """
+                        echo "Installing gke-gcloud-auth-plugin..."
+                        gcloud components install gke-gcloud-auth-plugin -q
+                    """
+                }
+            }
+        }
 
         stage('Create Kubernetes Secret for GCR') {
             steps {
@@ -107,17 +117,6 @@ pipeline {
                             --docker-email=goappdm@gmail.com --validate=false -o yaml | kubectl apply -f -
                         """
                     }
-                }
-            }
-        }
-
-        stage('Install gke-gcloud-auth-plugin') {
-            steps {
-                script {
-                    sh """
-                        echo "Installing gke-gcloud-auth-plugin..."
-                        gcloud components install gke-gcloud-auth-plugin -q
-                    """
                 }
             }
         }
