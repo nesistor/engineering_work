@@ -1,0 +1,179 @@
+### Email Microservice Documentation
+
+This document describes the **Email Microservice**, which facilitates sending emails using SMTP. The service is designed to be integrated with other microservices, providing them with a simple API to send emails, including support for HTML and plain-text messages with optional attachments.
+
+---
+
+#### Table of Contents
+
+1. **Overview**
+2. **Environment Variables**
+3. **Endpoints**
+4. **Request and Response Format**
+5. **Components**
+6. **Templates**
+
+---
+
+### 1. Overview
+
+The Email Microservice is implemented in Go and provides:
+- REST API for sending emails (`/send`).
+- SMTP integration for outgoing mail.
+- Support for HTML and plain-text email templates.
+- Handling of email attachments.
+
+The service is built using the `go-chi` router and integrates third-party libraries for SMTP (`go-simple-mail/v2`) and CSS inlining (`go-premailer`).
+
+---
+
+### 2. Environment Variables
+
+The microservice requires the following environment variables:
+
+| Variable         | Description                     | Example Value       |
+|-------------------|---------------------------------|---------------------|
+| `MAIL_DOMAIN`    | Domain for sending emails.      | `example.com`       |
+| `MAIL_HOST`      | SMTP host.                      | `smtp.example.com`  |
+| `MAIL_PORT`      | SMTP port.                      | `587`               |
+| `MAIL_USERNAME`  | SMTP username.                  | `user@example.com`  |
+| `MAIL_PASSWORD`  | SMTP password.                  | `password123`       |
+| `MAIL_ENCRYPTION`| Encryption type (`tls`, `ssl`, `none`). | `tls`         |
+| `FROM_NAME`      | Default "From" name.            | `Example Service`   |
+| `FROM_ADDRESS`   | Default "From" email address.   | `no-reply@example.com` |
+
+---
+
+### 3. Endpoints
+
+#### **POST /send**
+Send an email with the specified content.
+
+**Request Payload:**
+```json
+{
+  "from": "custom@example.com",
+  "to": "recipient@example.com",
+  "subject": "Hello!",
+  "message": "This is the email content."
+}
+```
+
+- `from` (optional): Sender email address.
+- `to` (required): Recipient email address.
+- `subject` (required): Subject of the email.
+- `message` (required): Content of the email (supports plain text and HTML).
+
+**Response Format:**
+- Success (`202 Accepted`):
+  ```json
+  {
+    "error": false,
+    "message": "sent to recipient@example.com"
+  }
+  ```
+- Failure (`400 Bad Request`):
+  ```json
+  {
+    "error": true,
+    "message": "Error message"
+  }
+  ```
+
+---
+
+### 4. Components
+
+#### **main.go**
+- Initializes the service by creating the `Config` struct and setting up the HTTP server.
+- Reads environment variables and configures the `Mail` object.
+
+#### **routes.go**
+- Defines the REST API routes using `go-chi`.
+- Middleware:
+  - **CORS**: Enables cross-origin requests.
+  - **Heartbeat**: Health check at `/ping`.
+
+#### **mailer.go**
+Handles email construction and sending:
+- **Templates**: Supports both HTML (`mail.html.gohtml`) and plain-text (`mail.plain.gohtml`) templates.
+- **Attachments**: Allows adding files to emails.
+- **SMTP Configuration**: Uses `go-simple-mail` for sending emails with TLS/SSL support.
+
+#### **helpers.go**
+Utility functions for JSON serialization/deserialization:
+- `readJSON`: Parses JSON from request body.
+- `writeJSON`: Sends JSON responses.
+- `errorJSON`: Sends error responses.
+
+#### **handlers.go**
+- Defines the `/send` handler for sending emails.
+- Validates and processes the incoming request payload.
+
+---
+
+### 5. Templates
+
+#### HTML Email Template: `mail.html.gohtml`
+```html
+{{define "body"}}
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title></title>
+    </head>
+    <body>
+        <p>{{.message}}</p>
+    </body>
+</html>
+{{end}}
+```
+
+#### Plain Text Email Template: `mail.plain.gohtml`
+```plaintext
+{{define "body"}}
+{{.message}}
+{{end}}
+```
+
+Both templates use Go's `text/template` package for rendering dynamic content.
+
+---
+
+### 6. Example Usage
+
+#### Running the Service
+Set the required environment variables and run the service:
+```bash
+export MAIL_DOMAIN=example.com
+export MAIL_HOST=smtp.example.com
+export MAIL_PORT=587
+export MAIL_USERNAME=user@example.com
+export MAIL_PASSWORD=yourpassword
+export MAIL_ENCRYPTION=tls
+export FROM_NAME="Example Service"
+export FROM_ADDRESS=no-reply@example.com
+
+go run main.go
+```
+
+#### Sending an Email
+Use `curl` to send an email:
+```bash
+curl -X POST http://localhost:80/send \
+-H "Content-Type: application/json" \
+-d '{
+  "from": "custom@example.com",
+  "to": "recipient@example.com",
+  "subject": "Welcome!",
+  "message": "Hello, and welcome to our service."
+}'
+```
+
+#### Health Check
+Verify the service is running:
+```bash
+curl http://localhost:80/ping
+```

@@ -1,0 +1,109 @@
+User-Service System Documentation
+
+The User-Service System is a microservice responsible for user management within a larger system. Its functionalities include user registration, authentication, password reset, data updates, and inter-service communication via gRPC. The project is implemented in Go and utilizes various technologies and tools such as PostgreSQL, Vault, gRPC, and REST API.
+System Architecture
+
+The service consists of the following components:
+
+    HTTP REST API
+    Handles user registration, login, and management requests.
+
+    gRPC API
+    Enables fast and reliable user authentication for other microservices.
+
+    PostgreSQL
+    Stores user-related data.
+
+    Vault
+    Manages keys and secrets, storing configurations and encryption keys.
+
+    Logger-Service
+    Logs user activity and system events.
+
+Functionalities
+REST API
+User Registration
+
+    Endpoint: /register
+    Method: POST
+    Description: Registers a new user with provided data (email, password, username).
+
+Fetch User List
+
+    Endpoint: /users
+    Method: GET
+    Description: Retrieves a list of all registered users.
+
+Email Check
+
+    Endpoint: /check-email
+    Method: POST
+    Description: Checks if the given email is already registered.
+
+Password Reset
+
+    Endpoint: /reset-password
+    Method: POST
+    Description: Sends a password reset link to the specified email address.
+
+Password Update
+
+    Endpoint: /update-password
+    Method: POST
+    Description: Updates the user's password using a provided token and new password.
+
+User Deletion
+
+    Endpoint: /delete-user
+    Method: DELETE
+    Description: Deletes a user by their ID.
+
+gRPC API
+User Validation
+
+    Method: ValidateUser
+    Description: Verifies the accuracy of user login credentials (email and password).
+
+Key Management
+
+Encryption keys are stored in Vault and automatically refreshed every hour.
+Code Structure
+
+    main.go
+    Entry point of the application, initializing database and Vault connections, and setting up HTTP and gRPC servers.
+
+    handlers.go
+    Implements REST API handlers (e.g., registration, login, password reset).
+
+    grpc.go
+    Contains the gRPC server implementation and the ValidateUser method.
+
+    routes.go
+    Defines HTTP REST API routes.
+
+    models.go
+    Handles database logic (retrieving, inserting, updating, and deleting records).
+
+    keys.go
+    Manages encryption keys using Vault.
+
+Technologies Used
+
+    Programming Language: Go
+    Database: PostgreSQL
+    Inter-Service Communication: gRPC, REST
+    Secrets Management: HashiCorp Vault
+    Testing & Logging: Logger-Service
+
+System Requirements
+
+    PostgreSQL database with the necessary tables for users and tokens.
+    A configured Vault server with an accessible address and token.
+    A Go environment with the required modules (pgx, grpc, etc.) specified in go.mod.
+
+Deployment Instructions
+
+    Configure the following environment variables:
+        VAULT_ADDR: Vault server address.
+        VAULT_TOKEN: Vault access token.
+        DSN: PostgreSQL connection string.
