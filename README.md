@@ -1,4 +1,4 @@
-# Secure JWT Microservices Deployment with Vault and Google Cloud KMS
+# Design and implementation of a microservice application for notification management with JSON Web Token-based authentication
 
 ## Overview
 
