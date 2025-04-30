@@ -26,3 +26,4 @@ frontned/*.ntvs*
 frontned/*.njsproj
 frontned/*.sln
 frontned/*.sw?
+.qodo
